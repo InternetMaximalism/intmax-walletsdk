@@ -11,6 +11,9 @@ importers:
       '@biomejs/biome':
         specifier: 1.5.3
         version: 1.5.3
+      husky:
+        specifier: ^9.0.7
+        version: 9.0.7
 
 packages:
 
@@ -101,3 +104,9 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
+
+  /husky@9.0.7:
+    resolution: {integrity: sha512-vWdusw+y12DUEeoZqW1kplOFqk3tedGV8qlga8/SF6a3lOiWLqGZZQvfWvY0fQYdfiRi/u1DFNpudTSV9l1aCg==}
+    engines: {node: '>=18'}
+    hasBin: true
+    dev: true
