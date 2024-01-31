@@ -1,0 +1,19 @@
+{
+  "name": "@webmax2/wallet",
+  "description": "",
+  "version": "0.0.1",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "sideEffects": false,
+  "type": "module",
+  "main": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm run clean && npm run build:esm",
+    "build:esm": "tsc --project tsconfig.json",
+    "clean": "rimraf dist",
+    "typecheck": "tsc --noEmit"
+  }
+}
