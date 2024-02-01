@@ -15,5 +15,8 @@
     "build:esm": "tsc --project tsconfig.json",
     "clean": "rimraf dist",
     "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "viem": "^2.7.1"
   }
 }
