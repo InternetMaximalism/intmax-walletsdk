@@ -1,4 +1,4 @@
-import type { ClientMode } from "./types";
+import type { ClientMode } from "./types/messaging";
 
 export const parentWindow = (): Window | null => {
 	if (typeof window === "undefined") return null;
@@ -21,7 +21,6 @@ export const sendMessage = (message: unknown) => {
 };
 
 export const onMessage = (callback: (message: unknown) => void) => {
-	// biome-ignore lint/nursery/noEmptyBlockStatements: for consistency
 	if (typeof window === "undefined") return () => {};
 	const listener = (event: MessageEvent) => {
 		if (event.source !== parentWindow()) return;

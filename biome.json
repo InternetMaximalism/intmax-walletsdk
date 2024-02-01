@@ -18,6 +18,9 @@
 			"all": true,
 			"style": {
 				"useBlockStatements": "off"
+			},
+			"nursery": {
+				"useImportRestrictions": "off"
 			}
 		}
 	}
