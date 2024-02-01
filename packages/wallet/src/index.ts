@@ -1,1 +1,1 @@
-export const sayHello = () => console.log("Hello World!");
+export * from "./walletClient";
