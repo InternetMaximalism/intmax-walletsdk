@@ -2,11 +2,10 @@ import type { AddEthereumChainParameter, TransactionRequest, WatchAssetParams } 
 
 export type Namespaces = {
 	EIP155: "eip155";
-	EIP155_CHAIN: `eip155:${number}`;
 	WEBMAX: "webmax";
 };
-
 export type Namespace = Namespaces[keyof Namespaces];
+export type ChainedNamespace<NS extends Namespace = Namespace> = `${NS}:${string}`;
 
 export type EthereumAddress = `0x${string}`;
 export type Hex = `0x${string}`;
@@ -14,6 +13,7 @@ export type Hash = `0x${string}`;
 
 export type WebmaxHandshakeResult = {
 	supportedNamespaces: Namespace[];
+	supportedChains: ChainedNamespace[];
 };
 
 export type WebmaxMessageSchema = [
@@ -21,6 +21,7 @@ export type WebmaxMessageSchema = [
 	 * @description Handshake message sent when popup is opened and returns supported namespaces and chains to dApp.
 	 */
 	{
+		namespace: Namespaces["WEBMAX"];
 		method: "webmax_handshake";
 		params?: undefined;
 		result: WebmaxHandshakeResult;
@@ -29,6 +30,7 @@ export type WebmaxMessageSchema = [
 	 * @description Forbidden message sent when dApp tries to call a method before walletconnect.
 	 */
 	{
+		namespace: Namespaces["WEBMAX"];
 		method: "webmax_forbidden";
 		params?: [napespace: Namespace, method: string];
 		result?: undefined;
@@ -41,7 +43,7 @@ export type EIP1193MessageSchema = [
 	 * @link https://eips.ethereum.org/EIPS/eip-1102
 	 */
 	{
-		namespace: Namespaces["EIP155_CHAIN"];
+		namespace: Namespaces["EIP155"];
 		method: "eth_requestAccounts";
 		params?: undefined;
 		result: EthereumAddress[];
@@ -51,31 +53,31 @@ export type EIP1193MessageSchema = [
 	 * @link https://eips.ethereum.org/EIPS/eip-1193
 	 */
 	{
-		namespace: Namespaces["EIP155_CHAIN"];
+		namespace: Namespaces["EIP155"];
 		method: "eth_sendTransaction";
-		params: [transaction: TransactionRequest];
+		params: [transaction: TransactionRequest<string>];
 		result: Hash;
 	},
 	{
-		namespace: Namespaces["EIP155_CHAIN"] | Namespaces["EIP155"];
+		namespace: Namespaces["EIP155"];
 		method: "eth_sign";
 		params: [address: EthereumAddress, data: Hex];
 		result: Hex;
 	},
 	{
-		namespace: Namespaces["EIP155_CHAIN"];
+		namespace: Namespaces["EIP155"];
 		method: "eth_signTransaction";
-		params: [transaction: TransactionRequest];
+		params: [transaction: TransactionRequest<string>];
 		result: Hex;
 	},
 	{
-		namespace: Namespaces["EIP155_CHAIN"];
+		namespace: Namespaces["EIP155"];
 		method: "eth_signTypedData_v4";
 		params: [address: EthereumAddress, message: string];
 		result: Hex;
 	},
 	{
-		namespace: Namespaces["EIP155_CHAIN"] | Namespaces["EIP155"];
+		namespace: Namespaces["EIP155"];
 		method: "personal_sign";
 		params: [data: Hex, address: EthereumAddress];
 		result: Hex;
@@ -93,9 +95,23 @@ export type EIP1193MessageSchema = [
 		result: null;
 	},
 	{
-		namespace: Namespaces["EIP155_CHAIN"];
+		namespace: Namespaces["EIP155"];
 		method: "wallet_watchAsset";
 		params: [asset: WatchAssetParams];
 		result: null;
 	},
 ];
+
+export type MessageSchema = [...WebmaxMessageSchema, ...EIP1193MessageSchema];
+
+export type MessageMethod<NS extends Namespace> = Extract<MessageSchema[number], { namespace: NS }>["method"];
+
+export type MessageParams<NS extends Namespace, Method extends string> = Extract<
+	Extract<MessageSchema[number], { namespace: NS; method: Method }>,
+	{ namespace: NS; method: Method }
+>["params"];
+
+export type MessageResult<NS extends Namespace, Method extends string> = Extract<
+	Extract<MessageSchema[number], { namespace: NS; method: Method }>,
+	{ namespace: NS; method: Method }
+>["result"];
