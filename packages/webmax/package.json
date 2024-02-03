@@ -1,22 +1,40 @@
 {
-  "name": "@webmax2/wallet",
-  "description": "",
-  "version": "0.0.1",
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "sideEffects": false,
-  "type": "module",
-  "main": "dist/esm/index.js",
-  "types": "dist/types/index.d.ts",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm run clean && npm run build:esm",
-    "build:esm": "tsc --project tsconfig.json",
-    "clean": "rimraf dist",
-    "typecheck": "tsc --noEmit"
-  },
-  "devDependencies": {
-    "viem": "^2.7.1"
-  }
+	"name": "@webmax2/wallet",
+	"description": "",
+	"version": "0.0.1",
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"sideEffects": false,
+	"type": "module",
+	"main": "dist/esm/index.js",
+	"types": "dist/types/index.d.ts",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"build": "npm run clean && npm run build:esm",
+		"build:esm": "tsc --project tsconfig.json",
+		"clean": "rimraf dist",
+		"typecheck": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"viem": "^2.7.1"
+	},
+	"exports": {
+		".": {
+			"types": "./dist/types/index.d.ts",
+			"import": "./dist/esm/index.js"
+		},
+		"./wallet": {
+			"types": "./dist/types/wallet/index.d.ts",
+			"import": "./dist/esm/wallet/index.js"
+		},
+		"./dapp": {
+			"types": "./dist/types/dapp/index.d.ts",
+			"import": "./dist/esm/dapp/index.js"
+		},
+		"./types/": {
+			"types": "./dist/types/index.d.ts",
+			"import": "./dist/esm/index.js"
+		}
+	}
 }
