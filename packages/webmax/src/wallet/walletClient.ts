@@ -1,7 +1,7 @@
+import { AbstractResponse } from "../types/messaging";
+import { MessageMethod, Namespace, WalletClientMessageSchema } from "../types/protocol";
 import { WebmaxWalletContext, createWebmaxWalletContext } from "./context";
 import { onMessage, sendMessage } from "./messaging";
-import { AbstractResponse } from "./types/messaging";
-import { MessageMethod, Namespace } from "./types/protocol";
 
 // biome-ignore lint/suspicious/noExplicitAny:
 type WebmaxWalletClientHandler<NS extends Namespace = any, Method extends string = any> = (
@@ -9,7 +9,7 @@ type WebmaxWalletClientHandler<NS extends Namespace = any, Method extends string
 ) => AbstractResponse | Promise<AbstractResponse>;
 
 export type WebmaxWalletClient = {
-	on: <NS extends Namespace, Method extends MessageMethod<NS>>(
+	on: <NS extends Namespace, Method extends MessageMethod<WalletClientMessageSchema, NS>>(
 		path: `${NS}/${Method}`,
 		cb: WebmaxWalletClientHandler<NS, Method>,
 	) => void;

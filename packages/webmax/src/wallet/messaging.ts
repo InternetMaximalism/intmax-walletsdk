@@ -1,4 +1,4 @@
-import type { AbstractResponse, ClientMode } from "./types/messaging";
+import type { AbstractResponse, ClientMode } from "../types/messaging";
 
 export const parentWindow = (): Window | null => {
 	if (typeof window === "undefined") return null;

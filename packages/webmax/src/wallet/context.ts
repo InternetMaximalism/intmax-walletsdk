@@ -1,17 +1,27 @@
-import { AbstractErrorResponse, AbstractRequest, AbstractSuccessResponse, WindowHandling } from "./types/messaging";
-import { ChainedNamespace, MessageMethod, MessageParams, MessageResult, Namespace } from "./types/protocol";
+import { AbstractErrorResponse, AbstractRequest, AbstractSuccessResponse, WindowHandling } from "../types/messaging";
+import {
+	ChainedNamespace,
+	MessageMethod,
+	MessageParams,
+	MessageResult,
+	Namespace,
+	WalletClientMessageSchema,
+} from "../types/protocol";
 
 export type WebmaxWalletContext<NS extends Namespace, Method extends string> = {
 	namespace: ChainedNamespace<NS> | NS;
 	method: Method;
-	params: MessageParams<NS, Method>;
+	params: MessageParams<WalletClientMessageSchema, NS, Method>;
 	raw: { request: AbstractRequest; event: MessageEvent };
 	window: (handling: WindowHandling) => void;
-	success: (result: MessageResult<NS, Method>) => AbstractSuccessResponse;
+	success: (result: MessageResult<WalletClientMessageSchema, NS, Method>) => AbstractSuccessResponse;
 	failure: (message: string, opt?: { code?: number; window?: WindowHandling }) => AbstractErrorResponse;
 };
 
-export const createWebmaxWalletContext = <NS extends Namespace, Method extends MessageMethod<NS>>(
+export const createWebmaxWalletContext = <
+	NS extends Namespace,
+	Method extends MessageMethod<WalletClientMessageSchema, NS>,
+>(
 	event: MessageEvent,
 ) => {
 	type Context = WebmaxWalletContext<NS, Method>;

@@ -122,6 +122,10 @@ export type EIP1193ReadonlyMessageSchema = [
 	},
 ];
 
+export type WalletClientMessageSchema = [...WebmaxMessageSchema, ...EIP1193MessageSchema];
+
+export type DappMessageSchema = [...WebmaxMessageSchema, ...EIP1193MessageSchema, ...EIP1193ReadonlyMessageSchema];
+
 export type MessageMethod<Schemas extends AbstractMessageSchema[], NS extends Namespace> = Extract<
 	Schemas[number],
 	{ namespace: NS }
