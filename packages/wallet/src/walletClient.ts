@@ -36,6 +36,7 @@ export const webmaxWalletClient = (): WebmaxWalletClient => {
 			const payload = { id: 0, namespace: "webmax", method: "webmax_handshake", params: undefined };
 			const handshakeMessage = new MessageEvent("message", { data: payload });
 			dispatch(handshakeMessage);
+			1;
 		},
 		destruct: () => clean(),
 	};

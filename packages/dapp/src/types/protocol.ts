@@ -8,6 +8,13 @@ export type EthereumAddress = `0x${string}`;
 export type Hex = `0x${string}`;
 export type Hash = `0x${string}`;
 
+export type AbstractMessageSchema = {
+	namespace: Namespace;
+	method: string;
+	params?: unknown;
+	result?: unknown;
+};
+
 export type WebmaxHandshakeResult = {
 	supportedNamespaces: Namespace[];
 	supportedChains: ChainedNamespace[];
@@ -100,16 +107,34 @@ export type EIP1193MessageSchema = [
 	},
 ];
 
-export type MessageSchema = [...WebmaxMessageSchema, ...EIP1193MessageSchema];
+export type EIP1193ReadonlyMessageSchema = [
+	{
+		namespace: Namespaces["EIP155"];
+		method: "eth_accounts";
+		params?: undefined;
+		result: EthereumAddress[];
+	},
+	{
+		namespace: Namespaces["EIP155"];
+		method: "eth_chainId";
+		params?: undefined;
+		result: string;
+	},
+];
 
-export type MessageMethod<NS extends Namespace> = Extract<MessageSchema[number], { namespace: NS }>["method"];
+export type MessageMethod<Schemas extends AbstractMessageSchema[], NS extends Namespace> = Extract<
+	Schemas[number],
+	{ namespace: NS }
+>["method"];
 
-export type MessageParams<NS extends Namespace, Method extends string> = Extract<
-	Extract<MessageSchema[number], { namespace: NS; method: Method }>,
-	{ namespace: NS; method: Method }
->["params"];
+export type MessageParams<
+	Schemas extends AbstractMessageSchema[],
+	NS extends Namespace,
+	Method extends string,
+> = Extract<Extract<Schemas[number], { namespace: NS; method: Method }>, { namespace: NS; method: Method }>["params"];
 
-export type MessageResult<NS extends Namespace, Method extends string> = Extract<
-	Extract<MessageSchema[number], { namespace: NS; method: Method }>,
-	{ namespace: NS; method: Method }
->["result"];
+export type MessageResult<
+	Schemas extends AbstractMessageSchema[],
+	NS extends Namespace,
+	Method extends string,
+> = Extract<Extract<Schemas[number], { namespace: NS; method: Method }>, { namespace: NS; method: Method }>["result"];
