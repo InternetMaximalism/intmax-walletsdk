@@ -49,6 +49,7 @@ export const createWebmaxDappClient = (opt: WebmaxDappClientOptions): WebmaxDapp
 		},
 		provider: (namespace) => {
 			if (namespace !== "eip155") throw new Error("Not implemented");
+			// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: This is a complex function
 			const request = async (method: string, params: unknown) => {
 				if (WALLET_ACTION_METHODS.includes(method)) {
 					const message = { namespace, method, params };
