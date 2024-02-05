@@ -5,7 +5,7 @@ import { Account, english, generateMnemonic, mnemonicToAccount } from "viem/acco
 const cache = new Map<string, Account>();
 const getAccount = (mnemonic: string, index: number) => {
 	const key = `${mnemonic}-${index}`;
-	if (cache.has(key)) return cache.get(key);
+	if (cache.has(key)) return cache.get(key) as Account;
 	const account = mnemonicToAccount(mnemonic, { addressIndex: index });
 	cache.set(key, account);
 	return account;
