@@ -10,6 +10,7 @@
 	},
 	"dependencies": {
 		"@radix-ui/react-slot": "^1.0.2",
+		"@tanstack/react-query": "^5.18.1",
 		"class-variance-authority": "^0.7.0",
 		"clsx": "^2.1.0",
 		"localforage": "^1.10.0",
@@ -21,7 +22,9 @@
 		"sort-by": "^1.2.0",
 		"tailwind-merge": "^2.2.1",
 		"tailwindcss-animate": "^1.0.7",
-		"webmax2": "workspace:^"
+		"viem": "^2.7.1",
+		"webmax2": "workspace:^",
+		"zustand": "^4.5.0"
 	},
 	"devDependencies": {
 		"@types/node": "^20.11.16",
