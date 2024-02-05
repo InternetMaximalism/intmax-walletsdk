@@ -1,3 +1,4 @@
+import { AccountAvatar } from "@/components/AccountAvatar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,10 +31,7 @@ export const AccountSwitcher = () => {
 					aria-label="Select a team"
 					className="w-48 justify-between"
 				>
-					<Avatar className="mr-2 h-5 w-5">
-						<AvatarImage src="/avatars/02.png" />
-						<AvatarFallback>IN</AvatarFallback>
-					</Avatar>
+					<AccountAvatar className="mr-2 h-5 w-5" account={account} />
 					<span className="truncate">{account?.address}</span>
 					<ChevronDown className="ml-auto h-5 w-5 shrink-0 opacity-50" />
 				</Button>
@@ -46,10 +44,7 @@ export const AccountSwitcher = () => {
 						<CommandGroup heading="Accounts">
 							{accounts.map((_account) => (
 								<CommandItem key={_account?.address} className="text-sm">
-									<Avatar className="mr-2 h-5 w-5">
-										<AvatarImage src={`/avatars/${_account?.address}.png`} alt={_account?.address} />
-										<AvatarFallback>SC</AvatarFallback>
-									</Avatar>
+									<AccountAvatar className="mr-2 h-5 w-5" account={_account} />
 									<span className="truncate">{_account?.address}</span>
 									<CheckIcon
 										className={cn(
