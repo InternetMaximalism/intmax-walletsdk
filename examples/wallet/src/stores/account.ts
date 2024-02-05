@@ -11,9 +11,9 @@ export type AccountState = {
 };
 
 const initialState = {
-	mnemonic: null,
-	indexes: [],
-	current: null,
+	mnemonic: "legal winner thank year wave sausage worth useful legal winner thank yellow",
+	indexes: [0],
+	current: 0,
 };
 
 export const useAccountStore = create<AccountState>((set) => ({
