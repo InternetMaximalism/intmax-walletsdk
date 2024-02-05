@@ -1,14 +1,18 @@
-name: Vercel Dapps Deployment
+name: Vercel Dapp Deployment
 env:
   NODE_VERSION: "18.19.0"
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_DAPPS }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_DAPP }}
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN_WEBMAX2 }}
 on:
   push:
+    branches:
+      - main
+    paths:
+      - "examples/dapp/**"
 
 jobs:
-  Deploy-Home:
+  Deploy-Dapp:
     runs-on: ubuntu-latest
 
     steps:

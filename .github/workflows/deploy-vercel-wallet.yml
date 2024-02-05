@@ -6,9 +6,13 @@ env:
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN_WEBMAX2 }}
 on:
   push:
+    branches:
+      - main
+    paths:
+      - "examples/wallet/**"
 
 jobs:
-  Deploy-Home:
+  Deploy-Wallet:
     runs-on: ubuntu-latest
 
     steps:
