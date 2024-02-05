@@ -7,6 +7,8 @@ import GlobalLayout from "./app/layout";
 import SettingsPage from "./app/settings";
 import "./globals.css";
 
+import { Toaster } from "@/components/ui/sonner";
+
 const router = createBrowserRouter([
 	{
 		path: "/",
@@ -24,6 +26,7 @@ if (!root) throw new Error("Root element not found");
 
 ReactDOM.createRoot(root).render(
 	<React.StrictMode>
+		<Toaster />
 		<RouterProvider router={router} />
 	</React.StrictMode>,
 );
