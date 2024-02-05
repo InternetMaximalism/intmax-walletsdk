@@ -1,10 +1,18 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import {
+	Command,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
+	CommandSeparator,
+} from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAccount, useAccounts } from "@/hooks/account";
 import { cn } from "@/lib/utils";
-import { CheckIcon, ChevronDown } from "lucide-react";
+import { CheckIcon, ChevronDown, PlusCircleIcon } from "lucide-react";
 import { useState } from "react";
 
 export const AccountSwitcher = () => {
@@ -51,6 +59,15 @@ export const AccountSwitcher = () => {
 									/>
 								</CommandItem>
 							))}
+						</CommandGroup>
+					</CommandList>
+					<CommandSeparator />
+					<CommandList>
+						<CommandGroup>
+							<CommandItem>
+								<PlusCircleIcon className="mr-2 h-5 w-5" />
+								Create new
+							</CommandItem>
 						</CommandGroup>
 					</CommandList>
 				</Command>
