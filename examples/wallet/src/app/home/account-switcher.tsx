@@ -1,5 +1,4 @@
 import { AccountAvatar } from "@/components/AccountAvatar";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
 	Command,
@@ -32,7 +31,7 @@ export const AccountSwitcher = () => {
 					className="w-48 justify-between"
 				>
 					<AccountAvatar className="mr-2 h-5 w-5" account={account} />
-					<span className="truncate">{account?.address}</span>
+					<span className="truncate">{account?.ens || account?.address}</span>
 					<ChevronDown className="ml-auto h-5 w-5 shrink-0 opacity-50" />
 				</Button>
 			</PopoverTrigger>
@@ -45,7 +44,7 @@ export const AccountSwitcher = () => {
 							{accounts.map((_account) => (
 								<CommandItem key={_account?.address} className="text-sm">
 									<AccountAvatar className="mr-2 h-5 w-5" account={_account} />
-									<span className="truncate">{_account?.address}</span>
+									<span className="truncate">{_account?.ens || _account?.address}</span>
 									<CheckIcon
 										className={cn(
 											"ml-auto h-4 w-4 shrink-0",

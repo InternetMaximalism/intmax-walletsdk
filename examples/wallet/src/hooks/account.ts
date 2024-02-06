@@ -1,6 +1,18 @@
+import { ENSAccount, ensAccountsBatch } from "@/lib/blockchain/ens";
 import { useAccountStore } from "@/stores/account";
+import { useQueries } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 import { Account, english, generateMnemonic, mnemonicToAccount } from "viem/accounts";
+
+export const useENSAccounts = (accounts: Account[]) => {
+	const results = useQueries({
+		queries: accounts.map((account) => ({
+			queryKey: ["ens", account.address],
+			queryFn: () => ensAccountsBatch.fetch(account),
+		})),
+	});
+	return results;
+};
 
 const cache = new Map<string, Account>();
 const getAccount = (mnemonic: string, index: number) => {
@@ -15,24 +27,31 @@ export const useAccount = () => {
 	const mnemonic = useAccountStore((state) => state.mnemonic);
 	const current = useAccountStore((state) => state.current);
 
-	const account = useMemo(() => {
+	const _account = useMemo(() => {
 		if (!mnemonic || current === null) return null;
-		return getAccount(mnemonic, current);
+		return getAccount(mnemonic, current) as ENSAccount;
 	}, [mnemonic, current]);
 
-	return account ?? null;
+	const ensAccounts = useENSAccounts(_account ? [_account] : []);
+
+	return ensAccounts?.[0]?.data ?? _account ?? null;
 };
 
 export const useAccounts = () => {
 	const mnemonic = useAccountStore((state) => state.mnemonic);
 	const indexes = useAccountStore((state) => state.indexes);
 
-	const accounts = useMemo(() => {
+	const _accounts = useMemo(() => {
 		if (!mnemonic) return [];
 		return indexes.map((index) => getAccount(mnemonic, index));
 	}, [mnemonic, indexes]);
 
-	return accounts;
+	const results = useENSAccounts(_accounts);
+	const ensAccounts = results
+		.map((result, i) => result.data ?? _accounts[i])
+		.filter((account): account is ENSAccount => !!account);
+
+	return ensAccounts;
 };
 
 export const useGenerateAccount = () => {
