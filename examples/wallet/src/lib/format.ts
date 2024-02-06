@@ -68,7 +68,9 @@ type FormatterType = keyof typeof FORMATTERS;
 
 export const formatNumber = (value: number, type: FormatterType) => {
 	const rules = FORMATTERS[type];
-	const rule = rules.find((rule) => (rule.lt ? value < rule.lt : true));
+	const rule = rules
+		.sort((a, b) => (a.lt ?? Infinity) - (b.lt ?? Infinity))
+		.find((rule) => value < (rule.lt ?? Infinity));
 	if (!rule) throw new Error("No formatter found");
 	return typeof rule.formatter === "string" ? rule.formatter : rule.formatter.format(value);
 };

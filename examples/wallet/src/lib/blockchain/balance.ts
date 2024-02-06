@@ -16,11 +16,8 @@ const toBalanceWithPrice = (balance: AnkrBalance): BalanceWithPrice => {
 		balance.tokenType === "NATIVE"
 			? { chainId, type: "native", ...baseToken }
 			: { chainId, type: "erc20", address: balance.contractAddress as string, ...baseToken };
-	return {
-		token,
-		balance: BigInt(balance.balance),
-		priceUsd: Number(balance.tokenPrice),
-	};
+
+	return { token, balance: BigInt(balance.balanceRawInteger), priceUsd: Number(balance.tokenPrice) };
 };
 
 export const fetchAnkrBalanceWithPrice = async (params: { account: Account; chains: Chain[]; whitelist?: boolean }) => {
@@ -39,6 +36,7 @@ export const fetchAnkrBalanceWithPrice = async (params: { account: Account; chai
 	});
 
 	const balanceWithPrice = result.assets.map(toBalanceWithPrice);
+
 	return balanceWithPrice;
 };
 
