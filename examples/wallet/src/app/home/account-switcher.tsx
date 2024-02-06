@@ -1,4 +1,4 @@
-import { AccountAvatar } from "@/components/AccountAvatar";
+import { AccountAvatar } from "@/components/account-avatar";
 import { Button } from "@/components/ui/button";
 import {
 	Command,
