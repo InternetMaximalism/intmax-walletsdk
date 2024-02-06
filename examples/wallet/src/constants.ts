@@ -50,8 +50,10 @@ export const ANKR_BALANCE_CHAIN_MAP = {
 	[syscoin.id]: "syscoin",
 } satisfies Record<number, Blockchain>;
 
+export type AnkrBalanceChain = keyof typeof ANKR_BALANCE_CHAIN_MAP;
+
 export const getAnkrBalanceID = (chian: Chain) => {
-	const id = ANKR_BALANCE_CHAIN_MAP[chian.id as keyof typeof ANKR_BALANCE_CHAIN_MAP];
+	const id = ANKR_BALANCE_CHAIN_MAP[chian.id as AnkrBalanceChain];
 	return id ?? null;
 };
 
