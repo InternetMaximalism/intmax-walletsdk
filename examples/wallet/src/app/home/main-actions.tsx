@@ -1,4 +1,4 @@
-import { ProfileDrawer } from "@/components/drawers/ProfileDrawer";
+import { ProfileDrawer } from "@/components/drawers/profile-drawer";
 import { Button } from "@/components/ui/button";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { useState } from "react";
