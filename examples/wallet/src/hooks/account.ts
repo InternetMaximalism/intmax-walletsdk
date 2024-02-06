@@ -29,7 +29,9 @@ export const useAccount = () => {
 
 	const _account = useMemo(() => {
 		if (!mnemonic || current === null) return null;
-		return getAccount(mnemonic, current) as ENSAccount;
+		const account = getAccount(mnemonic, current) as ENSAccount;
+
+		return account;
 	}, [mnemonic, current]);
 
 	const ensAccounts = useENSAccounts(_account ? [_account] : []);

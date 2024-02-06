@@ -73,3 +73,36 @@ export const getAnkrRpcUrl = (chain: Chain): InternalRpcUrl => {
 	const ankrRpc = `https://rpc.ankr.com/${ankrChainId}/${ANKR_API_KEY}`;
 	return { url: ankrRpc };
 };
+
+export const CHAIN_LOGO_MAP = {
+	[mainnet.id]: "https://ankrscan.io/assets/blockchains/eth.svg",
+	[goerli.id]: "https://ankrscan.io/assets/blockchains/eth.svg",
+	[sepolia.id]: "https://ankrscan.io/assets/blockchains/eth.svg",
+	[arbitrum.id]: "https://ankrscan.io/assets/blockchains/arbitrum.svg",
+	[arbitrumSepolia.id]: "https://ankrscan.io/assets/blockchains/arbitrum.svg",
+	[avalanche.id]: "https://ankrscan.io/assets/blockchains/avalanche.svg",
+	[avalancheFuji.id]: "https://ankrscan.io/assets/blockchains/avalanche.svg",
+	[base.id]: "https://ankrscan.io/assets/blockchains/base.svg",
+	[bsc.id]: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/info/logo.png",
+	[bscTestnet.id]: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/info/logo.png",
+	[fantom.id]: "https://ankrscan.io/assets/blockchains/fantom.svg",
+	[flare.id]: "https://ankrscan.io/assets/blockchains/flare.svg",
+	[gnosis.id]: "https://ankrscan.io/assets/blockchains/gnosis.svg",
+	[linea.id]: "https://ankrscan.io/assets/blockchains/linea.svg",
+	[optimism.id]: "https://ankrscan.io/assets/blockchains/optimism.svg",
+	[optimismGoerli.id]: "https://ankrscan.io/assets/blockchains/optimism.svg",
+	[optimismSepolia.id]: "https://ankrscan.io/assets/blockchains/optimism.svg",
+	[polygon.id]: "https://ankrscan.io/assets/blockchains/polygon.svg",
+	[polygonMumbai.id]: "https://ankrscan.io/assets/blockchains/polygon.svg",
+	[polygonZkEvm.id]:
+		"https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygonzkevm/info/logo.png",
+	[rollux.id]: "https://ankrscan.io/assets/blockchains/rollux.svg",
+	[scroll.id]: "https://ankrscan.io/assets/blockchains/scroll.svg",
+	[scrollSepolia.id]: "https://ankrscan.io/assets/blockchains/scroll.svg",
+	[syscoin.id]: "https://ankrscan.io/assets/blockchains/syscoin.svg",
+};
+
+export const getChainLogo = (chain: Chain) => {
+	const logo = CHAIN_LOGO_MAP[chain.id as keyof typeof CHAIN_LOGO_MAP];
+	return logo ?? null;
+};
