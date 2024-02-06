@@ -171,6 +171,9 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.18.1
         version: 5.18.1(react@18.2.0)
+      '@yornaath/batshit':
+        specifier: ^0.9.0
+        version: 0.9.0
       boring-avatars:
         specifier: ^1.10.1
         version: 1.10.1
@@ -2612,6 +2615,16 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /@yornaath/batshit-devtools@1.6.0:
+    resolution: {integrity: sha512-ckKxrdfuFSRFz54tYU+VkD1eZOOaxa92U4eKOPtlxc1itB12Cqb1Dmk8Rqv6mARxp8YvocVGKbccrXoCwH2Lew==}
+    dev: false
+
+  /@yornaath/batshit@0.9.0:
+    resolution: {integrity: sha512-QdI1hQUPlpFT+o1iKLi9fQEKCli8c3UG7q4Ih8MP4jn+pyAjbfC4xaK5PwqSsSZgT0YeAZ0GWbbO9+1xAtWXlQ==}
+    dependencies:
+      '@yornaath/batshit-devtools': 1.6.0
+    dev: false
 
   /abitype@1.0.0(typescript@5.3.3)(zod@3.22.4):
     resolution: {integrity: sha512-NMeMah//6bJ56H5XRj8QCV4AwuW6hB6zqz2LnhhLdcWVQOsXki6/Pn3APeqxCma62nXIcmZWdu1DlHWS74umVQ==}
