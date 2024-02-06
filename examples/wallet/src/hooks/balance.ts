@@ -18,7 +18,7 @@ export const useAnkrBalances = (account: Account | null) => {
 		queryKey: ["ankrBalance", account?.address, lightKey(chains, "id"), testnetmode, whitelisted],
 		queryFn: async () => {
 			if (!account) return [];
-			const filteredChains = chains.filter((chain) => chain.testnet === testnetmode);
+			const filteredChains = chains.filter((chain) => !!chain.testnet === !!testnetmode);
 			return fetchAnkrBalanceWithPrice({ account, chains: filteredChains, whitelist: whitelisted });
 		},
 	});
@@ -44,7 +44,7 @@ export const useTokenBalances = (account: Account | null, tokens: Token[]) => {
 	return results.map((result) => result.data).filter((data): data is NonNullable<typeof data> => !!data);
 };
 
-export const useBalances = (account: Account) => {
+export const useBalances = (account: Account | null) => {
 	const tokens = useTokensStore((state) => state.tokens);
 	const ankrBalances = useAnkrBalances(account);
 	const tokenBalances = useTokenBalances(account, tokens);

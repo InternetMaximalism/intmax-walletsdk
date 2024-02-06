@@ -8,6 +8,7 @@ export const getAnkrProvider = () => {
 	if (cache.has(cacheKey)) return cache.get(cacheKey) as AnkrProvider;
 	const endpoint = `https://rpc.ankr.com/multichain/${ANKR_API_KEY}`;
 	const provider = new AnkrProvider(endpoint);
+	provider.requestConfig = { headers: { "Content-Type": "application/json" } };
 	cache.set(cacheKey, provider);
 	return provider;
 };
