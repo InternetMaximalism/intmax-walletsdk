@@ -9,6 +9,7 @@ import GlobalLayout from "./app/layout";
 import SettingsPage from "./app/settings";
 import "./globals.css";
 
+import { Drawers } from "@/components/drawers";
 import { Toaster } from "@/components/ui/sonner";
 
 const queryClient = new QueryClient();
@@ -30,8 +31,9 @@ if (!root) throw new Error("Root element not found");
 
 ReactDOM.createRoot(root).render(
 	<React.StrictMode>
-		<Toaster />
 		<QueryClientProvider client={queryClient}>
+			<Drawers />
+			<Toaster />
 			<RouterProvider router={router} />
 		</QueryClientProvider>
 	</React.StrictMode>,
