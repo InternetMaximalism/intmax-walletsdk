@@ -56,7 +56,7 @@ const TOKEN_LONG: FormatterRule[] = [
 
 const USD_BALANCE: FormatterRule[] = [
 	{ formatter: "$0.00" },
-	{ lt: 0.01, formatter: "<$0.01" },
+	{ lt: 0.001, formatter: "<$0.001" },
 	{ lt: 1_000_000, formatter: DECIMALS_USD(2) },
 	{ lt: 1_000_000_000_000, formatter: DOCIMALS_USD_COMPACT(2) },
 	{ lt: Infinity, formatter: "$ SO MUCH" },
