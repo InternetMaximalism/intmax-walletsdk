@@ -12,7 +12,9 @@ export const createViemClient = <T extends Chain>(chain: T) => {
 	const client = createPublicClient<HttpTransport, T>({
 		chain,
 		transport: http(rpc.url),
-		batch: { multicall: chain.contracts && "multicall3" in chain.contracts },
+		batch: {
+			multicall: chain.contracts && "multicall3" in chain.contracts && { wait: 10 },
+		},
 	});
 	clientCache.set(chain, client);
 

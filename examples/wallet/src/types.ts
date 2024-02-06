@@ -13,5 +13,6 @@ export type Token = NativeToken | Erc20Token;
 
 export type Balance = { token: Token; balance: bigint };
 export type Price = { token: Token; priceUsd: number };
+export type BalanceWithPrice = Balance & Price;
 
 export type InternalRpcUrl = { url: string };
