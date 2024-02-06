@@ -2,8 +2,8 @@ import { Outlet } from "react-router-dom";
 
 function GlobalLayout() {
 	return (
-		<div className="h-[100dvh] max-h-[100dvh] overflow-hidden bg-muted sm:p-4 lg:p-6">
-			<div className="mx-auto sm:max-w-sm sm:border rounded-md bg-background h-full">
+		<div className="h-[100dvh] max-h-[100dvh] overflow-hidden bg-muted sm:p-4 lg:p-6 flex items-center justify-center">
+			<div className="w-full sm:max-w-sm sm:border sm:aspect-[1/2] rounded-md bg-background h-full sm:h-auto">
 				<Outlet />
 			</div>
 		</div>

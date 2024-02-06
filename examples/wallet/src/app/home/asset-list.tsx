@@ -23,13 +23,13 @@ export const AssetList: FC<{ className?: string }> = memo(({ className }) => {
 						className="flex gap-2 items-center rounded-md hover:bg-muted focus:bg-muted px-2 py-2 transition-colors"
 					>
 						<div className="flex items-end">
-							<Avatar className="h-4 w-4 -mr-3 z-10 bg-background">
-								<AvatarImage src={getChainLogo(balance.chain)} alt={balance.chain?.name} />
-								<AvatarFallback>{balance.chain?.name?.toUpperCase().slice(0, 2)}</AvatarFallback>
-							</Avatar>
 							<Avatar className="h-10 w-10 bg-background">
 								<AvatarImage src={balance.token.logoURI} alt={balance.token.symbol} />
 								<AvatarFallback>{balance.token.symbol?.toUpperCase().slice(0, 2)}</AvatarFallback>
+							</Avatar>
+							<Avatar className="h-5 w-5 -ml-2.5 border-2 border-background z-10 bg-background">
+								<AvatarImage src={getChainLogo(balance.chain)} alt={balance.chain?.name} />
+								<AvatarFallback>{balance.chain?.name?.toUpperCase().slice(0, 2)}</AvatarFallback>
 							</Avatar>
 						</div>
 						<div className="flex-1">
