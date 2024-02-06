@@ -15,8 +15,6 @@ export const BalanceCard = () => {
 			.reduce((a, b) => a + b, 0);
 	}, [balances]);
 
-	console.log(totalUsdBalance);
-
 	return (
 		<div className="border p-4 rounded-md bg-background">
 			<h2 className="text-xld">Your Balance</h2>
