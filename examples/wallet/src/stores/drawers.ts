@@ -11,18 +11,23 @@ export type DrawerPropsPattern =
 export type DrawerProps<T extends DrawerPropsPattern["id"]> = Omit<Extract<DrawerPropsPattern, { id: T }>, "id"> & {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	setLock: (lock: boolean) => void;
 };
 
 export type DrawerState = {
+	lock: boolean;
 	props: DrawerPropsPattern | null;
-	setDrawerProps: (props: DrawerPropsPattern | null) => void;
+	setDrawerProps: (props: DrawerPropsPattern | null, lock?: boolean) => void;
+	setLock: (lock: boolean) => void;
 };
 
 const initialState = {
 	props: null,
+	lock: false,
 };
 
 export const useDrawerStore = create<DrawerState>((set) => ({
 	...initialState,
-	setDrawerProps: (props) => set({ props }),
+	setDrawerProps: (props, lock) => set({ props, lock: lock ?? false }),
+	setLock: (lock) => set((stat) => ({ ...stat, lock })),
 }));
