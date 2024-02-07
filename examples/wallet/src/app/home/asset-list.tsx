@@ -34,7 +34,7 @@ const AssetListItem: FC<{
 					<AvatarFallback>{balance.chain?.name?.toUpperCase().slice(0, 2)}</AvatarFallback>
 				</Avatar>
 			</div>
-			<div className="flex-1">
+			<div className="flex-1 text-start">
 				<div className="text-sm font-medium leading-none">{balance.token.name}</div>
 				<div className="text-sm text-muted-foreground">{`${formatBalance(balance)} ${balance.token.symbol}`}</div>
 			</div>
