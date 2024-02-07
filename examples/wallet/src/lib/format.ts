@@ -68,20 +68,20 @@ type FormatterType = keyof typeof FORMATTERS;
 
 export const formatNumber = (value: number, type: FormatterType) => {
 	const rules = FORMATTERS[type];
-	const rule = rules
-		.sort((a, b) => (a?.lte ?? a?.lt ?? 0) - (b?.lte ?? b?.lt ?? 0))
-		.find((rule) => (rule?.lte ?? rule?.lt ?? 0) > value);
+	const rule = rules.find((rule) => (rule.lt !== undefined ? value < rule.lt : value <= (rule?.lte ?? 0)));
 
 	if (!rule) throw new Error("No formatter found");
 	return typeof rule.formatter === "string" ? rule.formatter : rule.formatter.format(value);
 };
 
-export const formatBalance = (balance: Balance, type: FormatterType = "TOKEN_SHORT") => {
+export const formatBalance = (balance: Balance | null, type: FormatterType = "TOKEN_SHORT") => {
+	if (!balance) return formatNumber(0, type);
 	const value = formatUnits(balance.balance, balance.token.decimals);
 	return formatNumber(Number(value), type);
 };
 
-export const formatUsdBalance = (balance: BalanceWithPrice, type: FormatterType = "USD_BALANCE") => {
+export const formatUsdBalance = (balance: BalanceWithPrice | null, type: FormatterType = "USD_BALANCE") => {
+	if (!balance) return formatNumber(0, type);
 	const value = formatUnits(balance.balance, balance.token.decimals);
 	return formatNumber(balance.priceUsd * Number(value), type);
 };

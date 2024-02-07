@@ -12,7 +12,7 @@ import "./globals.css";
 import { Drawers } from "@/components/drawers";
 import { Toaster } from "@/components/ui/sonner";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({});
 
 const router = createBrowserRouter([
 	{

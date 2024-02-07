@@ -24,17 +24,29 @@ export const fetchTokenPriceHistory = async (params: {
 		contractAddress = result.contractAddress;
 	}
 
-	const result = await ankr.getTokenPriceHistory({
-		blockchain: ankrChain,
-		contractAddress,
-		interval,
-		toTimestamp: Math.floor(Date.now() / 1000),
-		limit: DETAIL_NUM + 1,
-		syncCheck: true,
-	});
+	try {
+		const result = await ankr.getTokenPriceHistory({
+			blockchain: ankrChain,
+			contractAddress,
+			interval,
+			toTimestamp: Math.floor(Date.now() / 1000),
+			limit: DETAIL_NUM + 1,
+		});
 
-	return {
-		token,
-		history: result.quotes.map((item) => ({ timestamp: item.timestamp, priceUsd: Number(item.usdPrice) })),
-	};
+		return {
+			token,
+			history: result.quotes.map((item) => ({ timestamp: item.timestamp, priceUsd: Number(item.usdPrice) })),
+		};
+	} catch (e) {
+		if (e instanceof Error && e.message.includes("invalid params")) {
+			return {
+				token,
+				history: Array.from({ length: DETAIL_NUM }, (_, i) => ({
+					timestamp: Math.floor(Date.now() / 1000) - (DETAIL_NUM - i) * interval,
+					priceUsd: 1,
+				})),
+			};
+		}
+		throw e;
+	}
 };
