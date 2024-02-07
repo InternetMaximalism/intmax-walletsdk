@@ -24,13 +24,7 @@ export const AccountSwitcher = () => {
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
-				<Button
-					variant="outline"
-					role="combobox"
-					aria-expanded={open}
-					aria-label="Select a team"
-					className="w-48 justify-between overflow-hidden"
-				>
+				<Button variant="outline" role="combobox" aria-expanded={open} className="w-48 justify-between overflow-hidden">
 					<AccountAvatar className="mr-2 h-5 w-5" account={account} />
 					<AccountName account={account} />
 					<ChevronDown className="ml-auto h-5 w-5 shrink-0 opacity-50" />

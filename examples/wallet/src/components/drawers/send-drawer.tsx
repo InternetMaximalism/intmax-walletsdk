@@ -1,90 +1,120 @@
-import AutoForm, { AutoFormSubmit } from "@/components/ui/auto-form";
 import { Button } from "@/components/ui/button";
-import { DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import { DrawerClose, DrawerFooter, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useBalances } from "@/hooks/balance";
+import { usePaste } from "@/hooks/utils";
 import { DrawerProps } from "@/stores/drawers";
+import { InternalTransactionRequest, Token } from "@/types";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft } from "lucide-react";
 import { FC, useState } from "react";
-import * as z from "zod";
+import { useForm } from "react-hook-form";
+import { isAddress, parseUnits } from "viem";
+import { z } from "zod";
+import { TokenSelect } from "../token-select";
 
-const formSchema = z.object({
-	username: z
-		.string({
-			required_error: "Username is required.",
-		})
-		// You can use zod's built-in validation as normal
-		.min(2, {
-			message: "Username must be at least 2 characters.",
-		}),
-
-	password: z
-		.string({
-			required_error: "Password is required.",
-		})
-		// Use the "describe" method to set the label
-		// If no label is set, the field name will be used
-		// and un-camel-cased
-		.describe("Your secure password")
-		.min(8, {
-			message: "Password must be at least 8 characters.",
-		}),
-
-	favouriteNumber: z.coerce // When using numbers and dates, you must use coerce
-		.number({
-			invalid_type_error: "Favourite number must be a number.",
-		})
-		.min(1, {
-			message: "Favourite number must be at least 1.",
-		})
-		.max(10, {
-			message: "Favourite number must be at most 10.",
-		})
-		.default(5) // You can set a default value
-		.optional(),
-
-	acceptTerms: z
-		.boolean()
-		.describe("Accept terms and conditions.")
-		.refine((value) => value, {
-			message: "You must accept the terms and conditions.",
-			path: ["acceptTerms"],
-		}),
-
-	// Date will show a date picker
-	birthday: z.coerce.date().optional(),
-
-	sendMeMails: z.boolean().optional(),
-
-	// Enum will show a select
-	color: z.enum(["red", "green", "blue"]),
-
-	// Create sub-objects to create accordion sections
-	address: z.object({
-		street: z.string(),
-		city: z.string(),
-		zip: z.string(),
-	}),
+const schema = z.object({
+	token: z.object({}),
+	to: z.string().refine((v) => isAddress(v) || /^.+\.eth$/.test(v), { message: "Invalid address or ENS name" }),
+	amount: z.string().refine((v) => /^\d+(\.\d{0,18})?$/.test(v), { message: "Invalid amount" }),
 });
 
-const SendDrawer: FC<DrawerProps<"send-input">> = ({ back, previos, transfer }) => {
+//TODO: Refactor to zod and rhf stack
+const SendDrawer: FC<DrawerProps<"send-input">> = ({ back, open, previos, transfer }) => {
+	const { paste } = usePaste();
+
 	const [titleSymbol] = useState(transfer.token?.symbol);
+	const balances = useBalances(transfer.account);
+
+	const form = useForm<z.infer<typeof schema>>({
+		defaultValues: { token: transfer.token, to: transfer.to, amount: transfer.amount },
+		resolver: zodResolver(schema),
+	});
+
+	const handlePaste = async () => {
+		form.setValue("to", (await paste()) ?? "");
+	};
+
+	const handleSubmit = (values: z.infer<typeof schema>) => {
+		const token = values.token as Token;
+		const transaction: InternalTransactionRequest = {
+			type: "token-transfer",
+			token,
+			account: transfer.account,
+			to: values.to,
+			amount: parseUnits(values.amount, token.decimals),
+		};
+		open(
+			{ id: "send-transaction", transaction },
+			{ id: "send-input", transfer: { ...transfer, token, to: values.to, amount: values.amount } },
+		);
+	};
 
 	return (
 		<>
-			<DrawerHeader className="flex justify-start items-center px-4">
+			<DrawerHeader className="flex items-center px-2">
 				{previos && (
 					<Button variant="ghost" size="icon" onClick={back} className="h-10 w-10">
 						<ArrowLeft />
 					</Button>
 				)}
-				<DrawerTitle>{titleSymbol ? `Send ${titleSymbol}` : "Send Token"}</DrawerTitle>
+				<DrawerTitle className="flex-1 text-left">{titleSymbol ? `Send ${titleSymbol}` : "Send Token"}</DrawerTitle>
+				<TokenSelect
+					className="w-auto"
+					popverClassName="-translate-x-2"
+					tokens={balances.map((b) => b.token)}
+					selected={form.watch("token") as Token}
+					onSelect={(token) => form.setValue("token", token)}
+				/>
 			</DrawerHeader>
+			<Form {...form}>
+				<form onSubmit={form.handleSubmit(handleSubmit)}>
+					<div className="px-4 space-y-2 pb-8">
+						<FormField
+							control={form.control}
+							name="to"
+							render={({ field }) => (
+								<FormItem>
+									<div className="flex justify-between">
+										<FormLabel htmlFor="to">Receiver (address or ENS)</FormLabel>
+										<Button variant="link" size="sm" className="h-auto text-foreground" onClick={handlePaste}>
+											Paste
+										</Button>
+									</div>
+									<FormControl>
+										<Input inputMode="text" placeholder="vitalik.eth or 0x1234..." {...field} />
+									</FormControl>
 
-			<AutoForm
-				// Pass the schema to the form
-				formSchema={formSchema}
-			>
-				<AutoFormSubmit>Send now</AutoFormSubmit>
-			</AutoForm>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="amount"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel htmlFor="to">Amount</FormLabel>
+									<FormControl>
+										<Input inputMode="decimal" placeholder="0.00" {...field} />
+									</FormControl>
+
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
+					<DrawerFooter className="grid grid-cols-2">
+						<DrawerClose asChild>
+							<Button type="button" variant="outline" onClick={back}>
+								Cancel
+							</Button>
+						</DrawerClose>
+						<Button type="submit">Next</Button>
+					</DrawerFooter>
+				</form>
+			</Form>
 		</>
 	);
 };

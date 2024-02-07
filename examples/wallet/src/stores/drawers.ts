@@ -1,5 +1,5 @@
 import { ENSAccount } from "@/lib/blockchain/ens";
-import { Token } from "@/types";
+import { InternalTransactionRequest, Token } from "@/types";
 import { Account, Address } from "viem";
 import { create } from "zustand";
 
@@ -7,7 +7,8 @@ export type DrawerPropsPattern =
 	| { id: "token-detail"; account: Account; token: Token }
 	| { id: "profile"; account: ENSAccount }
 	| { id: "onboarding" }
-	| { id: "send-input"; transfer: { account?: Account; to?: Address; token?: Token; value?: bigint } };
+	| { id: "send-input"; transfer: { account: Account; token?: Token; to?: string; amount?: string } }
+	| { id: "send-transaction"; transaction: InternalTransactionRequest };
 
 type HisoricalDrawerPropsPattern = DrawerPropsPattern & { previos?: HisoricalDrawerPropsPattern };
 
@@ -16,7 +17,7 @@ export type DrawerProps<T extends DrawerPropsPattern["id"]> = Omit<Extract<Drawe
 	setLock: (lock: boolean) => void;
 	previos?: HisoricalDrawerPropsPattern | null;
 	back: () => void;
-	open: (props: DrawerPropsPattern) => void;
+	open: (props: DrawerPropsPattern, previos?: DrawerPropsPattern) => void;
 };
 
 export type DrawerState = {

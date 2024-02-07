@@ -1,3 +1,5 @@
+import { Account, Address, TransactionRequest } from "viem";
+
 export type BaseToken = {
 	chainId: number;
 	decimals: number;
@@ -21,3 +23,7 @@ export type PriceHistory = {
 	token: Token;
 	history: { timestamp: number; priceUsd: number }[];
 };
+
+export type InternalTransactionRequest =
+	| { type: "raw-request"; raw: TransactionRequest }
+	| { type: "token-transfer"; token: Token; account: Account; to: Address | string; amount: bigint };
