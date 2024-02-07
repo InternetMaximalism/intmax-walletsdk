@@ -2,7 +2,7 @@ import { ENSAccount, ensAccountsBatch } from "@/lib/blockchain/ens";
 import { useAccountStore } from "@/stores/account";
 import { useQueries } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
-import { Account, english, generateMnemonic, mnemonicToAccount } from "viem/accounts";
+import { Account, Address, english, generateMnemonic, mnemonicToAccount, privateKeyToAccount } from "viem/accounts";
 
 export const useENSAccounts = (accounts: Account[]) => {
 	const results = useQueries({
@@ -24,15 +24,15 @@ const getAccount = (mnemonic: string, index: number) => {
 };
 
 export const useAccount = () => {
-	const mnemonic = useAccountStore((state) => state.mnemonic);
+	const accounts = useAccounts();
 	const current = useAccountStore((state) => state.current);
 
 	const _account = useMemo(() => {
-		if (!mnemonic || current === null) return null;
-		const account = getAccount(mnemonic, current) as ENSAccount;
+		if (!current) return accounts[0] ?? null;
+		const account = accounts.find((account) => account.address === current);
 
 		return account;
-	}, [mnemonic, current]);
+	}, [accounts, accounts[0], current]);
 
 	const ensAccounts = useENSAccounts(_account ? [_account] : []);
 
@@ -42,11 +42,15 @@ export const useAccount = () => {
 export const useAccounts = () => {
 	const mnemonic = useAccountStore((state) => state.mnemonic);
 	const indexes = useAccountStore((state) => state.indexes);
+	const privateKeys = useAccountStore((state) => state.privateKeys);
+	const viewAddresses = useAccountStore((state) => state.viewAddresses);
 
 	const _accounts = useMemo(() => {
-		if (!mnemonic) return [];
-		return indexes.map((index) => getAccount(mnemonic, index));
-	}, [mnemonic, indexes]);
+		const mnemonicAccounts = mnemonic ? indexes.map((index) => getAccount(mnemonic, index)) : [];
+		const privateAccounts = privateKeys.map(privateKeyToAccount);
+		const viewAccounts = viewAddresses.map((address) => ({ address, type: "json-rpc" }) as const);
+		return [...mnemonicAccounts, ...privateAccounts, ...viewAccounts];
+	}, [mnemonic, indexes, privateKeys, viewAddresses]);
 
 	const results = useENSAccounts(_accounts);
 	const ensAccounts = results
@@ -66,7 +70,7 @@ export const useGenerateAccount = () => {
 		if (mnemonic) throw new Error("MNEMONIC_ALREADY_EXISTS");
 		const newMnemonic = generateMnemonic(english);
 		setMnemonic(newMnemonic);
-		setCurrent(0);
+		setCurrent(getAccount(newMnemonic, 0).address);
 		setIndexes([0]);
 	}, [mnemonic, setMnemonic, setCurrent, setIndexes]);
 
@@ -74,15 +78,13 @@ export const useGenerateAccount = () => {
 };
 
 export const useSwitchAccount = () => {
-	const indexes = useAccountStore((state) => state.indexes);
 	const setCurrent = useAccountStore((state) => state.setCurrent);
 
 	const switchAccount = useCallback(
-		(index: number) => {
-			if (!indexes.includes(index)) throw new Error("INDEX_NOT_FOUND");
-			setCurrent(index);
+		(address: Address) => {
+			setCurrent(address);
 		},
-		[indexes, setCurrent],
+		[setCurrent],
 	);
 
 	return switchAccount;
