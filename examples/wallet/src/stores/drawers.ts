@@ -5,7 +5,9 @@ import { create } from "zustand";
 
 export type DrawerPropsPattern =
 	| { id: "token-detail"; account: Account; token: Token }
-	| { id: "profile"; account: ENSAccount };
+	| { id: "profile"; account: ENSAccount }
+	| { id: "onboarding" };
+
 export type DrawerProps<T extends DrawerPropsPattern["id"]> = Omit<Extract<DrawerPropsPattern, { id: T }>, "id"> & {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
