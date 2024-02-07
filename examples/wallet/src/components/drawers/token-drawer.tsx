@@ -1,13 +1,14 @@
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { DrawerClose, DrawerFooter, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useTokenWithChain } from "@/hooks/blockchain";
 import { useTokenBalanceWithPrice, useTokenPriceHistory } from "@/hooks/token";
 import { formatBalance, formatNumber, formatUsdBalance } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import { DrawerProps } from "@/stores/drawers";
 import { PriceHistory } from "@/types";
-import { ExternalLink, Link2Icon, LinkIcon } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { FC, useState } from "react";
 import { Line, LineChart, ResponsiveContainer, Tooltip, YAxis } from "recharts";
 import { Loading } from "../loading";
@@ -107,13 +108,13 @@ const TokenDrawer: FC<DrawerProps<"token-detail">> = ({ account, token }) => {
 				)}
 			</div>
 
-			<DrawerFooter className="grid grid-cols-2">
+			<DrawerFooter className={cn("grid", account.type === "json-rpc" ? "grid-cols-1" : "grid-cols-2")}>
 				<DrawerClose>
 					<Button className="w-full" variant="secondary">
 						Close
 					</Button>
 				</DrawerClose>
-				<Button className="w-full">Send</Button>
+				{account.type !== "json-rpc" && <Button className="w-full">Send</Button>}
 			</DrawerFooter>
 		</>
 	);
