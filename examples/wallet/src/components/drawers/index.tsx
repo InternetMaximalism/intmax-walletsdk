@@ -8,18 +8,21 @@ const TokenDrawer = lazy(() => import("./token-drawer"));
 const OnboardingDrawer = lazy(() => import("./onboading-drawer"));
 
 export const Drawers = () => {
-	const { props, setDrawerProps } = useDrawerStore();
+	const { props, setDrawerProps, lock, setLock } = useDrawerStore();
 
-	const restProps = { open: !!props, onOpenChange: (open: boolean) => setDrawerProps(open ? props : null) };
+	const restProps = {
+		...{ open: !!props, lock, setLock },
+		onOpenChange: (open: boolean) => !lock && setDrawerProps(open ? props : null),
+	};
 
 	return (
-		<Drawer {...restProps}>
-			<DrawerContent className="min-h-48 sm:min-h-56">
+		<Drawer {...restProps} closeThreshold={lock ? Infinity : 0.25}>
+			<DrawerContent>
 				<div className="mx-auto w-full max-w-md">
-					<Suspense fallback={<Loading />}>
+					<Suspense fallback={<Loading className="h-48" />}>
 						{props?.id === "profile" && <ProfileDrawer {...props} {...restProps} />}
 						{props?.id === "token-detail" && <TokenDrawer {...props} {...restProps} />}
-						{props?.id === "onboarding" && <OnboardingDrawer />}
+						{props?.id === "onboarding" && <OnboardingDrawer {...props} {...restProps} />}
 					</Suspense>
 				</div>
 			</DrawerContent>

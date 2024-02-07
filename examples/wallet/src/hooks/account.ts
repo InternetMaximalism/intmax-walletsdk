@@ -60,13 +60,13 @@ export const useAccounts = () => {
 	return ensAccounts;
 };
 
-export const useGenerateAccount = () => {
+export const useCreateAccount = () => {
 	const mnemonic = useAccountStore((state) => state.mnemonic);
 	const setMnemonic = useAccountStore((state) => state.setMnemonic);
 	const setCurrent = useAccountStore((state) => state.setCurrent);
 	const setIndexes = useAccountStore((state) => state.setIndexes);
 
-	const generate = useCallback(() => {
+	const create = useCallback(() => {
 		if (mnemonic) throw new Error("MNEMONIC_ALREADY_EXISTS");
 		const newMnemonic = generateMnemonic(english);
 		setMnemonic(newMnemonic);
@@ -74,7 +74,7 @@ export const useGenerateAccount = () => {
 		setIndexes([0]);
 	}, [mnemonic, setMnemonic, setCurrent, setIndexes]);
 
-	return generate;
+	return create;
 };
 
 export const useSwitchAccount = () => {

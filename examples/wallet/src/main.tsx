@@ -10,9 +10,6 @@ import "./globals.css";
 const HomePage = lazy(() => import("./app/home"));
 const SettingsPage = lazy(() => import("./app/settings"));
 
-import { Drawers } from "@/components/drawers";
-import { Toaster } from "@/components/ui/sonner";
-
 const queryClient = new QueryClient({});
 
 const router = createBrowserRouter([
@@ -33,8 +30,6 @@ if (!root) throw new Error("Root element not found");
 ReactDOM.createRoot(root).render(
 	<React.StrictMode>
 		<QueryClientProvider client={queryClient}>
-			<Drawers />
-			<Toaster />
 			<RouterProvider router={router} />
 		</QueryClientProvider>
 	</React.StrictMode>,
