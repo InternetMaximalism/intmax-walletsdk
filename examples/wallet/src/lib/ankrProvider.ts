@@ -1,4 +1,4 @@
-import { ANKR_API_KEY } from "@/constants";
+import { ANKR_API_KEY, ANKR_BALANCE_CHAIN_MAP, AnkrBalanceChain } from "@/constants";
 import { AnkrProvider } from "@ankr.com/ankr.js";
 
 const cacheKey = { _: Symbol("AnkrProvider") };
@@ -11,4 +11,15 @@ export const getAnkrProvider = () => {
 	provider.requestConfig = { headers: { "Content-Type": "application/json" } };
 	cache.set(cacheKey, provider);
 	return provider;
+};
+
+export const toAnkrChain = (chainId: number) => {
+	if (chainId in ANKR_BALANCE_CHAIN_MAP) {
+		return ANKR_BALANCE_CHAIN_MAP[chainId as AnkrBalanceChain];
+	}
+	return null;
+};
+
+export const toAnkrChains = (chainIds: number[]) => {
+	return chainIds.map(toAnkrChain).filter((chain): chain is NonNullable<typeof chain> => chain !== null);
 };
