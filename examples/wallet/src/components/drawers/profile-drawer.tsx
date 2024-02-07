@@ -27,8 +27,8 @@ const ProfileDrawer: FC<DrawerProps<"profile">> = ({ account }) => {
 		<>
 			<DrawerHeader className="flex items-center overflow-x-hidden px-4">
 				<AccountAvatar account={account} className="w-10 h-10" />
-				<DrawerTitle className="text-start text-xl flex-1">
-					<AccountName account={account} />
+				<DrawerTitle className="text-start text-xl flex-1 overflow-x-hidden">
+					<AccountName account={account} className="w-full" />
 				</DrawerTitle>
 			</DrawerHeader>
 			<div className="px-6">

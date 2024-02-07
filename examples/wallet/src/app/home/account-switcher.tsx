@@ -1,4 +1,5 @@
 import { AccountAvatar } from "@/components/account-avatar";
+import { AccountName } from "@/components/account-name";
 import { Button } from "@/components/ui/button";
 import {
 	Command,
@@ -16,15 +17,6 @@ import { cn } from "@/lib/utils";
 import { CheckIcon, ChevronDown, PlusCircleIcon } from "lucide-react";
 import { FC, useState } from "react";
 
-const AccountName: FC<{ account: ENSAccount | null }> = ({ account }) => {
-	return (
-		<span>
-			<span className="truncate">{account?.ens ?? account?.address}</span>
-			{account?.type === "json-rpc" && <span className="ml-1 font-medium text-muted-foreground">(view)</span>}
-		</span>
-	);
-};
-
 export const AccountSwitcher = () => {
 	const [open, setOpen] = useState(false);
 	const account = useAccount();
@@ -38,7 +30,7 @@ export const AccountSwitcher = () => {
 					role="combobox"
 					aria-expanded={open}
 					aria-label="Select a team"
-					className="w-48 justify-between"
+					className="w-48 justify-between overflow-hidden"
 				>
 					<AccountAvatar className="mr-2 h-5 w-5" account={account} />
 					<AccountName account={account} />
