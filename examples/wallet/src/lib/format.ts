@@ -34,10 +34,10 @@ const DOCIMALS_USD_COMPACT = (n: number, m = n) =>
 	});
 
 type Formatter = Intl.NumberFormat | string;
-type FormatterRule = { lt?: number; formatter: Formatter };
+type FormatterRule = { lt?: number; lte?: number; formatter: Formatter };
 
 const TOKEN_SHORT: FormatterRule[] = [
-	{ formatter: "0" },
+	{ lte: 0, formatter: "0" },
 	{ lt: 0.0001, formatter: "<0.0001" },
 	{ lt: 0.01, formatter: DECIMALS(4) },
 	{ lt: 1, formatter: DECIMALS(3) },
@@ -47,7 +47,7 @@ const TOKEN_SHORT: FormatterRule[] = [
 ];
 
 const TOKEN_LONG: FormatterRule[] = [
-	{ formatter: "0" },
+	{ lte: 0, formatter: "0" },
 	{ lt: 0.0001, formatter: "<0.0001" },
 	{ lt: 100_000, formatter: DECIMALS(5, 2) },
 	{ lt: 1_000_000_000_000, formatter: DECIMALS(2) },
@@ -55,7 +55,7 @@ const TOKEN_LONG: FormatterRule[] = [
 ];
 
 const USD_BALANCE: FormatterRule[] = [
-	{ formatter: "$0.00" },
+	{ lte: 0, formatter: "$0.00" },
 	{ lt: 0.001, formatter: "<$0.001" },
 	{ lt: 1_000_000, formatter: DECIMALS_USD(2) },
 	{ lt: 1_000_000_000_000, formatter: DOCIMALS_USD_COMPACT(2) },
@@ -69,8 +69,9 @@ type FormatterType = keyof typeof FORMATTERS;
 export const formatNumber = (value: number, type: FormatterType) => {
 	const rules = FORMATTERS[type];
 	const rule = rules
-		.sort((a, b) => (a.lt ?? Infinity) - (b.lt ?? Infinity))
-		.find((rule) => value < (rule.lt ?? Infinity));
+		.sort((a, b) => (a?.lte ?? a?.lt ?? 0) - (b?.lte ?? b?.lt ?? 0))
+		.find((rule) => (rule?.lte ?? rule?.lt ?? 0) > value);
+
 	if (!rule) throw new Error("No formatter found");
 	return typeof rule.formatter === "string" ? rule.formatter : rule.formatter.format(value);
 };

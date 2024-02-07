@@ -16,3 +16,8 @@ export type Price = { token: Token; priceUsd: number };
 export type BalanceWithPrice = Balance & Price;
 
 export type InternalRpcUrl = { url: string };
+
+export type PriceHistory = {
+	token: Token;
+	history: { timestamp: number; priceUsd: number }[];
+};

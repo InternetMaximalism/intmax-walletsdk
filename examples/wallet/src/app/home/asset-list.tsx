@@ -21,7 +21,7 @@ const AssetListItem: FC<{
 	return (
 		<button
 			type="button"
-			className="flex gap-2 items-center rounded-md hover:bg-muted focus:bg-muted px-2 py-2 transition-colors"
+			className="flex gap-2 items-center rounded-md hover:bg-muted focus:bg-muted px-2 py-2 transition-colors overflow-x-hidden"
 			onClick={() => setDrawerProps({ id: "token-detail", token: balance.token })}
 		>
 			<div className="flex items-end">
@@ -34,7 +34,7 @@ const AssetListItem: FC<{
 					<AvatarFallback>{balance.chain?.name?.toUpperCase().slice(0, 2)}</AvatarFallback>
 				</Avatar>
 			</div>
-			<div className="flex-1 text-start">
+			<div className="flex-1 text-start truncate">
 				<div className="text-sm font-medium leading-none">{balance.token.name}</div>
 				<div className="text-sm text-muted-foreground">{`${formatBalance(balance)} ${balance.token.symbol}`}</div>
 			</div>

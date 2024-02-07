@@ -1,8 +1,8 @@
-import { ANKR_BALANCE_CHAIN_MAP, AnkrBalanceChain } from "@/constants";
+import { ANKR_BALANCE_CHAIN_MAP } from "@/constants";
 import { BalanceWithPrice, Token } from "@/types";
 import { Balance as AnkrBalance } from "@ankr.com/ankr.js";
 import { Account, Address, Chain, erc20Abi } from "viem";
-import { getAnkrProvider } from "../ankrProvider";
+import { getAnkrProvider, toAnkrChains } from "../ankrProvider";
 import { createViemClient } from "../viemClient";
 
 const toBalanceWithPrice = (balance: AnkrBalance): BalanceWithPrice => {
@@ -24,15 +24,14 @@ export const fetchAnkrBalanceWithPrice = async (params: { account: Account; chai
 	const { account, chains, whitelist } = params;
 	const ankr = getAnkrProvider();
 
-	const ankrChains = chains
-		.map((chain) => chain.id)
-		.filter((chainId): chainId is AnkrBalanceChain => chainId in ANKR_BALANCE_CHAIN_MAP)
-		.map((chainId) => ANKR_BALANCE_CHAIN_MAP[chainId]);
+	const ankrChains = toAnkrChains(chains.map((chain) => chain.id));
 
 	const result = await ankr.getAccountBalance({
 		walletAddress: account.address,
 		blockchain: ankrChains,
 		onlyWhitelisted: whitelist,
+		pageSize: 500,
+		syncCheck: true,
 	});
 
 	const balanceWithPrice = result.assets.map(toBalanceWithPrice);
