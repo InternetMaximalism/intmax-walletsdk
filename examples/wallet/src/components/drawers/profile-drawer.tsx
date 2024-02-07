@@ -1,16 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { DrawerClose, DrawerFooter, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { useAccount } from "@/hooks/account";
 import { useCopy, useShare } from "@/hooks/utils";
 import { DrawerProps } from "@/stores/drawers";
 import { CopyIcon } from "lucide-react";
 import { FC, useCallback } from "react";
 import QRCode from "react-qr-code";
 import { toast } from "sonner";
+import { AccountAvatar } from "../account-avatar";
+import { AccountName } from "../account-name";
 
-const ProfileDrawer: FC<DrawerProps<"profile">> = () => {
-	const account = useAccount();
+const ProfileDrawer: FC<DrawerProps<"profile">> = ({ account }) => {
 	const { share, isCanShare } = useShare();
 	const { copy } = useCopy();
 
@@ -25,8 +25,11 @@ const ProfileDrawer: FC<DrawerProps<"profile">> = () => {
 
 	return (
 		<>
-			<DrawerHeader>
-				<DrawerTitle>Account Profile</DrawerTitle>
+			<DrawerHeader className="flex items-center overflow-x-hidden px-4">
+				<AccountAvatar account={account} className="w-10 h-10" />
+				<DrawerTitle className="text-start text-xl flex-1">
+					<AccountName account={account} />
+				</DrawerTitle>
 			</DrawerHeader>
 			<div className="px-6">
 				<div className="w-48 h-48 mx-auto overflow-hidden p-2 bg-white">
