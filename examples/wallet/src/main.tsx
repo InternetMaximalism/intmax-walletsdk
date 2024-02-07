@@ -1,13 +1,14 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import NotFound from "./app/404";
-import HomePage from "./app/home";
 import GlobalLayout from "./app/layout";
-import SettingsPage from "./app/settings";
 import "./globals.css";
+
+const HomePage = lazy(() => import("./app/home"));
+const SettingsPage = lazy(() => import("./app/settings"));
 
 import { Drawers } from "@/components/drawers";
 import { Toaster } from "@/components/ui/sonner";
@@ -34,6 +35,7 @@ ReactDOM.createRoot(root).render(
 		<QueryClientProvider client={queryClient}>
 			<Drawers />
 			<Toaster />
+
 			<RouterProvider router={router} />
 		</QueryClientProvider>
 	</React.StrictMode>,
