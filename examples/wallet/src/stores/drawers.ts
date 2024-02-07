@@ -1,23 +1,28 @@
 import { ENSAccount } from "@/lib/blockchain/ens";
 import { Token } from "@/types";
-import { Account } from "viem";
+import { Account, Address } from "viem";
 import { create } from "zustand";
 
 export type DrawerPropsPattern =
 	| { id: "token-detail"; account: Account; token: Token }
 	| { id: "profile"; account: ENSAccount }
-	| { id: "onboarding" };
+	| { id: "onboarding" }
+	| { id: "send-input"; transfer: { account?: Account; to?: Address; token?: Token; value?: bigint } };
+
+type HisoricalDrawerPropsPattern = DrawerPropsPattern & { previos?: HisoricalDrawerPropsPattern };
 
 export type DrawerProps<T extends DrawerPropsPattern["id"]> = Omit<Extract<DrawerPropsPattern, { id: T }>, "id"> & {
-	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	setLock: (lock: boolean) => void;
+	previos?: HisoricalDrawerPropsPattern | null;
+	back: () => void;
+	open: (props: DrawerPropsPattern) => void;
 };
 
 export type DrawerState = {
 	lock: boolean;
-	props: DrawerPropsPattern | null;
-	setDrawerProps: (props: DrawerPropsPattern | null, lock?: boolean) => void;
+	props: HisoricalDrawerPropsPattern | null;
+	setDrawerProps: (props: HisoricalDrawerPropsPattern | null) => void;
 	setLock: (lock: boolean) => void;
 };
 
@@ -28,6 +33,6 @@ const initialState = {
 
 export const useDrawerStore = create<DrawerState>((set) => ({
 	...initialState,
-	setDrawerProps: (props, lock) => set({ props, lock: lock ?? false }),
+	setDrawerProps: (props) => set((stat) => ({ ...stat, props })),
 	setLock: (lock) => set((stat) => ({ ...stat, lock })),
 }));

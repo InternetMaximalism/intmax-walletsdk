@@ -3,10 +3,10 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useAccount } from "@/hooks/account";
 import { useBalances } from "@/hooks/balance";
 import { useTokensWithChain } from "@/hooks/blockchain";
+import { useDrawer } from "@/hooks/drawer";
 import { tokenKey } from "@/lib/blockchain/utils";
 import { formatBalance, formatUsdBalance } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { useDrawerStore } from "@/stores/drawers";
 import { BalanceWithPrice } from "@/types";
 import { FC, memo } from "react";
 import { Chain } from "viem";
@@ -15,13 +15,13 @@ const AssetListItem: FC<{
 	balance: BalanceWithPrice & { chain: Chain };
 }> = memo(({ balance }) => {
 	const account = useAccount();
-	const setDrawerProps = useDrawerStore((state) => state.setDrawerProps);
+	const { open } = useDrawer();
 
 	return (
 		<button
 			type="button"
 			className="flex gap-2 items-center rounded-md hover:bg-muted focus:bg-muted px-2 py-2 transition-colors overflow-x-hidden"
-			onClick={() => account && setDrawerProps({ id: "token-detail", account, token: balance.token })}
+			onClick={() => account && open({ id: "token-detail", account, token: balance.token })}
 		>
 			<TokenAvatar token={balance.token} chain={balance.chain} sizeRem={2.5} />
 			<div className="flex-1 text-start truncate">
