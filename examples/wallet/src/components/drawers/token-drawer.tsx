@@ -47,7 +47,7 @@ const TokenChart: FC<{ history: PriceHistory }> = ({ history }) => {
 	);
 };
 
-const TokenDrawer: FC<DrawerProps<"token-detail">> = ({ account, token }) => {
+const TokenDrawer: FC<DrawerProps<"token-detail">> = ({ account, token, open }) => {
 	const [scale, setScale] = useState<"1d" | "7d" | "30d">("1d");
 	const history = useTokenPriceHistory(token, scale);
 	const balance = useTokenWithChain(useTokenBalanceWithPrice(account, token));
@@ -57,6 +57,10 @@ const TokenDrawer: FC<DrawerProps<"token-detail">> = ({ account, token }) => {
 	const explorerName = explorer?.name ?? "Blockchain Explorer";
 	const tokenExplorerUrl =
 		explorer?.url && token.type === "erc20" ? `${explorer.url}/token/${token.address}` : explorer?.url ?? null;
+
+	const handleSend = () => {
+		open({ id: "send-input", transfer: { account, token } });
+	};
 
 	return (
 		<>
@@ -114,7 +118,11 @@ const TokenDrawer: FC<DrawerProps<"token-detail">> = ({ account, token }) => {
 						Close
 					</Button>
 				</DrawerClose>
-				{account.type !== "json-rpc" && <Button className="w-full">Send</Button>}
+				{account.type !== "json-rpc" && (
+					<Button className="w-full" onClick={handleSend}>
+						Send
+					</Button>
+				)}
 			</DrawerFooter>
 		</>
 	);
