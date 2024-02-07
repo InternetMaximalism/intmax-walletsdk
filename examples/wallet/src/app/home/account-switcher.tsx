@@ -12,10 +12,9 @@ import {
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAccount, useAccounts } from "@/hooks/account";
-import { ENSAccount } from "@/lib/blockchain/ens";
 import { cn } from "@/lib/utils";
 import { CheckIcon, ChevronDown, PlusCircleIcon } from "lucide-react";
-import { FC, useState } from "react";
+import { useState } from "react";
 
 export const AccountSwitcher = () => {
 	const [open, setOpen] = useState(false);

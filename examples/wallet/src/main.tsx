@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from "react";
+import React, { lazy } from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
@@ -35,7 +35,6 @@ ReactDOM.createRoot(root).render(
 		<QueryClientProvider client={queryClient}>
 			<Drawers />
 			<Toaster />
-
 			<RouterProvider router={router} />
 		</QueryClientProvider>
 	</React.StrictMode>,
