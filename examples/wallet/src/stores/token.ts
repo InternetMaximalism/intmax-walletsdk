@@ -1,9 +1,10 @@
 import { Erc20Token } from "@/types";
 import { create } from "zustand";
+import { ArrayUpdater, applyUpdater } from "./utils";
 
 export type TokensState = {
 	tokens: Erc20Token[];
-	setTokens: (cbOrTokens: Erc20Token[] | ((tokens: Erc20Token[]) => Erc20Token[])) => void;
+	setTokens: ArrayUpdater<Erc20Token>;
 	reset: () => void;
 };
 
@@ -13,7 +14,6 @@ const initialState = {
 
 export const useTokensStore = create<TokensState>((set) => ({
 	...initialState,
-	setTokens: (cbOrTokens) =>
-		set((state) => ({ tokens: typeof cbOrTokens === "function" ? cbOrTokens(state.tokens) : cbOrTokens })),
+	setTokens: (cbOrTokens) => set((state) => ({ tokens: applyUpdater(cbOrTokens, state.tokens) })),
 	reset: () => set(initialState),
 }));
