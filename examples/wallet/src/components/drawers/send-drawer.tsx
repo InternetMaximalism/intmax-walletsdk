@@ -15,7 +15,7 @@ import { z } from "zod";
 import { TokenSelect } from "../token-select";
 
 const schema = z.object({
-	token: z.object({}),
+	token: z.any().refine((v) => v?.type === "native" || v?.type === "erc20", { message: "Invalid token" }),
 	to: z.string().refine((v) => isAddress(v) || /^.+\.eth$/.test(v), { message: "Invalid address or ENS name" }),
 	amount: z.string().refine((v) => /^\d+(\.\d{0,18})?$/.test(v), { message: "Invalid amount" }),
 });
@@ -45,9 +45,14 @@ const SendDrawer: FC<DrawerProps<"send-input">> = ({ back, open, previos, transf
 			to: values.to,
 			amount: parseUnits(values.amount, token.decimals),
 		};
+
 		open(
 			{ id: "send-transaction", transaction },
-			{ id: "send-input", transfer: { ...transfer, token, to: values.to, amount: values.amount } },
+			{
+				id: "send-input",
+				previos: previos ?? undefined,
+				transfer: { ...transfer, token, to: values.to, amount: values.amount },
+			},
 		);
 	};
 

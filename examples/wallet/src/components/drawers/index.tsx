@@ -8,6 +8,7 @@ const ProfileDrawer = lazy(() => import("./profile-drawer"));
 const TokenDrawer = lazy(() => import("./token-drawer"));
 const OnboardingDrawer = lazy(() => import("./onboading-drawer"));
 const SendDrawer = lazy(() => import("./send-drawer"));
+const SendTransactionDrawer = lazy(() => import("./send-transaction"));
 
 export const Drawers = () => {
 	const { open, back } = useDrawer();
@@ -31,6 +32,8 @@ export const Drawers = () => {
 						{props?.id === "token-detail" && <TokenDrawer {...props} {...restProps} />}
 						{props?.id === "onboarding" && <OnboardingDrawer {...props} {...restProps} />}
 						{props?.id === "send-input" && <SendDrawer {...props} {...restProps} />}
+						{props?.id === "send-transaction" && <SendTransactionDrawer {...props} {...restProps} />}
+						{}
 					</Suspense>
 				</div>
 			</DrawerContent>
