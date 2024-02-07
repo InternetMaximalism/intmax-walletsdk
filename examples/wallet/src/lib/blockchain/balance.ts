@@ -31,7 +31,6 @@ export const fetchAnkrBalanceWithPrice = async (params: { account: Account; chai
 		blockchain: ankrChains,
 		onlyWhitelisted: whitelist,
 		pageSize: 500,
-		syncCheck: true,
 	});
 
 	const balanceWithPrice = result.assets.map(toBalanceWithPrice);

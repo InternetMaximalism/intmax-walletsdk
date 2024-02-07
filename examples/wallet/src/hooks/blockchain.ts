@@ -3,7 +3,7 @@ import { Token } from "@/types";
 import { useMemo } from "react";
 import { Chain } from "viem";
 
-export const useTokenWithChain = <T extends { token: Token }>(data: T[]): (T & { chain: Chain })[] => {
+export const useTokensWithChain = <T extends { token: Token }>(data: T[]): (T & { chain: Chain })[] => {
 	const chains = useNetworksStore((state) => state.networks);
 	const chainMap = useMemo(() => new Map(chains.map((chain) => [chain.id, chain])), [chains]);
 
@@ -12,4 +12,14 @@ export const useTokenWithChain = <T extends { token: Token }>(data: T[]): (T & {
 	}, [data, chainMap]);
 
 	return result;
+};
+
+export const useTokenWithChain = <T extends { token: Token }>(item: T | null): (T & { chain: Chain }) | null => {
+	const chains = useNetworksStore((state) => state.networks);
+	const chainMap = useMemo(() => new Map(chains.map((chain) => [chain.id, chain])), [chains]);
+	if (!item) return null;
+
+	const chain = chainMap.get(item.token.chainId) as Chain;
+
+	return { ...item, chain };
 };
