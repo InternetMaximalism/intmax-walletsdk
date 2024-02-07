@@ -48,3 +48,16 @@ export const useDownload = () => {
 
 	return { download };
 };
+
+export const usePaste = () => {
+	const paste = useCallback(async () => {
+		try {
+			const text = await navigator.clipboard.readText();
+			return text;
+		} catch (e) {
+			console.error(e);
+		}
+	}, []);
+
+	return { paste };
+};

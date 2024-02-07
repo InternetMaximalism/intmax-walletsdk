@@ -4,7 +4,11 @@ import { Token } from "@/types";
 import { FC } from "react";
 import { Chain } from "viem";
 
-export const TokenAvatar: FC<{ token: Token; chain?: Chain; sizeRem?: number }> = ({ token, chain, sizeRem = 2.5 }) => {
+export const TokenAvatar: FC<{ token: Token; chain?: Chain | null; sizeRem?: number }> = ({
+	token,
+	chain,
+	sizeRem = 2.5,
+}) => {
 	return (
 		<div className="flex items-end">
 			<Avatar className="bg-background" style={{ width: `${sizeRem}rem`, height: `${sizeRem}rem` }}>
