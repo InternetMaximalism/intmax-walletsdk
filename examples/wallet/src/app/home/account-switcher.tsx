@@ -45,7 +45,7 @@ export const AccountSwitcher = () => {
 					<ChevronDown className="ml-auto h-5 w-5 shrink-0 opacity-50" />
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className="w-48 p-0">
+			<PopoverContent className="p-0 ml-2">
 				<Command>
 					<CommandList>
 						<CommandInput placeholder="Search team..." />

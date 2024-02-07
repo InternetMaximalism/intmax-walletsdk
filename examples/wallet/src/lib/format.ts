@@ -43,7 +43,7 @@ const TOKEN_SHORT: FormatterRule[] = [
 	{ lt: 1, formatter: DECIMALS(3) },
 	{ lt: 1_000_000, formatter: DECIMALS(2) },
 	{ lt: 1_000_000_000_000, formatter: COMPACT_DECIMALS(2) },
-	{ lt: Infinity, formatter: "OMG" },
+	{ lt: Infinity, formatter: "SO MUCH" },
 ];
 
 const TOKEN_LONG: FormatterRule[] = [
@@ -51,7 +51,7 @@ const TOKEN_LONG: FormatterRule[] = [
 	{ lt: 0.0001, formatter: "<0.0001" },
 	{ lt: 100_000, formatter: DECIMALS(5, 2) },
 	{ lt: 1_000_000_000_000, formatter: DECIMALS(2) },
-	{ lt: Infinity, formatter: "WOW" },
+	{ lt: Infinity, formatter: "HMM, A LOT" },
 ];
 
 const USD_BALANCE: FormatterRule[] = [
