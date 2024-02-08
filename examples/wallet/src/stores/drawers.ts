@@ -1,5 +1,5 @@
 import { ENSAccount } from "@/lib/blockchain/ens";
-import { InternalTransactionRequest, Token } from "@/types";
+import { InternalTxRequest, Token } from "@/types";
 import { Account } from "viem";
 import { create } from "zustand";
 
@@ -8,7 +8,7 @@ export type DrawerPropsPattern =
 	| { id: "profile"; account: ENSAccount }
 	| { id: "onboarding" }
 	| { id: "send-input"; transfer: { account: Account; token?: Token; to?: string; amount?: string } }
-	| { id: "send-transaction"; transaction: InternalTransactionRequest };
+	| { id: "send-transaction"; transaction: InternalTxRequest };
 
 type HisoricalDrawerPropsPattern = DrawerPropsPattern & { previos?: HisoricalDrawerPropsPattern };
 

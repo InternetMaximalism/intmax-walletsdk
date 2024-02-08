@@ -50,3 +50,17 @@ export const fetchTokenPriceHistory = async (params: {
 		throw e;
 	}
 };
+
+export const fetchTokenPrice = async (token: Token): Promise<number> => {
+	const ankr = getAnkrProvider();
+	const ankrChain = toAnkrChain(token.chainId);
+
+	if (!ankrChain) throw new Error("Invalid chain");
+
+	const result = await ankr.getTokenPrice({
+		blockchain: ankrChain,
+		contractAddress: token.type === "erc20" ? token.address : undefined,
+	});
+
+	return Number(result.usdPrice);
+};
