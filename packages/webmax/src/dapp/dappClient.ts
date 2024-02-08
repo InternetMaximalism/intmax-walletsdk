@@ -1,4 +1,4 @@
-import { Namespace, WebmaxHandshakeResult } from "../types/protocol";
+import { EthereumAddress, Namespace, WebmaxHandshakeResult } from "../types/protocol";
 import { WALLET_ACTION_METHODS, WALLET_READ_METHODS } from "./constants";
 import { RpcProviderError } from "./errors";
 import { WalletClientRef, callRequest, incrementId } from "./messaging";
@@ -25,7 +25,7 @@ export const createWebmaxDappClient = (opt: WebmaxDappClientOptions): WebmaxDapp
 	const state: WalletState = {
 		supportedNamespaces: [],
 		supportedChains: [],
-		accounts: {} as Record<string, string[]>,
+		accounts: {} as WalletState["accounts"],
 	};
 
 	const callHttp = async (namespace: string, method: string, params: unknown) => {
@@ -56,7 +56,7 @@ export const createWebmaxDappClient = (opt: WebmaxDappClientOptions): WebmaxDapp
 					const { windowHandling: _, namespace: __, ...response } = await callRequest(ref, opt, message);
 					Object.assign(state, ref.handshake);
 					if (method === "eth_requestAccounts" && "result" in response) {
-						state.accounts[namespace] = response.result as string[];
+						state.accounts.eip155 = response.result as EthereumAddress[];
 					}
 					return response;
 				}

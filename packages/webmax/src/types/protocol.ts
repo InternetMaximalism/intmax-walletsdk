@@ -18,7 +18,7 @@ export type AbstractMessageSchema = {
 export type WebmaxHandshakeResult = {
 	supportedNamespaces: Namespace[];
 	supportedChains: ChainedNamespace[];
-	accounts: Record<Namespace, string[]>;
+	accounts: { eip155: EthereumAddress[] };
 };
 
 export type WebmaxMessageSchema = [
