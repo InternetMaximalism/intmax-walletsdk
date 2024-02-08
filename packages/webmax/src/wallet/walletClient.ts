@@ -25,7 +25,8 @@ export const webmaxWalletClient = <
 	const dispatch = async (event: MessageEvent) => {
 		const { namespace, method } = event.data;
 		const context = createWebmaxWalletContext(event);
-		const handler = handlers.find(([path]) => path === `${namespace}/${method}`);
+		const handler =
+			handlers.find(([path]) => path === `${namespace}/${method}`) ?? handlers.find(([path]) => path === namespace);
 		if (handler) return sendMessage(await handler[1](context));
 		return sendMessage(context.failure("method_not_supported"));
 	};

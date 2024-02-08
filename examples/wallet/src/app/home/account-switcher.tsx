@@ -11,15 +11,21 @@ import {
 	CommandSeparator,
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useAccount, useAccounts } from "@/hooks/account";
+import { useAccount, useAccounts, useSwitchAccount } from "@/hooks/account";
 import { cn } from "@/lib/utils";
 import { CheckIcon, ChevronDown, PlusCircleIcon } from "lucide-react";
 import { useState } from "react";
+import { Account } from "viem";
 
 export const AccountSwitcher = () => {
 	const [open, setOpen] = useState(false);
 	const account = useAccount();
 	const accounts = useAccounts();
+	const switchAccount = useSwitchAccount();
+
+	const onAccountSelect = (account: Account) => {
+		switchAccount(account.address);
+	};
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -37,7 +43,7 @@ export const AccountSwitcher = () => {
 						<CommandEmpty>No results found.</CommandEmpty>
 						<CommandGroup heading="Accounts">
 							{accounts.map((_account) => (
-								<CommandItem key={_account?.address} className="text-sm">
+								<CommandItem key={_account?.address} className="text-sm" onSelect={() => onAccountSelect(_account)}>
 									<AccountAvatar className="mr-2 h-5 w-5" account={_account} />
 									<AccountName account={_account} />
 									<CheckIcon
