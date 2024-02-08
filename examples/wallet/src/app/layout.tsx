@@ -6,8 +6,11 @@ import { Outlet, useLocation } from "react-router-dom";
 
 import { Drawers } from "@/components/drawers";
 import { Toaster } from "@/components/ui/sonner";
+import { useWebmax } from "@/hooks/webmax";
 
 function GlobalLayout() {
+	useWebmax();
+
 	const setDrawerProps = useDrawerStore((state) => state.setDrawerProps);
 	const mnemonic = useAccountStore((state) => state.mnemonic);
 	const privateKeys = useAccountStore((state) => state.privateKeys);
