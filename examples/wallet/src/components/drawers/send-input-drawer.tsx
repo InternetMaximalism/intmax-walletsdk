@@ -4,13 +4,17 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { useBalances } from "@/hooks/balance";
 import { usePaste } from "@/hooks/utils";
+import { createViemClient } from "@/lib/viemClient";
 import { DrawerProps } from "@/stores/drawers";
-import { InternalTransactionRequest, Token } from "@/types";
+import { InternalTxRequest, Token } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft } from "lucide-react";
 import { FC, useState } from "react";
 import { useForm } from "react-hook-form";
 import { isAddress, parseUnits } from "viem";
+import { Address } from "viem/accounts";
+import { mainnet } from "viem/chains";
+import { normalize } from "viem/ens";
 import { z } from "zod";
 import { TokenSelect } from "../token-select";
 
@@ -21,7 +25,7 @@ const schema = z.object({
 });
 
 //TODO: Refactor to zod and rhf stack
-const SendDrawer: FC<DrawerProps<"send-input">> = ({ back, open, previos, transfer }) => {
+const SendInputDrawer: FC<DrawerProps<"send-input">> = ({ back, open, previos, transfer }) => {
 	const { paste } = usePaste();
 
 	const [titleSymbol] = useState(transfer.token?.symbol);
@@ -36,13 +40,20 @@ const SendDrawer: FC<DrawerProps<"send-input">> = ({ back, open, previos, transf
 		form.setValue("to", (await paste()) ?? "");
 	};
 
-	const handleSubmit = (values: z.infer<typeof schema>) => {
+	const handleSubmit = async (values: z.infer<typeof schema>) => {
 		const token = values.token as Token;
-		const transaction: InternalTransactionRequest = {
+
+		let toAddress: Address | null = null;
+		if (isAddress(values.to)) toAddress = values.to;
+		else toAddress = await createViemClient(mainnet).getEnsAddress({ name: normalize(values.to) });
+
+		if (!toAddress) return form.setError("to", { message: "Address not found" });
+
+		const transaction: InternalTxRequest = {
 			type: "token-transfer",
-			token,
 			account: transfer.account,
-			to: values.to,
+			token,
+			to: toAddress,
 			amount: parseUnits(values.amount, token.decimals),
 		};
 
@@ -124,4 +135,4 @@ const SendDrawer: FC<DrawerProps<"send-input">> = ({ back, open, previos, transf
 	);
 };
 
-export default SendDrawer;
+export default SendInputDrawer;

@@ -1,4 +1,4 @@
-import { Balance, BalanceWithPrice } from "@/types";
+import { Amount, AmountWithPrice, Balance, BalanceWithPrice } from "@/types";
 import { formatUnits } from "viem";
 
 const DECIMALS = (n: number, m = n) =>
@@ -57,6 +57,7 @@ const TOKEN_LONG: FormatterRule[] = [
 const USD_BALANCE: FormatterRule[] = [
 	{ lte: 0, formatter: "$0.00" },
 	{ lt: 0.001, formatter: "<$0.001" },
+	{ lt: 1_00, formatter: DECIMALS_USD(3) },
 	{ lt: 1_000_000, formatter: DECIMALS_USD(2) },
 	{ lt: 1_000_000_000_000, formatter: DOCIMALS_USD_COMPACT(2) },
 	{ lt: Infinity, formatter: "$ SO MUCH" },
@@ -74,6 +75,12 @@ export const formatNumber = (value: number, type: FormatterType) => {
 	return typeof rule.formatter === "string" ? rule.formatter : rule.formatter.format(value);
 };
 
+export const formatAmount = (balance: Amount | null, type: FormatterType = "TOKEN_SHORT") => {
+	if (!balance) return formatNumber(0, type);
+	const value = formatUnits(balance.amount, balance.token.decimals);
+	return formatNumber(Number(value), type);
+};
+
 export const formatBalance = (balance: Balance | null, type: FormatterType = "TOKEN_SHORT") => {
 	if (!balance) return formatNumber(0, type);
 	const value = formatUnits(balance.balance, balance.token.decimals);
@@ -83,5 +90,11 @@ export const formatBalance = (balance: Balance | null, type: FormatterType = "TO
 export const formatUsdBalance = (balance: BalanceWithPrice | null, type: FormatterType = "USD_BALANCE") => {
 	if (!balance) return formatNumber(0, type);
 	const value = formatUnits(balance.balance, balance.token.decimals);
+	return formatNumber(balance.priceUsd * Number(value), type);
+};
+
+export const formatUsdAmount = (balance: AmountWithPrice | null, type: FormatterType = "USD_BALANCE") => {
+	if (!balance) return formatNumber(0, type);
+	const value = formatUnits(balance.amount, balance.token.decimals);
 	return formatNumber(balance.priceUsd * Number(value), type);
 };
