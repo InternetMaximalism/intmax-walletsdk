@@ -43,7 +43,7 @@ const TransferDetails: FC<{ transaction: PickInternalTxRequest<"token-transfer">
 	);
 };
 
-const TransactionSimulate: FC<{ transaction: InternalTxRequest }> = ({ transaction }) => {
+const TransactionSimulate: FC<{ transaction: InternalTxRequest }> = () => {
 	return <></>;
 };
 
