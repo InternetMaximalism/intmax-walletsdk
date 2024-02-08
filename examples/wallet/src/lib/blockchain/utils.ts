@@ -1,10 +1,13 @@
 import { InternalTxRequest, NativeToken, PickInternalTxRequest, Token } from "@/types";
 import { Address, Chain, decodeFunctionData, encodeFunctionData, erc20Abi } from "viem";
 
-export const tokenKey = (token: Token | null) => {
+export function tokenKey(token: Token): string;
+export function tokenKey(token: null): null;
+export function tokenKey(token: Token | null): string | null;
+export function tokenKey(token: Token | null) {
 	if (!token) return null;
 	return token.type === "native" ? String(token.chainId) : `${token.chainId}:${token.address}`;
-};
+}
 
 export const findToken = (tokens: Token[], chainId: number, address?: Address) => {
 	const token = tokens.find((t) => t.chainId === chainId && (t.type === "native" || t.address === address));
