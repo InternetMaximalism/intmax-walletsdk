@@ -45,7 +45,7 @@ export const TokenSelect: FC<{
 						<CommandGroup heading="Tokens">
 							<ScrollArea className="h-full max-h-48">
 								{chainedTokens.map(({ token, chain }) => (
-									<CommandItem key={`${tokenKey(token)}`} className="text-sm" onClick={() => onSelect?.(token)}>
+									<CommandItem key={`${tokenKey(token)}`} className="text-sm" onSelect={() => onSelect?.(token)}>
 										<TokenAvatar token={token} chain={chain} sizeRem={1.25} />
 										<span className="truncate ml-2">{`${token.name} (${token?.symbol})`}</span>
 										<CheckIcon

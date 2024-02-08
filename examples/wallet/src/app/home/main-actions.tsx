@@ -9,7 +9,10 @@ export const MainActions = () => {
 
 	return (
 		<div className="grid grid-cols-2 gap-4">
-			<Button disabled={!account || account.type === "json-rpc"}>
+			<Button
+				disabled={!account || account.type === "json-rpc"}
+				onClick={() => account && open({ id: "send-input", transfer: { account } })}
+			>
 				<ArrowUp className="mr-2 h-5 w-5" />
 				Send
 			</Button>
