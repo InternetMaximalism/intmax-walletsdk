@@ -1,5 +1,5 @@
 import { AbstractResponse } from "../types/messaging";
-import { MessageMethod, Namespace, WalletClientMessageSchema } from "../types/protocol";
+import { AbstractMessageSchema, MessageMethod, Namespace, WalletClientMessageSchema } from "../types/protocol";
 import { WebmaxWalletContext, createWebmaxWalletContext } from "./context";
 import { onMessage, sendMessage } from "./messaging";
 
@@ -8,16 +8,18 @@ type WebmaxWalletClientHandler<NS extends Namespace = any, Method extends string
 	context: WebmaxWalletContext<NS, Method>,
 ) => AbstractResponse | Promise<AbstractResponse>;
 
-export type WebmaxWalletClient = {
-	on: <NS extends Namespace, Method extends MessageMethod<WalletClientMessageSchema, NS>>(
-		path: `${NS}/${Method}`,
+export type WebmaxWalletClient<Schema extends AbstractMessageSchema[]> = {
+	on: <NS extends Namespace, Method extends MessageMethod<Schema, NS> = MessageMethod<Schema, NS>>(
+		path: NS | `${NS}/${Method}`,
 		cb: WebmaxWalletClientHandler<NS, Method>,
 	) => void;
 	ready: () => void;
 	destruct: () => void;
 };
 
-export const webmaxWalletClient = (): WebmaxWalletClient => {
+export const webmaxWalletClient = <
+	Schemas extends AbstractMessageSchema[] = WalletClientMessageSchema,
+>(): WebmaxWalletClient<Schemas> => {
 	const handlers: [string, WebmaxWalletClientHandler][] = [];
 
 	const dispatch = async (event: MessageEvent) => {
@@ -36,7 +38,6 @@ export const webmaxWalletClient = (): WebmaxWalletClient => {
 			const payload = { id: 0, namespace: "webmax", method: "webmax_handshake", params: undefined };
 			const handshakeMessage = new MessageEvent("message", { data: payload });
 			dispatch(handshakeMessage);
-			1;
 		},
 		destruct: () => clean(),
 	};
