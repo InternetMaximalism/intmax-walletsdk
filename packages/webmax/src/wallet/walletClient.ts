@@ -1,7 +1,7 @@
-import { AbstractResponse } from "../types/messaging";
+import { AbstractRequest, AbstractResponse } from "../types/messaging";
 import { AbstractMessageSchema, MessageMethod, Namespace, WalletClientMessageSchema } from "../types/protocol";
 import { WebmaxWalletContext, createWebmaxWalletContext } from "./context";
-import { onMessage, sendMessage } from "./messaging";
+import { onMessage, parentWindow, sendMessage } from "./messaging";
 
 // biome-ignore lint/suspicious/noExplicitAny:
 type WebmaxWalletClientHandler<NS extends Namespace = any, Method extends string = any> = (
@@ -22,9 +22,9 @@ export const webmaxWalletClient = <
 >(): WebmaxWalletClient<Schemas> => {
 	const handlers: [string, WebmaxWalletClientHandler][] = [];
 
-	const dispatch = async (event: MessageEvent) => {
-		const { namespace, method } = event.data;
-		const context = createWebmaxWalletContext(event);
+	const dispatch = async (request: AbstractRequest, origin: string) => {
+		const { namespace, method } = request;
+		const context = createWebmaxWalletContext(request, origin);
 		const handler =
 			handlers.find(([path]) => path === `${namespace}/${method}`) ?? handlers.find(([path]) => path === namespace);
 		if (handler) return sendMessage(await handler[1](context));
@@ -36,9 +36,10 @@ export const webmaxWalletClient = <
 	return {
 		on: (path, cb) => handlers.push([path, cb]),
 		ready: () => {
-			const payload = { id: 0, namespace: "webmax", method: "webmax_handshake", params: undefined };
-			const handshakeMessage = new MessageEvent("message", { data: payload });
-			dispatch(handshakeMessage);
+			const parent = parentWindow();
+			if (!parent) return;
+			const payload: AbstractRequest = { id: 0, namespace: "webmax", method: "webmax_handshake", params: undefined };
+			dispatch(payload, parent.origin);
 		},
 		destruct: () => clean(),
 	};
