@@ -5,7 +5,8 @@
         "baseUrl": ".",
         "sourceMap": true,
         "outDir": "./dist/esm",
-        "declarationDir": "./dist/types"
+        "declarationDir": "./dist/types",
+        "composite": true,
     },
     "include": [
         "src/**/*.ts",
