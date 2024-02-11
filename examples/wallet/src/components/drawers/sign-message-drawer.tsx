@@ -24,8 +24,8 @@ const SignMessageDrawer: FC<DrawerProps<"sign-message">> = ({ account, data, onS
 			<DrawerHeader>
 				<DrawerTitle>Sign Message</DrawerTitle>
 			</DrawerHeader>
-			<div>
-				<pre>{data}</pre>
+			<div className="px-2">
+				<pre className="border p-4 rounded-md">{data}</pre>
 			</div>
 			<DrawerFooter className="grid grid-cols-2">
 				<Button variant="outline" onClick={handleCancel}>
