@@ -1,9 +1,15 @@
-import { Namespace, WebmaxHandshakeResult } from "../types/protocol";
+import { AbstractResponse } from "src";
+import {
+	AbstractMessageSchema,
+	DappHandleTypes,
+	EthereumAddress,
+	ExtractSchema,
+	WebmaxConnectResult,
+	WebmaxDefaultMessageSchema,
+} from "../types/protocol";
 import { WALLET_ACTION_METHODS, WALLET_READ_METHODS } from "./constants";
 import { RpcProviderError } from "./errors";
-import { WalletClientRef, callRequest, incrementId } from "./messaging";
-
-type WalletState = WebmaxHandshakeResult;
+import { WalletClientRef, callRequest } from "./messaging";
 
 export type WebmaxDappClientOptions = {
 	url: string;
@@ -12,20 +18,28 @@ export type WebmaxDappClientOptions = {
 	httpRpc?: Record<string, { url: string }>;
 };
 
-export type WebmaxDappClient = {
-	connect: () => Promise<void>;
-	provider: (namespace: Namespace) => {
-		request: (method: string, params: unknown) => void;
-		on: (event: never, callback: (data: never) => void) => void;
-	};
+export type EIP1193Provider = {
+	request: (args: { method: string; params?: unknown }) => Promise<unknown>;
+	on: (event: never, callback: (data: never) => void) => void;
 };
 
-export const createWebmaxDappClient = (opt: WebmaxDappClientOptions): WebmaxDappClient => {
+type WalletState = WebmaxConnectResult;
+export type WebmaxDappClient<Schema extends AbstractMessageSchema> = {
+	connect: () => Promise<WebmaxConnectResult>;
+	provider: <NS extends Schema[number]["namespace"]>(namespace: NS) => EIP1193Provider;
+};
+
+export const webmaxDappClient = <
+	TSchema extends AbstractMessageSchema = WebmaxDefaultMessageSchema,
+	_TSchema extends AbstractMessageSchema = ExtractSchema<TSchema, DappHandleTypes>,
+>(
+	opt: WebmaxDappClientOptions,
+): WebmaxDappClient<_TSchema> => {
 	const ref: WalletClientRef = {};
 	const state: WalletState = {
 		supportedNamespaces: [],
 		supportedChains: [],
-		accounts: {} as Record<string, string[]>,
+		accounts: {} as WalletState["accounts"],
 	};
 
 	const callHttp = async (namespace: string, method: string, params: unknown) => {
@@ -46,37 +60,46 @@ export const createWebmaxDappClient = (opt: WebmaxDappClientOptions): WebmaxDapp
 			const response = await callRequest(ref, opt, message);
 			if ("error" in response) throw new RpcProviderError(response.error.message, response.error.code);
 			Object.assign(state, response.result);
+			return response.result as WebmaxConnectResult;
 		},
 		provider: (namespace) => {
 			if (namespace !== "eip155") throw new Error("Not implemented");
+
+			const throwOrResult = (response: AbstractResponse) => {
+				if ("error" in response) throw new RpcProviderError(response.error.message, response.error.code);
+				return response.result;
+			};
+
 			// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: This is a complex function
-			const request = async (method: string, params: unknown) => {
-				if (WALLET_ACTION_METHODS.includes(method)) {
+			const request = async (args: { method: string; params?: unknown }) => {
+				const { method, params } = args;
+				if (WALLET_ACTION_METHODS.includes(`${namespace}/${method}`)) {
 					const message = { namespace, method, params };
-					const { windowHandling: _, namespace: __, ...response } = await callRequest(ref, opt, message);
+					const response = await callRequest(ref, opt, message);
 					Object.assign(state, ref.handshake);
 					if (method === "eth_requestAccounts" && "result" in response) {
-						state.accounts[namespace] = response.result as string[];
+						state.accounts.eip155 = response.result as EthereumAddress[];
 					}
-					return response;
+
+					return throwOrResult(response);
 				}
 
-				if (WALLET_READ_METHODS.includes(method)) {
-					if (method === "eth_accounts") return { id: incrementId(ref), result: state.accounts[namespace] };
+				if (WALLET_READ_METHODS.includes(`${namespace}/${method}`)) {
+					if (method === "eth_accounts") {
+						return state.accounts.eip155;
+					}
 					if (method === "eth_chainId") {
 						const eip155Chains = state.supportedChains
 							.filter((c) => c.split(":")[0] === "eip155")
 							.map((c) => c.split(":")[1]);
-						return { id: incrementId(ref), result: eip155Chains };
+						return eip155Chains[0];
 					}
 				}
 
 				const response = await callHttp(namespace, method, params);
-				return { id: incrementId(ref), result: response.result };
+				return throwOrResult(response);
 			};
-			const on = () => {
-				throw new Error("Not implemented");
-			};
+			const on = () => {};
 			return { request, on };
 		},
 	};
