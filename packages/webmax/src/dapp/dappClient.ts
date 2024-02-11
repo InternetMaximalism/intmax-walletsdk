@@ -18,17 +18,17 @@ export type WebmaxDappClientOptions = {
 	httpRpc?: Record<string, { url: string }>;
 };
 
-export type EIP1193Provider<Schema extends AbstractMessageSchema[]> = {
+export type EIP1193Provider<Schema extends AbstractMessageSchema> = {
 	request: (args: { method: string; params: unknown }) => void;
 	on: (event: never, callback: (data: never) => void) => void;
 };
 
-export type WebmaxDappClient<Schema extends AbstractMessageSchema[]> = {
+export type WebmaxDappClient<Schema extends AbstractMessageSchema> = {
 	connect: () => Promise<void>;
 	provider: <NS extends Namespace>(namespace: NS) => EIP1193Provider<Schema>;
 };
 
-export const webmaxDappClient = <Schema extends AbstractMessageSchema[] = WebmaxDefaultMessageSchema>(
+export const webmaxDappClient = <Schema extends AbstractMessageSchema = WebmaxDefaultMessageSchema>(
 	opt: WebmaxDappClientOptions,
 ): WebmaxDappClient<Schema> => {
 	const ref: WalletClientRef = {};
