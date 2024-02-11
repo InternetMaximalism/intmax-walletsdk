@@ -1,50 +1,48 @@
 import { AbstractErrorResponse, AbstractRequest, AbstractSuccessResponse, WindowHandling } from "../types/messaging";
-import {
-	ChainedNamespace,
-	MessageMethod,
-	MessageParams,
-	MessageResult,
-	Namespace,
-	WalletClientMessageSchema,
-} from "../types/protocol";
+import { AbstractMessageSchema, ChainedNamespace } from "../types/protocol";
 
-export type WebmaxWalletContext<NS extends Namespace, Method extends string> = {
-	namespace: ChainedNamespace<NS> | NS;
-	method: Method;
-	params: MessageParams<WalletClientMessageSchema, NS, Method>;
-	raw: { request: AbstractRequest; event: MessageEvent };
+export type WebmaxWalletContext<MethodSchema extends AbstractMessageSchema[number]> = {
+	namespace: ChainedNamespace<MethodSchema["namespace"]> | MethodSchema["namespace"];
+	method: MethodSchema["method"];
+	req: {
+		params: MethodSchema["params"];
+		origin: string | "internal";
+		raw: AbstractRequest;
+	};
 	window: (handling: WindowHandling) => void;
-	success: (result: MessageResult<WalletClientMessageSchema, NS, Method>) => AbstractSuccessResponse;
+	success: (result: MethodSchema["result"]) => AbstractSuccessResponse;
 	failure: (message: string, opt?: { code?: number; window?: WindowHandling }) => AbstractErrorResponse;
 };
 
-export const createWebmaxWalletContext = <
-	NS extends Namespace,
-	Method extends MessageMethod<WalletClientMessageSchema, NS>,
->(
-	event: MessageEvent,
+export const createWebmaxWalletContext = <MethodSchema extends AbstractMessageSchema[number]>(
+	request: AbstractRequest,
+	origin: string,
 ) => {
-	type Context = WebmaxWalletContext<NS, Method>;
-	const request = event.data as AbstractRequest;
+	type Context = WebmaxWalletContext<MethodSchema>;
 	let windowHandling: WindowHandling = "close";
 
 	const context: Context = {
 		namespace: request.namespace as Context["namespace"],
 		method: request.method as Context["method"],
-		params: request.params as Context["params"],
-		raw: { request, event },
+		req: {
+			origin,
+			params: request.params as Context["req"]["params"],
+			raw: request,
+		},
 		window: (handling) => {
 			windowHandling = handling;
 		},
 		success: (result) => ({
 			id: request.id,
 			namespace: request.namespace,
+			method: request.method,
 			windowHandling,
 			result,
 		}),
 		failure: (message, opt) => ({
 			id: request.id,
 			namespace: request.namespace,
+			method: request.method,
 			windowHandling: opt?.window || windowHandling,
 			error: { message, code: opt?.code || 0 },
 		}),

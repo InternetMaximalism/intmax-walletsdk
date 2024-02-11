@@ -13,6 +13,7 @@ export type AbstractRequest<Params = unknown> = {
 export type AbstractSuccessResponse<Result = unknown> = {
 	id: number;
 	namespace: Namespace | ChainedNamespace;
+	method: string;
 	windowHandling: WindowHandling;
 	result: Result;
 };
@@ -20,6 +21,7 @@ export type AbstractSuccessResponse<Result = unknown> = {
 export type AbstractErrorResponse = {
 	id: number;
 	namespace: Namespace | ChainedNamespace;
+	method: string;
 	windowHandling: WindowHandling;
 	error: { code: number; message: string };
 };

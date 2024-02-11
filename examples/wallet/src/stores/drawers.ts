@@ -1,6 +1,6 @@
 import { ENSAccount } from "@/lib/blockchain/ens";
 import { InternalTxRequest, Token } from "@/types";
-import { Account } from "viem";
+import { Account, Hash, Hex } from "viem";
 import { create } from "zustand";
 
 export type DrawerPropsPattern =
@@ -8,7 +8,10 @@ export type DrawerPropsPattern =
 	| { id: "profile"; account: ENSAccount }
 	| { id: "onboarding" }
 	| { id: "send-input"; transfer: { account: Account; token?: Token; to?: string; amount?: string } }
-	| { id: "send-transaction"; transaction: InternalTxRequest };
+	| { id: "send-transaction"; transaction: InternalTxRequest; onSign?: (hash: Hash) => void; onCancel?: () => void }
+	| { id: "sign-transaction"; transaction: InternalTxRequest; onSign?: (tx: Hex) => void; onCancel?: () => void }
+	| { id: "sign-message"; account: Account; data: Hex; onSign?: (signature: Hex) => void; onCancel?: () => void }
+	| { id: "sign-typed-data"; account: Account; data: string; onSign?: (signature: Hex) => void; onCancel?: () => void };
 
 type HisoricalDrawerPropsPattern = DrawerPropsPattern & { previos?: HisoricalDrawerPropsPattern };
 

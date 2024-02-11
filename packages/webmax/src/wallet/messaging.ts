@@ -1,4 +1,4 @@
-import type { AbstractResponse, ClientMode } from "../types/messaging";
+import type { AbstractRequest, AbstractResponse, ClientMode } from "../types/messaging";
 
 export const parentWindow = (): Window | null => {
 	if (typeof window === "undefined") return null;
@@ -17,14 +17,15 @@ export const checkClientMode = (): ClientMode | null => {
 export const sendMessage = (message: AbstractResponse) => {
 	const parent = parentWindow();
 	if (!parent) return;
-	parent.postMessage(message, parent.location.origin);
+	parent.postMessage(message, "*");
 };
 
-export const onMessage = (callback: (event: MessageEvent) => void) => {
-	if (typeof window === "undefined") return () => {};
+export const onMessage = (callback: (event: AbstractRequest, origin: string) => void) => {
+	const parent = parentWindow();
+	if (!parent) return () => {};
 	const listener = (event: MessageEvent) => {
 		if (event.source !== parentWindow()) return;
-		callback(event.data);
+		callback(event.data, event.origin);
 	};
 	window.addEventListener("message", listener);
 	return () => window.removeEventListener("message", listener);
