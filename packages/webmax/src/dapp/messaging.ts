@@ -6,6 +6,9 @@ import { WebmaxDappClientOptions } from "./dappClient";
 const DEFAULT_WALLET_WINDOW_HEIGHT = 600;
 const DEFAULT_WALLET_WINDOW_WIDTH = 400;
 
+const MESSAGE_INTERVAL = 1000;
+const CLOSE_WAITING = 200;
+
 export type WalletClientRef = {
 	window?: Window;
 	id?: number;
@@ -31,21 +34,18 @@ const _callRequest = (ref: WalletClientRef, opt: WebmaxDappClientOptions, messag
 	const sendMessageOnce = () => {
 		if (sensed) return;
 		sensed = true;
+
 		ref.window?.postMessage({ ...message, id: ref.id }, new URL(opt.url).origin);
 	};
 
 	ref.handshake && sendMessageOnce();
 	const listener = (event: MessageEvent) => {
-		//console.log("event", event);
 		if (event.source !== ref.window) return;
 		if (event.data.method === "webmax_handshake") {
-			console.log("handshake", event.data.result);
 			ref.handshake = event.data.result;
 			sendMessageOnce();
-			//window.postMessage({ ...message, id: ref.id }, event.origin);
 		}
 		if (event.data.id === message.id) {
-			console.log("event.data", event.data);
 			resolve(event.data);
 			window.removeEventListener("message", listener);
 		}
@@ -67,10 +67,13 @@ export const callRequest = async (
 ) => {
 	const { promise, resolve } = withResolvers<void>();
 	const waiting = Promise.allSettled(ref.calls || []);
+
 	ref.id = ref.id ? ref.id + 1 : 1;
 	ref.calls = [...(ref.calls || []), promise];
 
 	await waiting;
+
+	if (ref.window) await new Promise((r) => setTimeout(r, MESSAGE_INTERVAL));
 
 	if (ref.window?.closed || !ref.window) ref.window = openWindow(opt);
 
@@ -78,10 +81,13 @@ export const callRequest = async (
 	const result = await _callRequest(ref, opt, _message);
 
 	ref.calls = ref.calls?.filter((p) => p !== promise);
-	if (ref.calls?.length === 0 && result?.windowHandling === "close") {
+	setTimeout(() => {
+		if (ref.calls?.length !== 0 || result?.windowHandling !== "close") return;
 		ref.window?.close();
 		ref.window = undefined;
-	}
+		ref.handshake = undefined;
+	}, CLOSE_WAITING);
+
 	resolve();
 
 	return result;

@@ -6,7 +6,7 @@ export type WebmaxWalletContext<MethodSchema extends AbstractMessageSchema[numbe
 	method: MethodSchema["method"];
 	req: {
 		params: MethodSchema["params"];
-		origin: string;
+		origin: string | "internal";
 		raw: AbstractRequest;
 	};
 	window: (handling: WindowHandling) => void;

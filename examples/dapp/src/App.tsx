@@ -8,8 +8,21 @@ const webmax = webmaxDappClient({
 
 function App() {
 	const handleClick = async () => {
+		await webmax.connect();
+
 		const ethereum = webmax.provider("eip155");
-		ethereum.request({ method: "eth_sign", params: ["0x3280129f0006825fC1AcccC227993ebAdAb6c8f5", "Hello"] });
+		const accounts = (await ethereum.request({ method: "eth_accounts", params: [] })) as string[];
+		console.log("accounts", accounts);
+
+		const result1 = await ethereum.request({
+			method: "eth_sign",
+			params: [accounts[0], "Hello"],
+		});
+		const result2 = await ethereum.request({
+			method: "eth_sign",
+			params: [accounts[0], "Hello"],
+		});
+		console.log("result", await result1);
 	};
 
 	return (
