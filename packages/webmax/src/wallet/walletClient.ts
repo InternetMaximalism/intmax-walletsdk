@@ -1,25 +1,34 @@
 import { AbstractRequest, AbstractResponse } from "../types/messaging";
-import { AbstractMessageSchema, MessageMethod, Namespace, WebmaxDefaultMessageSchema } from "../types/protocol";
+import { AbstractMessageSchema, WebmaxDefaultMessageSchema } from "../types/protocol";
 import { WebmaxWalletContext, createWebmaxWalletContext } from "./context";
 import { onMessage, parentWindow, sendMessage } from "./messaging";
 
-// biome-ignore lint/suspicious/noExplicitAny:
-type WebmaxWalletClientHandler<NS extends Namespace = any, Method extends string = any> = (
-	context: WebmaxWalletContext<NS, Method>,
+type PathedMethodSchema<TSchema extends AbstractMessageSchema = AbstractMessageSchema> = {
+	[K in keyof TSchema]: {
+		path: `${TSchema[K]["namespace"]}/${TSchema[K]["method"]}`;
+		schema: TSchema[K];
+	};
+}[number];
+
+type WebmaxWalletClientHandler<TMethodSchema extends AbstractMessageSchema[number] = AbstractMessageSchema[number]> = (
+	context: WebmaxWalletContext<TMethodSchema>,
 ) => AbstractResponse | Promise<AbstractResponse>;
 
-export type WebmaxWalletClient<Schema extends AbstractMessageSchema[] = WebmaxDefaultMessageSchema> = {
-	on: <NS extends Namespace, Method extends MessageMethod<Schema, NS> = MessageMethod<Schema, NS>>(
-		path: NS | `${NS}/${Method}`,
-		cb: WebmaxWalletClientHandler<NS, Method>,
-	) => void;
+export type WebmaxWalletClient<TSchema extends AbstractMessageSchema> = {
 	ready: () => void;
 	destruct: () => void;
+	on: <
+		TPath extends PathedMethodSchema<TSchema>["path"],
+		TMethodSchema extends Extract<PathedMethodSchema<TSchema>, { path: TPath }>,
+	>(
+		path: TPath,
+		cb: WebmaxWalletClientHandler<TMethodSchema["schema"]>,
+	) => void;
 };
 
 export const webmaxWalletClient = <
-	Schemas extends AbstractMessageSchema[] = WebmaxDefaultMessageSchema,
->(): WebmaxWalletClient<Schemas> => {
+	TSchema extends AbstractMessageSchema = WebmaxDefaultMessageSchema,
+>(): WebmaxWalletClient<TSchema> => {
 	const handlers: [string, WebmaxWalletClientHandler][] = [];
 
 	const dispatch = async (request: AbstractRequest, origin: string) => {
@@ -44,3 +53,9 @@ export const webmaxWalletClient = <
 		destruct: () => clean(),
 	};
 };
+
+const client = webmaxWalletClient();
+
+client.on("eip155/eth_accounts", (c) => {
+	const params = c.method;
+});

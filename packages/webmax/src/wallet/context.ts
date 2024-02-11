@@ -1,34 +1,29 @@
 import { AbstractErrorResponse, AbstractRequest, AbstractSuccessResponse, WindowHandling } from "../types/messaging";
 import {
+	AbstractMessageSchema,
 	ChainedNamespace,
-	MessageMethod,
-	MessageParams,
-	MessageResult,
-	Namespace,
+	SchemaNamespace,
 	WebmaxDefaultMessageSchema,
 } from "../types/protocol";
 
-export type WebmaxWalletContext<NS extends Namespace, Method extends string> = {
-	namespace: ChainedNamespace<NS> | NS;
-	method: Method;
+export type WebmaxWalletContext<MethodSchema extends AbstractMessageSchema[number]> = {
+	namespace: ChainedNamespace<MethodSchema["namespace"]> | MethodSchema["namespace"];
+	method: MethodSchema["method"];
 	req: {
-		params: MessageParams<WebmaxDefaultMessageSchema, NS, Method>;
+		params: MethodSchema["params"];
 		origin: string;
 		raw: AbstractRequest;
 	};
 	window: (handling: WindowHandling) => void;
-	success: (result: MessageResult<WebmaxDefaultMessageSchema, NS, Method>) => AbstractSuccessResponse;
+	//success: (result: MessageResult<WebmaxDefaultMessageSchema, NS, Method>) => AbstractSuccessResponse;
 	failure: (message: string, opt?: { code?: number; window?: WindowHandling }) => AbstractErrorResponse;
 };
 
-export const createWebmaxWalletContext = <
-	NS extends Namespace,
-	Method extends MessageMethod<WebmaxDefaultMessageSchema, NS>,
->(
+export const createWebmaxWalletContext = <MethodSchema extends AbstractMessageSchema[number]>(
 	request: AbstractRequest,
 	origin: string,
 ) => {
-	type Context = WebmaxWalletContext<NS, Method>;
+	type Context = WebmaxWalletContext<MethodSchema>;
 	let windowHandling: WindowHandling = "close";
 
 	const context: Context = {
@@ -42,13 +37,13 @@ export const createWebmaxWalletContext = <
 		window: (handling) => {
 			windowHandling = handling;
 		},
-		success: (result) => ({
-			id: request.id,
-			namespace: request.namespace,
-			method: request.method,
-			windowHandling,
-			result,
-		}),
+		// success: (result) => ({
+		// 	id: request.id,
+		// 	namespace: request.namespace,
+		// 	method: request.method,
+		// 	windowHandling,
+		// 	result,
+		// }),
 		failure: (message, opt) => ({
 			id: request.id,
 			namespace: request.namespace,
