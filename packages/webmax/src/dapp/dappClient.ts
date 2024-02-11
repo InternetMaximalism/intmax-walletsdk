@@ -1,15 +1,14 @@
 import {
 	AbstractMessageSchema,
+	DappHandleTypes,
 	EthereumAddress,
-	Namespace,
+	ExtractSchema,
 	WebmaxDefaultMessageSchema,
 	WebmaxHandshakeResult,
 } from "../types/protocol";
 import { WALLET_ACTION_METHODS, WALLET_READ_METHODS } from "./constants";
 import { RpcProviderError } from "./errors";
 import { WalletClientRef, callRequest, incrementId } from "./messaging";
-
-type WalletState = WebmaxHandshakeResult;
 
 export type WebmaxDappClientOptions = {
 	url: string;
@@ -18,19 +17,23 @@ export type WebmaxDappClientOptions = {
 	httpRpc?: Record<string, { url: string }>;
 };
 
-export type EIP1193Provider<Schema extends AbstractMessageSchema> = {
+export type EIP1193Provider = {
 	request: (args: { method: string; params: unknown }) => void;
 	on: (event: never, callback: (data: never) => void) => void;
 };
 
+type WalletState = WebmaxHandshakeResult;
 export type WebmaxDappClient<Schema extends AbstractMessageSchema> = {
 	connect: () => Promise<void>;
-	provider: <NS extends Namespace>(namespace: NS) => EIP1193Provider<Schema>;
+	provider: <NS extends Schema[number]["namespace"]>(namespace: NS) => EIP1193Provider;
 };
 
-export const webmaxDappClient = <Schema extends AbstractMessageSchema = WebmaxDefaultMessageSchema>(
+export const webmaxDappClient = <
+	TSchema extends AbstractMessageSchema = WebmaxDefaultMessageSchema,
+	_TSchema extends AbstractMessageSchema = ExtractSchema<TSchema, DappHandleTypes>,
+>(
 	opt: WebmaxDappClientOptions,
-): WebmaxDappClient<Schema> => {
+): WebmaxDappClient<_TSchema> => {
 	const ref: WalletClientRef = {};
 	const state: WalletState = {
 		supportedNamespaces: [],
@@ -85,9 +88,7 @@ export const webmaxDappClient = <Schema extends AbstractMessageSchema = WebmaxDe
 				const response = await callHttp(namespace, method, params);
 				return { id: incrementId(ref), result: response.result };
 			};
-			const on = () => {
-				throw new Error("Not implemented");
-			};
+			const on = () => {};
 			return { request, on };
 		},
 	};
