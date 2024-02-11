@@ -1,10 +1,5 @@
 import { AbstractErrorResponse, AbstractRequest, AbstractSuccessResponse, WindowHandling } from "../types/messaging";
-import {
-	AbstractMessageSchema,
-	ChainedNamespace,
-	SchemaNamespace,
-	WebmaxDefaultMessageSchema,
-} from "../types/protocol";
+import { AbstractMessageSchema, ChainedNamespace } from "../types/protocol";
 
 export type WebmaxWalletContext<MethodSchema extends AbstractMessageSchema[number]> = {
 	namespace: ChainedNamespace<MethodSchema["namespace"]> | MethodSchema["namespace"];
@@ -15,7 +10,7 @@ export type WebmaxWalletContext<MethodSchema extends AbstractMessageSchema[numbe
 		raw: AbstractRequest;
 	};
 	window: (handling: WindowHandling) => void;
-	//success: (result: MessageResult<WebmaxDefaultMessageSchema, NS, Method>) => AbstractSuccessResponse;
+	success: (result: MethodSchema["result"]) => AbstractSuccessResponse;
 	failure: (message: string, opt?: { code?: number; window?: WindowHandling }) => AbstractErrorResponse;
 };
 
@@ -37,13 +32,13 @@ export const createWebmaxWalletContext = <MethodSchema extends AbstractMessageSc
 		window: (handling) => {
 			windowHandling = handling;
 		},
-		// success: (result) => ({
-		// 	id: request.id,
-		// 	namespace: request.namespace,
-		// 	method: request.method,
-		// 	windowHandling,
-		// 	result,
-		// }),
+		success: (result) => ({
+			id: request.id,
+			namespace: request.namespace,
+			method: request.method,
+			windowHandling,
+			result,
+		}),
 		failure: (message, opt) => ({
 			id: request.id,
 			namespace: request.namespace,

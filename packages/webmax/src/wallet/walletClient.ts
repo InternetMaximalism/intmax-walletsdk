@@ -1,11 +1,11 @@
 import { AbstractRequest, AbstractResponse } from "../types/messaging";
-import { AbstractMessageSchema, WebmaxDefaultMessageSchema } from "../types/protocol";
+import { AbstractMessageSchema, ExtractSchema, WalletHandleTypes, WebmaxDefaultMessageSchema } from "../types/protocol";
 import { WebmaxWalletContext, createWebmaxWalletContext } from "./context";
 import { onMessage, parentWindow, sendMessage } from "./messaging";
 
 type PathedMethodSchema<TSchema extends AbstractMessageSchema = AbstractMessageSchema> = {
 	[K in keyof TSchema]: {
-		path: `${TSchema[K]["namespace"]}/${TSchema[K]["method"]}`;
+		P0: `${TSchema[K]["namespace"]}/${TSchema[K]["method"]}`;
 		schema: TSchema[K];
 	};
 }[number];
@@ -18,8 +18,8 @@ export type WebmaxWalletClient<TSchema extends AbstractMessageSchema> = {
 	ready: () => void;
 	destruct: () => void;
 	on: <
-		TPath extends PathedMethodSchema<TSchema>["path"],
-		TMethodSchema extends Extract<PathedMethodSchema<TSchema>, { path: TPath }>,
+		TPath extends PathedMethodSchema<TSchema>["P0"],
+		TMethodSchema extends Extract<PathedMethodSchema<TSchema>, { P0: TPath }>,
 	>(
 		path: TPath,
 		cb: WebmaxWalletClientHandler<TMethodSchema["schema"]>,
@@ -28,7 +28,8 @@ export type WebmaxWalletClient<TSchema extends AbstractMessageSchema> = {
 
 export const webmaxWalletClient = <
 	TSchema extends AbstractMessageSchema = WebmaxDefaultMessageSchema,
->(): WebmaxWalletClient<TSchema> => {
+	_TSchema extends AbstractMessageSchema = ExtractSchema<TSchema, WalletHandleTypes>,
+>(): WebmaxWalletClient<_TSchema> => {
 	const handlers: [string, WebmaxWalletClientHandler][] = [];
 
 	const dispatch = async (request: AbstractRequest, origin: string) => {
@@ -53,9 +54,3 @@ export const webmaxWalletClient = <
 		destruct: () => clean(),
 	};
 };
-
-const client = webmaxWalletClient();
-
-client.on("eip155/eth_accounts", (c) => {
-	const params = c.method;
-});
