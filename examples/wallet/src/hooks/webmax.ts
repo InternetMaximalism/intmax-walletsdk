@@ -1,6 +1,6 @@
 import { withResolvers } from "@/lib/withResolvers";
 import { useNetworksStore } from "@/stores/network";
-import { useLayoutEffect, useState } from "react";
+import { useLayoutEffect } from "react";
 import { Hex, LocalAccount } from "viem";
 import { webmaxWalletClient } from "webmax2/wallet";
 import { useAccounts } from "./account";
@@ -23,6 +23,13 @@ export const useWebmax = () => {
 		if (!(localAccounts.length && supportedChains.length)) return;
 
 		webmax.on("webmax/webmax_handshake", (c) => {
+			return c.success({
+				supportedNamespaces: ["eip155", "webmax"],
+				supportedChains: supportedChains,
+			});
+		});
+
+		webmax.on("webmax/webmax_connect", (c) => {
 			return c.success({
 				supportedNamespaces: ["eip155", "webmax"],
 				supportedChains: supportedChains,

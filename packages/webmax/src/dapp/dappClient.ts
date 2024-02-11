@@ -1,14 +1,15 @@
+import { AbstractResponse } from "src";
 import {
 	AbstractMessageSchema,
 	DappHandleTypes,
 	EthereumAddress,
 	ExtractSchema,
+	WebmaxConnectResult,
 	WebmaxDefaultMessageSchema,
-	WebmaxHandshakeResult,
 } from "../types/protocol";
 import { WALLET_ACTION_METHODS, WALLET_READ_METHODS } from "./constants";
 import { RpcProviderError } from "./errors";
-import { WalletClientRef, callRequest, incrementId } from "./messaging";
+import { WalletClientRef, callRequest } from "./messaging";
 
 export type WebmaxDappClientOptions = {
 	url: string;
@@ -18,13 +19,13 @@ export type WebmaxDappClientOptions = {
 };
 
 export type EIP1193Provider = {
-	request: (args: { method: string; params: unknown }) => void;
+	request: (args: { method: string; params?: unknown }) => Promise<unknown>;
 	on: (event: never, callback: (data: never) => void) => void;
 };
 
-type WalletState = WebmaxHandshakeResult;
+type WalletState = WebmaxConnectResult;
 export type WebmaxDappClient<Schema extends AbstractMessageSchema> = {
-	connect: () => Promise<void>;
+	connect: () => Promise<WebmaxConnectResult>;
 	provider: <NS extends Schema[number]["namespace"]>(namespace: NS) => EIP1193Provider;
 };
 
@@ -59,34 +60,44 @@ export const webmaxDappClient = <
 			const response = await callRequest(ref, opt, message);
 			if ("error" in response) throw new RpcProviderError(response.error.message, response.error.code);
 			Object.assign(state, response.result);
+			return response.result as WebmaxConnectResult;
 		},
 		provider: (namespace) => {
 			if (namespace !== "eip155") throw new Error("Not implemented");
+
+			const throwOrResult = (response: AbstractResponse) => {
+				if ("error" in response) throw new RpcProviderError(response.error.message, response.error.code);
+				return response.result;
+			};
+
 			// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: This is a complex function
-			const request = async (args: { method: string; params: unknown }) => {
+			const request = async (args: { method: string; params?: unknown }) => {
 				const { method, params } = args;
 				if (WALLET_ACTION_METHODS.includes(`${namespace}/${method}`)) {
 					const message = { namespace, method, params };
-					const { windowHandling: _, namespace: __, ...response } = await callRequest(ref, opt, message);
+					const response = await callRequest(ref, opt, message);
 					Object.assign(state, ref.handshake);
 					if (method === "eth_requestAccounts" && "result" in response) {
 						state.accounts.eip155 = response.result as EthereumAddress[];
 					}
-					return response;
+
+					return throwOrResult(response);
 				}
 
-				if (WALLET_READ_METHODS.includes(method)) {
-					if (method === "eth_accounts") return { id: incrementId(ref), result: state.accounts.eip155 };
+				if (WALLET_READ_METHODS.includes(`${namespace}/${method}`)) {
+					if (method === "eth_accounts") {
+						return state.accounts.eip155;
+					}
 					if (method === "eth_chainId") {
 						const eip155Chains = state.supportedChains
 							.filter((c) => c.split(":")[0] === "eip155")
 							.map((c) => c.split(":")[1]);
-						return { id: incrementId(ref), result: eip155Chains };
+						return eip155Chains[0];
 					}
 				}
 
 				const response = await callHttp(namespace, method, params);
-				return { id: incrementId(ref), result: response.result };
+				return throwOrResult(response);
 			};
 			const on = () => {};
 			return { request, on };

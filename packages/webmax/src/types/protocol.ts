@@ -1,4 +1,5 @@
 import type { AddEthereumChainParameter, TransactionRequest, WatchAssetParams } from "viem";
+import { Prettify } from "./utils";
 
 export type Namespaces = { EIP155: "eip155"; WEBMAX: "webmax" };
 export type Namespace = Namespaces[keyof Namespaces];
@@ -22,8 +23,9 @@ export type AbstractMessageSchema = {
 export type WebmaxHandshakeResult = {
 	supportedNamespaces: Namespace[];
 	supportedChains: ChainedNamespace[];
-	accounts: { eip155: EthereumAddress[] };
 };
+
+export type WebmaxConnectResult = Prettify<WebmaxHandshakeResult & { accounts: { eip155: EthereumAddress[] } }>;
 
 export type WebmaxMessageSchema = [
 	/**
@@ -35,6 +37,16 @@ export type WebmaxMessageSchema = [
 		method: "webmax_handshake";
 		params?: undefined;
 		result: WebmaxHandshakeResult;
+	},
+	/**
+	 * @description Handshake message sent when popup is opened and returns supported namespaces and chains to dApp.
+	 */
+	{
+		type: "approval";
+		namespace: Namespaces["WEBMAX"];
+		method: "webmax_connect";
+		params?: undefined;
+		result: WebmaxConnectResult;
 	},
 ];
 

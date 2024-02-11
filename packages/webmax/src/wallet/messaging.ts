@@ -17,16 +17,13 @@ export const checkClientMode = (): ClientMode | null => {
 export const sendMessage = (message: AbstractResponse) => {
 	const parent = parentWindow();
 	if (!parent) return;
-	console.log("message", message);
 	parent.postMessage(message, "*");
 };
 
 export const onMessage = (callback: (event: AbstractRequest, origin: string) => void) => {
 	const parent = parentWindow();
 	if (!parent) return () => {};
-	console.log("init handler");
 	const listener = (event: MessageEvent) => {
-		console.log("event", event);
 		if (event.source !== parentWindow()) return;
 		callback(event.data, event.origin);
 	};
