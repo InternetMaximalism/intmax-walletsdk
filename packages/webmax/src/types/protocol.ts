@@ -135,9 +135,7 @@ export type WebmaxDefaultMessageSchema = [
 	...EthReadonlyMessageSchema,
 ];
 
-export type SchemaNamespace<Schema extends AbstractMessageSchema> = Schema[number]["namespace"];
-
-export type ExtractSchemaByType<
+export type ExtractSchema<
 	Schema extends AbstractMessageSchema,
 	Type extends Schema[number]["type"] = Schema[number]["type"],
-> = Extract<Schema[number], { type: Type }>;
+> = { [K in keyof Schema]: Schema[K]["type"] extends Type ? Schema[K] : never };
