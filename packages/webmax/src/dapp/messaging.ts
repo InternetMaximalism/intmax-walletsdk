@@ -1,6 +1,6 @@
 import { AbstractRequest, AbstractResponse, WebmaxHandshakeResult } from "src";
-import invariant from "src/utils/invariant";
-import { withResolvers } from "src/utils/withResolvers";
+import invariant from "../utils/invariant";
+import { withResolvers } from "../utils/withResolvers";
 import { WebmaxDappClientOptions } from "./dappClient";
 
 const DEFAULT_WALLET_WINDOW_HEIGHT = 600;
@@ -23,19 +23,35 @@ const openWindow = (opt: WebmaxDappClientOptions) => {
 	return win;
 };
 
-const _callRequest = (ref: WalletClientRef, message: AbstractRequest) => {
+const _callRequest = (ref: WalletClientRef, opt: WebmaxDappClientOptions, message: AbstractRequest) => {
 	invariant(ref.window);
 	const { promise, resolve } = withResolvers<AbstractResponse>();
-	ref.window.postMessage({ ...message, id: ref.id }, ref.window.origin);
+
+	let sensed = false;
+	const sendMessageOnce = () => {
+		if (sensed) return;
+		sensed = true;
+		ref.window?.postMessage({ ...message, id: ref.id }, new URL(opt.url).origin);
+	};
+
+	ref.handshake && sendMessageOnce();
 	const listener = (event: MessageEvent) => {
-		if (event.origin !== ref.window?.origin) return;
-		if (event.data.method === "webmax_handshake") ref.handshake = event.data.result;
+		//console.log("event", event);
+		if (event.source !== ref.window) return;
+		if (event.data.method === "webmax_handshake") {
+			console.log("handshake", event.data.result);
+			ref.handshake = event.data.result;
+			sendMessageOnce();
+			//window.postMessage({ ...message, id: ref.id }, event.origin);
+		}
 		if (event.data.id === message.id) {
+			console.log("event.data", event.data);
 			resolve(event.data);
-			ref.window.removeEventListener("message", listener);
+			window.removeEventListener("message", listener);
 		}
 	};
-	ref.window?.addEventListener("message", listener);
+
+	window.addEventListener("message", listener);
 	return promise;
 };
 
@@ -59,7 +75,7 @@ export const callRequest = async (
 	if (ref.window?.closed || !ref.window) ref.window = openWindow(opt);
 
 	const _message = { ...message, id: ref.id };
-	const result = await _callRequest(ref, _message);
+	const result = await _callRequest(ref, opt, _message);
 
 	ref.calls = ref.calls?.filter((p) => p !== promise);
 	if (ref.calls?.length === 0 && result?.windowHandling === "close") {
