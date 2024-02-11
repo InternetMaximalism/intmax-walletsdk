@@ -5,25 +5,25 @@ import {
 	MessageParams,
 	MessageResult,
 	Namespace,
-	WalletClientMessageSchema,
+	WebmaxDefaultMessageSchema,
 } from "../types/protocol";
 
 export type WebmaxWalletContext<NS extends Namespace, Method extends string> = {
 	namespace: ChainedNamespace<NS> | NS;
 	method: Method;
 	req: {
-		params: MessageParams<WalletClientMessageSchema, NS, Method>;
+		params: MessageParams<WebmaxDefaultMessageSchema, NS, Method>;
 		origin: string;
 		raw: AbstractRequest;
 	};
 	window: (handling: WindowHandling) => void;
-	success: (result: MessageResult<WalletClientMessageSchema, NS, Method>) => AbstractSuccessResponse;
+	success: (result: MessageResult<WebmaxDefaultMessageSchema, NS, Method>) => AbstractSuccessResponse;
 	failure: (message: string, opt?: { code?: number; window?: WindowHandling }) => AbstractErrorResponse;
 };
 
 export const createWebmaxWalletContext = <
 	NS extends Namespace,
-	Method extends MessageMethod<WalletClientMessageSchema, NS>,
+	Method extends MessageMethod<WebmaxDefaultMessageSchema, NS>,
 >(
 	request: AbstractRequest,
 	origin: string,
@@ -45,12 +45,14 @@ export const createWebmaxWalletContext = <
 		success: (result) => ({
 			id: request.id,
 			namespace: request.namespace,
+			method: request.method,
 			windowHandling,
 			result,
 		}),
 		failure: (message, opt) => ({
 			id: request.id,
 			namespace: request.namespace,
+			method: request.method,
 			windowHandling: opt?.window || windowHandling,
 			error: { message, code: opt?.code || 0 },
 		}),
