@@ -24,6 +24,7 @@ function App() {
 		const ethereum = webmax.provider("eip155");
 		const _accounts = (await ethereum.request({ method: "eth_accounts", params: [] })) as string[];
 		const result = await ethereum.request({ method: "eth_sign", params: [_accounts[0], "Hello Webmax"] });
+
 		setResult(result as string);
 	};
 
