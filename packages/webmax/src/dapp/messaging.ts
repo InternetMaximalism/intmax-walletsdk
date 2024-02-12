@@ -8,6 +8,7 @@ const DEFAULT_WALLET_WINDOW_WIDTH = 400;
 
 const MESSAGE_INTERVAL = 1000;
 const CLOSE_WAITING = 200;
+const WINDOW_WATCH_INTERVAL = 100;
 
 export type WalletClientRef = {
 	window?: Window;
@@ -24,6 +25,18 @@ const openWindow = (opt: WebmaxDappClientOptions) => {
 	const win = window.open(url, name, `top=${top}px, left=${left}px, height=${height}px, width=${width}px`);
 	if (!win) throw new Error("Failed to open window");
 	return win;
+};
+
+const waitForClose = (ref: WalletClientRef) => {
+	const { promise, resolve } = withResolvers<void>();
+	const timer = setInterval(() => {
+		if (!ref.window || ref.window.closed) {
+			clearInterval(timer);
+			resolve();
+		}
+	}, WINDOW_WATCH_INTERVAL);
+
+	return promise;
 };
 
 const _callRequest = (ref: WalletClientRef, opt: WebmaxDappClientOptions, message: AbstractRequest) => {
@@ -52,7 +65,14 @@ const _callRequest = (ref: WalletClientRef, opt: WebmaxDappClientOptions, messag
 	};
 
 	window.addEventListener("message", listener);
-	return promise;
+
+	const windowClosed = waitForClose(ref).then(() => ({
+		...{ id: message.id, method: message.method, namespace: message.namespace },
+		windowHandling: "close" as const,
+		error: { code: -32000, message: "Window closed" },
+	}));
+
+	return Promise.race([promise, windowClosed]);
 };
 
 export const incrementId = (ref: WalletClientRef) => {
