@@ -22,9 +22,10 @@ export const sendMessage = (message: AbstractResponse) => {
 
 export const onMessage = (callback: (event: AbstractRequest, origin: string) => void) => {
 	const parent = parentWindow();
-	if (!parent) return () => {};
+	if (!parent || typeof window === "undefined") return () => {};
 	const listener = (event: MessageEvent) => {
 		if (event.source !== parentWindow()) return;
+		window.focus();
 		callback(event.data, event.origin);
 	};
 	window.addEventListener("message", listener);

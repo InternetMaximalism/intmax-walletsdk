@@ -18,7 +18,7 @@ export type WalletClientRef = {
 };
 
 const openWindow = (opt: WebmaxDappClientOptions) => {
-	const { url, name, window: windowOpt } = opt;
+	const { url, name, window: windowOpt } = opt.wallet;
 	const height = windowOpt?.height || DEFAULT_WALLET_WINDOW_HEIGHT;
 	const width = windowOpt?.width || DEFAULT_WALLET_WINDOW_WIDTH;
 	const [top, left] = [window.screenY, window.screenX + window.innerWidth - width];
@@ -47,8 +47,7 @@ const _callRequest = (ref: WalletClientRef, opt: WebmaxDappClientOptions, messag
 	const sendMessageOnce = () => {
 		if (sensed) return;
 		sensed = true;
-
-		ref.window?.postMessage({ ...message, id: ref.id }, new URL(opt.url).origin);
+		ref.window?.postMessage({ ...message, id: ref.id }, new URL(opt.wallet.url).origin);
 	};
 
 	ref.handshake && sendMessageOnce();

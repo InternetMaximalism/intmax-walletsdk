@@ -1,5 +1,7 @@
+import { isConnected } from "@/lib/webmax";
 import { withResolvers } from "@/lib/withResolvers";
 import { useNetworksStore } from "@/stores/network";
+import { useWebmaxConnectionStore } from "@/stores/webmax";
 import { useLayoutEffect } from "react";
 import { Hex, LocalAccount } from "viem";
 import { webmaxWalletClient } from "webmax2/wallet";
@@ -10,8 +12,10 @@ import { useDrawer } from "./drawer";
 
 export const useWebmax = () => {
 	const { open } = useDrawer();
-	const chains = useNetworksStore((state) => state.networks);
 	const accounts = useAccounts();
+
+	const chains = useNetworksStore((state) => state.networks);
+	const { connections, setConnections } = useWebmaxConnectionStore();
 
 	useLayoutEffect(() => {
 		const webmax = webmaxWalletClient();
@@ -29,26 +33,66 @@ export const useWebmax = () => {
 			});
 		});
 
-		webmax.on("webmax/webmax_connect", (c) => {
-			return c.success({
-				supportedNamespaces: ["eip155", "webmax"],
-				supportedChains: supportedChains,
-				accounts: { eip155: ethereumAccounts },
-			});
+		webmax.on("webmax/webmax_connect", async (c) => {
+			const [origin, dappMetadata] = [c.req.origin, c.req.metadata];
+			if (!dappMetadata) return c.failure("Invalid metadata", { code: 4001 });
+
+			if (isConnected(c, connections)) {
+				return c.success({
+					supportedNamespaces: ["eip155", "webmax"],
+					supportedChains: supportedChains,
+					accounts: { eip155: ethereumAccounts },
+				});
+			}
+
+			const { promise, resolve, reject } = withResolvers<void>();
+
+			open({ id: "webmax-connect", origin, dappMetadata, onConnect: resolve, onCancel: reject });
+
+			try {
+				await promise;
+				setConnections((connections) => [...connections, { origin, namespaces: ["eip155", "webmax"] }]);
+
+				return c.success({
+					supportedNamespaces: ["eip155", "webmax"],
+					supportedChains: supportedChains,
+					accounts: { eip155: ethereumAccounts },
+				});
+			} catch {
+				return c.failure("User Rejected", { code: 4001 });
+			}
 		});
 
-		webmax.on("eip155/eth_requestAccounts", (c) => {
-			return c.success(ethereumAccounts);
+		webmax.on("eip155/eth_requestAccounts", async (c) => {
+			const [origin, dappMetadata] = [c.req.origin, c.req.metadata];
+			if (!dappMetadata) return c.failure("Invalid metadata", { code: 4001 });
+
+			if (isConnected(c, connections)) return c.success(ethereumAccounts);
+
+			const { promise, resolve, reject } = withResolvers<void>();
+
+			open({ id: "webmax-connect", origin, dappMetadata, onConnect: resolve, onCancel: reject });
+
+			try {
+				await promise;
+				setConnections((connections) => [...connections, { origin, namespaces: ["eip155", "webmax"] }]);
+
+				return c.success(ethereumAccounts);
+			} catch {
+				return c.failure("User Rejected", { code: 4001 });
+			}
 		});
 
 		webmax.on("eip155/eth_sign", async (c) => {
 			const [address, data] = c.req.params;
 			const { promise, resolve, reject } = withResolvers<Hex>();
 
+			if (!isConnected(c, connections)) return c.failure("Not connected", { code: 4100 });
+
 			const account = localAccounts.find((account) => account.address === address);
 			if (!account) return c.failure("Account Not found", { code: 4001 });
 
-			open({ id: "sign-message", account, data, onSign: resolve, onCancel: reject });
+			open({ id: "sign-message", account, dappMetadata: c.req.metadata, data, onSign: resolve, onCancel: reject });
 
 			try {
 				const signature = await promise;
@@ -61,5 +105,5 @@ export const useWebmax = () => {
 		webmax.ready();
 
 		return () => webmax.destruct();
-	}, [chains, accounts, open]);
+	}, [chains, accounts, open, connections, setConnections]);
 };
