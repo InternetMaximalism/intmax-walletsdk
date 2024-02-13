@@ -1,10 +1,12 @@
 import { AbstractResponse } from "src";
 import {
 	AbstractMessageSchema,
+	ChainedNamespace,
 	DappHandleTypes,
 	DappMetadata,
 	EthereumAddress,
 	ExtractSchema,
+	SchemaNamespace,
 	WebmaxConnectResult,
 	WebmaxDefaultMessageSchema,
 } from "../types/protocol";
@@ -19,7 +21,7 @@ export type WebmaxDappClientOptions = {
 		window?: { width: number; height: number; mode?: "popup" };
 	};
 	metadata: DappMetadata;
-	httpRpc?: Record<string, { url: string }>;
+	httpRpc?: Record<ChainedNamespace, { url: string }>;
 };
 
 export type EIP1193Provider = {
@@ -30,7 +32,10 @@ export type EIP1193Provider = {
 type WalletState = WebmaxConnectResult;
 export type WebmaxDappClient<Schema extends AbstractMessageSchema> = {
 	connect: () => Promise<WebmaxConnectResult>;
-	provider: <NS extends Schema[number]["namespace"]>(namespace: NS) => EIP1193Provider;
+	provider: <NS extends Schema[number]["namespace"]>(
+		namespace: ChainedNamespace<NS> | NS,
+		opt?: { lockChainId?: boolean },
+	) => EIP1193Provider;
 };
 
 export const webmaxDappClient = <
@@ -46,8 +51,8 @@ export const webmaxDappClient = <
 		accounts: {} as WalletState["accounts"],
 	};
 
-	const callHttp = async (namespace: string, method: string, params: unknown) => {
-		const url = opt.httpRpc?.[namespace]?.url;
+	const callHttp = async (namespace: string, chainId: string, method: string, params: unknown) => {
+		const url = opt.httpRpc?.[`${namespace}:${chainId}`]?.url;
 		if (!url) throw new Error("No HTTP RPC URL");
 		const response = await fetch(url, {
 			method: "POST",
@@ -66,11 +71,18 @@ export const webmaxDappClient = <
 			Object.assign(state, response.result);
 			return response.result as WebmaxConnectResult;
 		},
-		provider: (namespace) => {
+		provider: (chainedNamespace, providerOpt?: { lockChainId?: boolean }) => {
+			const [namespace, defaultChain] = chainedNamespace.split(":") as [SchemaNamespace<_TSchema>, string];
 			if (namespace !== "eip155") throw new Error("Not implemented");
 
+			let chainId =
+				defaultChain ?? state.supportedChains.map((c) => c.split(":")).find((c) => c[0] === "eip155")?.[1] ?? "1";
+
 			const throwOrResult = (response: AbstractResponse) => {
-				if ("error" in response) throw new RpcProviderError(response.error.message, response.error.code);
+				if ("error" in response) {
+					console.error(response.error);
+					throw new RpcProviderError(response.error.message, response.error.code);
+				}
 				return response.result;
 			};
 
@@ -89,18 +101,16 @@ export const webmaxDappClient = <
 				}
 
 				if (WALLET_READ_METHODS.includes(`${namespace}/${method}`)) {
-					if (method === "eth_accounts") {
-						return state.accounts.eip155 as TReturn;
-					}
-					if (method === "eth_chainId") {
-						const eip155Chains = state.supportedChains
-							.filter((c) => c.split(":")[0] === "eip155")
-							.map((c) => c.split(":")[1]);
-						return eip155Chains[0] as TReturn;
+					if (method === "eth_accounts") return state.accounts.eip155 as TReturn;
+					if (method === "eth_chainId") return chainId as unknown as TReturn;
+					if (method === "wallet_switchEthereumChain") {
+						if (providerOpt?.lockChainId) throw new RpcProviderError("Chain ID is locked", 4001);
+						chainId = String(params);
+						return null as TReturn;
 					}
 				}
 
-				const response = await callHttp(namespace, method, params);
+				const response = await callHttp(namespace, chainId, method, params);
 				return throwOrResult(response) as TReturn;
 			};
 			const on = () => {};
