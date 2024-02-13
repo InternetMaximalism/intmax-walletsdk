@@ -4,10 +4,20 @@ import { useState } from "react";
 import { webmaxDappClient } from "webmax2/dapp";
 
 const DEFAULT_WALLET_URL = import.meta.env.VITE_WALLET_URL || "https://webmax2-wallet.vercel.app/";
+const DEFAULT_DAPP_ICON = (import.meta.env.VITE_APP_ICON || `${window.location.origin}/vite.svg`) as string;
+const DAPP_METADATA = {
+	name: "Webmax Dapp Example",
+	description: "This is a simple example of how to use the webmax dapp client.",
+	icons: [DEFAULT_DAPP_ICON],
+};
+
+const createWebmax = (walletUrl: string) => {
+	return webmaxDappClient({ wallet: { url: walletUrl, name: "DEMO Wallet" }, metadata: DAPP_METADATA });
+};
 
 function App() {
 	const [walletUrl, setWalletUrl] = useState(DEFAULT_WALLET_URL);
-	const [webmax, setWebmax] = useState(webmaxDappClient({ url: walletUrl, name: "DEMO Wallet" }));
+	const [webmax, setWebmax] = useState(createWebmax(DEFAULT_WALLET_URL));
 
 	const [accounts, setAccounts] = useState<string[]>([]);
 	const [result, setResult] = useState<string>("");
@@ -15,7 +25,7 @@ function App() {
 	const isValidUrl = /https?:\/\/[^\s$.?#].[^\s]*$/.test(walletUrl);
 	const handleUpdateWalletUrl = (url: string) => {
 		if (!isValidUrl) return;
-		setWebmax(webmaxDappClient({ url, name: "DEMO Wallet" }));
+		setWebmax(createWebmax(url));
 	};
 
 	const handleConnect = async () => {

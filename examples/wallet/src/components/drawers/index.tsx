@@ -10,6 +10,7 @@ const OnboardingDrawer = lazy(() => import("./onboading-drawer"));
 const SendInputDrawer = lazy(() => import("./send-input-drawer"));
 const SendTransactionDrawer = lazy(() => import("./send-transaction-drawer"));
 const SignMessageDrawer = lazy(() => import("./sign-message-drawer"));
+const WebmaxConnectDrawer = lazy(() => import("./webmax-connect-drawer"));
 
 export const Drawers = () => {
 	const { open, back } = useDrawer();
@@ -35,6 +36,7 @@ export const Drawers = () => {
 						{props?.id === "send-input" && <SendInputDrawer {...props} {...restProps} />}
 						{props?.id === "send-transaction" && <SendTransactionDrawer {...props} {...restProps} />}
 						{props?.id === "sign-message" && <SignMessageDrawer {...props} {...restProps} />}
+						{props?.id === "webmax-connect" && <WebmaxConnectDrawer {...props} {...restProps} />}
 					</Suspense>
 				</div>
 			</DrawerContent>

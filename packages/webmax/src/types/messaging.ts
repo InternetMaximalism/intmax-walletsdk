@@ -8,6 +8,7 @@ export type AbstractRequest<Params = unknown> = {
 	namespace: Namespace | ChainedNamespace;
 	method: string;
 	params: Params;
+	metadata?: unknown;
 };
 
 export type AbstractSuccessResponse<Result = unknown> = {

@@ -1,6 +1,8 @@
 import type { AddEthereumChainParameter, TransactionRequest, WatchAssetParams } from "viem";
 import { Prettify } from "./utils";
 
+export type DappMetadata = { name: string; description: string; icons: string[] };
+
 export type Namespaces = { EIP155: "eip155"; WEBMAX: "webmax" };
 export type Namespace = Namespaces[keyof Namespaces];
 export type ChainedNamespace<NS extends Namespace = Namespace> = `${NS}:${string}`;

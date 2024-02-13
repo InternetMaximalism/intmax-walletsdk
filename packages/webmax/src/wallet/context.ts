@@ -1,11 +1,12 @@
 import { AbstractErrorResponse, AbstractRequest, AbstractSuccessResponse, WindowHandling } from "../types/messaging";
-import { AbstractMessageSchema, ChainedNamespace } from "../types/protocol";
+import { AbstractMessageSchema, ChainedNamespace, DappMetadata } from "../types/protocol";
 
-export type WebmaxWalletContext<MethodSchema extends AbstractMessageSchema[number]> = {
+export type WebmaxWalletContext<MethodSchema extends AbstractMessageSchema[number] = AbstractMessageSchema[number]> = {
 	namespace: ChainedNamespace<MethodSchema["namespace"]> | MethodSchema["namespace"];
 	method: MethodSchema["method"];
 	req: {
 		params: MethodSchema["params"];
+		metadata?: DappMetadata;
 		origin: string | "internal";
 		raw: AbstractRequest;
 	};
@@ -26,6 +27,7 @@ export const createWebmaxWalletContext = <MethodSchema extends AbstractMessageSc
 		method: request.method as Context["method"],
 		req: {
 			origin,
+			metadata: request.metadata as Context["req"]["metadata"],
 			params: request.params as Context["req"]["params"],
 			raw: request,
 		},

@@ -2,6 +2,7 @@ import { AbstractResponse } from "src";
 import {
 	AbstractMessageSchema,
 	DappHandleTypes,
+	DappMetadata,
 	EthereumAddress,
 	ExtractSchema,
 	WebmaxConnectResult,
@@ -12,14 +13,17 @@ import { RpcProviderError } from "./errors";
 import { WalletClientRef, callRequest } from "./messaging";
 
 export type WebmaxDappClientOptions = {
-	url: string;
-	name: string;
-	window?: { width: number; height: number; mode?: "popup" };
+	wallet: {
+		url: string;
+		name: string;
+		window?: { width: number; height: number; mode?: "popup" };
+	};
+	metadata: DappMetadata;
 	httpRpc?: Record<string, { url: string }>;
 };
 
 export type EIP1193Provider = {
-	request: (args: { method: string; params?: unknown }) => Promise<unknown>;
+	request: <TReturn = unknown>(args: { method: string; params?: unknown }) => Promise<TReturn>;
 	on: (event: never, callback: (data: never) => void) => void;
 };
 
@@ -56,7 +60,7 @@ export const webmaxDappClient = <
 
 	return {
 		connect: async () => {
-			const message = { namespace: "webmax", method: "webmax_connect", params: [] } as const;
+			const message = { namespace: "webmax", method: "webmax_connect", params: [], metadata: opt.metadata } as const;
 			const response = await callRequest(ref, opt, message);
 			if ("error" in response) throw new RpcProviderError(response.error.message, response.error.code);
 			Object.assign(state, response.result);
@@ -71,33 +75,33 @@ export const webmaxDappClient = <
 			};
 
 			// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: This is a complex function
-			const request = async (args: { method: string; params?: unknown }) => {
+			const request = async <TReturn = unknown>(args: { method: string; params?: unknown }): Promise<TReturn> => {
 				const { method, params } = args;
 				if (WALLET_ACTION_METHODS.includes(`${namespace}/${method}`)) {
-					const message = { namespace, method, params };
+					const message = { namespace, method, params, metadata: opt.metadata };
 					const response = await callRequest(ref, opt, message);
 					Object.assign(state, ref.handshake);
 					if (method === "eth_requestAccounts" && "result" in response) {
 						state.accounts.eip155 = response.result as EthereumAddress[];
 					}
 
-					return throwOrResult(response);
+					return throwOrResult(response) as TReturn;
 				}
 
 				if (WALLET_READ_METHODS.includes(`${namespace}/${method}`)) {
 					if (method === "eth_accounts") {
-						return state.accounts.eip155;
+						return state.accounts.eip155 as TReturn;
 					}
 					if (method === "eth_chainId") {
 						const eip155Chains = state.supportedChains
 							.filter((c) => c.split(":")[0] === "eip155")
 							.map((c) => c.split(":")[1]);
-						return eip155Chains[0];
+						return eip155Chains[0] as TReturn;
 					}
 				}
 
 				const response = await callHttp(namespace, method, params);
-				return throwOrResult(response);
+				return throwOrResult(response) as TReturn;
 			};
 			const on = () => {};
 			return { request, on };
