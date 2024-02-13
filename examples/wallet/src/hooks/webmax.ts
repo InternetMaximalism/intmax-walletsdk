@@ -92,7 +92,7 @@ export const useWebmax = () => {
 			const account = localAccounts.find((account) => account.address === address);
 			if (!account) return c.failure("Account Not found", { code: 4001 });
 
-			open({ id: "sign-message", account, data, onSign: resolve, onCancel: reject });
+			open({ id: "sign-message", account, dappMetadata: c.req.metadata, data, onSign: resolve, onCancel: reject });
 
 			try {
 				const signature = await promise;

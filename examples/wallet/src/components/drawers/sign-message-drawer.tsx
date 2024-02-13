@@ -5,8 +5,16 @@ import { FC } from "react";
 import { isHex } from "viem";
 import { mainnet } from "viem/chains";
 import { DrawerFooter, DrawerHeader, DrawerTitle } from "../ui/drawer";
+import { WebmaxDappInfo } from "../webmax-dappinfo";
 
-const SignMessageDrawer: FC<DrawerProps<"sign-message">> = ({ account, data, onSign, onCancel, onOpenChange }) => {
+const SignMessageDrawer: FC<DrawerProps<"sign-message">> = ({
+	account,
+	dappMetadata,
+	data,
+	onSign,
+	onCancel,
+	onOpenChange,
+}) => {
 	const handleCancel = () => {
 		onOpenChange?.(false);
 		onCancel?.();
@@ -24,8 +32,14 @@ const SignMessageDrawer: FC<DrawerProps<"sign-message">> = ({ account, data, onS
 			<DrawerHeader>
 				<DrawerTitle>Sign Message</DrawerTitle>
 			</DrawerHeader>
-			<div className="px-2">
-				<pre className="border p-4 rounded-md">{data}</pre>
+
+			<div className="px-4 space-y-2">
+				{dappMetadata && <WebmaxDappInfo dappMetadata={dappMetadata} size="sm" />}
+
+				<div className="space-y-2">
+					<div className="font-semibold">Message</div>
+					<pre className="border p-4 rounded-md">{data}</pre>
+				</div>
 			</div>
 			<DrawerFooter className="grid grid-cols-2">
 				<Button variant="outline" onClick={handleCancel}>
