@@ -1,6 +1,7 @@
 import { ENSAccount } from "@/lib/blockchain/ens";
 import { InternalTxRequest, Token } from "@/types";
 import { Account, Hash, Hex } from "viem";
+import { DappMetadata } from "webmax2";
 import { create } from "zustand";
 
 export type DrawerPropsPattern =
@@ -11,7 +12,8 @@ export type DrawerPropsPattern =
 	| { id: "send-transaction"; transaction: InternalTxRequest; onSign?: (hash: Hash) => void; onCancel?: () => void }
 	| { id: "sign-transaction"; transaction: InternalTxRequest; onSign?: (tx: Hex) => void; onCancel?: () => void }
 	| { id: "sign-message"; account: Account; data: Hex; onSign?: (signature: Hex) => void; onCancel?: () => void }
-	| { id: "sign-typed-data"; account: Account; data: string; onSign?: (signature: Hex) => void; onCancel?: () => void };
+	| { id: "sign-typed-data"; account: Account; data: string; onSign?: (signature: Hex) => void; onCancel?: () => void }
+	| { id: "webmax-connect"; origin: string; dappMetadata: DappMetadata; onConnect: () => void; onCancel: () => void };
 
 type HisoricalDrawerPropsPattern = DrawerPropsPattern & { previos?: HisoricalDrawerPropsPattern };
 
