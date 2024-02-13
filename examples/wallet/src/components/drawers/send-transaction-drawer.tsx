@@ -77,13 +77,21 @@ const TransactionDetails: FC<{ transaction: InternalTxRequest }> = ({ transactio
 	);
 };
 
-const SendTransactionDrawer: FC<DrawerProps<"send-transaction">> = ({ back, onOpenChange, previos, transaction }) => {
+const SendTransactionDrawer: FC<DrawerProps<"send-transaction">> = ({
+	back,
+	onOpenChange,
+	previos,
+	transaction,
+	onCancel,
+	onSign,
+}) => {
 	const [loading, setLoading] = useState(false);
 	const sendTransaciton = useSendTransaction();
 
 	const handleSendTransaction = async () => {
 		setLoading(true);
-		sendTransaciton(transaction);
+		const hash = await sendTransaciton(transaction);
+		onSign?.(hash);
 		onOpenChange(false);
 	};
 
@@ -106,7 +114,7 @@ const SendTransactionDrawer: FC<DrawerProps<"send-transaction">> = ({ back, onOp
 			</div>
 			<DrawerFooter className="grid grid-cols-2">
 				<DrawerClose asChild>
-					<Button disabled={loading} variant="outline">
+					<Button disabled={loading} variant="outline" onClick={() => onCancel?.()}>
 						Close
 					</Button>
 				</DrawerClose>

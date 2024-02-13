@@ -30,3 +30,9 @@ export const uniq = <T>(items: T[], key: keyof T | ((item: T) => string)) => {
 
 	return Array.from(results.values());
 };
+
+export const invert = <T extends Record<string | number, string | number>>(obj: T): { [K in keyof T as T[K]]: K } => {
+	const result: Record<string | number, string | number> = {};
+	for (const [key, value] of Object.entries(obj)) result[value] = key;
+	return result as { [K in keyof T as T[K]]: K };
+};

@@ -23,6 +23,7 @@ export type DrawerPropsPattern =
 	  }
 	| {
 			id: "send-transaction";
+			dappMetadata?: DappMetadata;
 			transaction: InternalTxRequest;
 			onSign?: (hash: Hash) => void;
 			onCancel?: () => void;
