@@ -29,8 +29,8 @@ function App() {
 	};
 
 	const handleConnect = async () => {
-		await webmax.connect();
 		const ethereum = webmax.provider("eip155");
+		await ethereum.request({ method: "eth_requestAccounts", params: [] });
 		const accounts = (await ethereum.request({ method: "eth_accounts", params: [] })) as string[];
 		setAccounts(accounts);
 	};

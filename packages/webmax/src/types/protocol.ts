@@ -5,7 +5,7 @@ export type DappMetadata = { name: string; description: string; icons: string[] 
 
 export type Namespaces = { EIP155: "eip155"; WEBMAX: "webmax" };
 export type Namespace = Namespaces[keyof Namespaces];
-export type ChainedNamespace<NS extends Namespace = Namespace> = `${NS}:${string}`;
+export type ChainedNamespace<NS extends string = string> = `${NS}:${string}`;
 
 export type EthereumAddress = `0x${string}`;
 export type Hex = `0x${string}`;
@@ -113,13 +113,6 @@ export type EthApprovalMessageSchema = [
 	{
 		type: "approval";
 		namespace: Namespaces["EIP155"];
-		method: "wallet_switchEthereumChain";
-		params: [chain: { chainId: string }];
-		result: null;
-	},
-	{
-		type: "approval";
-		namespace: Namespaces["EIP155"];
 		method: "wallet_watchAsset";
 		params: [asset: WatchAssetParams];
 		result: null;
@@ -141,6 +134,13 @@ export type EthReadonlyMessageSchema = [
 		params?: undefined;
 		result: string;
 	},
+	{
+		type: "readonly";
+		namespace: Namespaces["EIP155"];
+		method: "wallet_switchEthereumChain";
+		params: [chain: { chainId: string }];
+		result: null;
+	},
 ];
 
 export type WebmaxDefaultMessageSchema = [
@@ -148,6 +148,8 @@ export type WebmaxDefaultMessageSchema = [
 	...EthApprovalMessageSchema,
 	...EthReadonlyMessageSchema,
 ];
+
+export type SchemaNamespace<Schema extends AbstractMessageSchema> = Schema[number]["namespace"];
 
 export type ExtractSchema<
 	Schema extends AbstractMessageSchema,
