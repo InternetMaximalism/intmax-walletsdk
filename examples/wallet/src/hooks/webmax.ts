@@ -3,7 +3,7 @@ import { withResolvers } from "@/lib/withResolvers";
 import { useNetworksStore } from "@/stores/network";
 import { useWebmaxConnectionStore } from "@/stores/webmax";
 import { useLayoutEffect } from "react";
-import { Hex, LocalAccount } from "viem";
+import { Hex, LocalAccount, isAddressEqual } from "viem";
 import { webmaxWalletClient } from "webmax2/wallet";
 import { useAccounts } from "./account";
 import { useDrawer } from "./drawer";
@@ -18,6 +18,8 @@ export const useWebmax = () => {
 	const { connections, setConnections } = useWebmaxConnectionStore();
 
 	useLayoutEffect(() => {
+		console.log("useWebmax");
+
 		const webmax = webmaxWalletClient();
 
 		const supportedChains = chains.map((chain) => `eip155:${chain.id}` as const);
@@ -89,7 +91,26 @@ export const useWebmax = () => {
 
 			if (!isConnected(c, connections)) return c.failure("Not connected", { code: 4100 });
 
-			const account = localAccounts.find((account) => account.address === address);
+			const account = localAccounts.find((account) => isAddressEqual(account.address, address));
+			if (!account) return c.failure("Account Not found", { code: 4001 });
+
+			open({ id: "sign-message", account, dappMetadata: c.req.metadata, data, onSign: resolve, onCancel: reject });
+
+			try {
+				const signature = await promise;
+				return c.success(signature);
+			} catch {
+				return c.failure("", { code: 4001 });
+			}
+		});
+
+		webmax.on("eip155/personal_sign", async (c) => {
+			const [data, address] = c.req.params;
+			const { promise, resolve, reject } = withResolvers<Hex>();
+
+			if (!isConnected(c, connections)) return c.failure("Not connected", { code: 4100 });
+
+			const account = localAccounts.find((account) => isAddressEqual(account.address, address));
 			if (!account) return c.failure("Account Not found", { code: 4001 });
 
 			open({ id: "sign-message", account, dappMetadata: c.req.metadata, data, onSign: resolve, onCancel: reject });
