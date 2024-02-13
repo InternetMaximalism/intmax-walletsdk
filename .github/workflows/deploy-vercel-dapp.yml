@@ -10,6 +10,7 @@ on:
       - main
     paths:
       - "examples/dapp/**"
+      - "packages/**"
 
 jobs:
   Deploy-Dapp:
