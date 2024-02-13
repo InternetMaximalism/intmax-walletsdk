@@ -45,6 +45,20 @@ function App() {
 		setResult(result as string);
 	};
 
+	const handleSendTransaction = async () => {
+		if (accounts.length === 0) await handleConnect();
+
+		const ethereum = webmax.provider("eip155");
+		const _accounts = (await ethereum.request({ method: "eth_accounts", params: [] })) as string[];
+		await ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x89" }] });
+		const result = await ethereum.request({
+			method: "eth_sendTransaction",
+			params: [{ from: _accounts[0], value: "0x0" }],
+		});
+
+		setResult(result as string);
+	};
+
 	return (
 		<>
 			<div className="w-full max-w-screen-sm mx-auto px-4 py-12 space-y-8">
@@ -67,12 +81,14 @@ function App() {
 				<div className="gap-2 grid grid-cols-2">
 					<Button onClick={handleConnect}>Connect</Button>
 					<Button onClick={handleSignMessage}>Sign Message</Button>
+					<Button onClick={handleSendTransaction}>Send Transaction</Button>
+					<Button onClick={handleSendTransaction}>Send Transaction</Button>
 					<div className="col-span-2">
 						<div className="font-semibold">Accounts:</div>
 						<div className="break-all text-muted-foreground">{accounts.join(", ")}</div>
 					</div>
 					<div className="col-span-2">
-						<div className="font-semibold">Signature:</div>
+						<div className="font-semibold">Result:</div>
 						<div className="break-all text-muted-foreground">{result}</div>
 					</div>
 				</div>

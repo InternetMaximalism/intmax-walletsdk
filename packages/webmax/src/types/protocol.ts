@@ -1,4 +1,4 @@
-import type { AddEthereumChainParameter, TransactionRequest, WatchAssetParams } from "viem";
+import type { AddEthereumChainParameter, RpcTransactionRequest, WatchAssetParams } from "viem";
 import { Prettify } from "./utils";
 
 export type DappMetadata = { name: string; description: string; icons: string[] };
@@ -72,7 +72,7 @@ export type EthApprovalMessageSchema = [
 		type: "approval";
 		namespace: Namespaces["EIP155"];
 		method: "eth_sendTransaction";
-		params: [transaction: TransactionRequest<string>];
+		params: [transaction: RpcTransactionRequest];
 		result: Hash;
 	},
 	{
@@ -86,7 +86,7 @@ export type EthApprovalMessageSchema = [
 		type: "approval";
 		namespace: Namespaces["EIP155"];
 		method: "eth_signTransaction";
-		params: [transaction: TransactionRequest<string>];
+		params: [transaction: RpcTransactionRequest];
 		result: Hex;
 	},
 	{
