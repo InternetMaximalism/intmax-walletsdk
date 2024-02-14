@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { DrawerClose, DrawerFooter, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
-import { useSendTransaction } from "@/hooks/blockchain";
+import { useSignTransaction } from "@/hooks/blockchain";
 import { DrawerProps } from "@/stores/drawers";
 import { ArrowLeft } from "lucide-react";
 import { FC, useState } from "react";
@@ -8,7 +8,7 @@ import { TransactionDetails } from "../transactions/transaction-details";
 import { TransferDetails } from "../transactions/transfer-details";
 import { WebmaxDappInfo } from "../webmax-dappinfo";
 
-const SendTransactionDrawer: FC<DrawerProps<"send-transaction">> = ({
+const SignTransactionDrawer: FC<DrawerProps<"sign-transaction">> = ({
 	back,
 	onOpenChange,
 	previos,
@@ -18,12 +18,12 @@ const SendTransactionDrawer: FC<DrawerProps<"send-transaction">> = ({
 	onSign,
 }) => {
 	const [loading, setLoading] = useState(false);
-	const sendTransaciton = useSendTransaction();
+	const signTransaction = useSignTransaction();
 
-	const handleSendTransaction = async () => {
+	const handleSignTransaction = async () => {
 		setLoading(true);
-		const hash = await sendTransaciton(transaction);
-		onSign?.(hash);
+		const signature = await signTransaction(transaction);
+		onSign?.(signature);
 		onOpenChange(false);
 	};
 
@@ -35,9 +35,7 @@ const SendTransactionDrawer: FC<DrawerProps<"send-transaction">> = ({
 						<ArrowLeft />
 					</Button>
 				)}
-				<DrawerTitle className="flex-1 text-left">
-					{transaction.type === "raw-request" ? "Send Transaction" : "Sending Token"}
-				</DrawerTitle>
+				<DrawerTitle className="flex-1 text-left">Sign Transaction</DrawerTitle>
 			</DrawerHeader>
 			<div className="px-4 space-y-4">
 				{dappMetadata && <WebmaxDappInfo dappMetadata={dappMetadata} size="sm" />}
@@ -50,12 +48,12 @@ const SendTransactionDrawer: FC<DrawerProps<"send-transaction">> = ({
 						Close
 					</Button>
 				</DrawerClose>
-				<Button disabled={loading} onClick={handleSendTransaction}>
-					Send
+				<Button disabled={loading} onClick={handleSignTransaction}>
+					Sign
 				</Button>
 			</DrawerFooter>
 		</>
 	);
 };
 
-export default SendTransactionDrawer;
+export default SignTransactionDrawer;
