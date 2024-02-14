@@ -26,6 +26,7 @@ const main = async () => {
 
 	// @ts-ignore
 	window.ethereum.request = (params) => {
+		console.log("Request", params);
 		return client.provider("eip155").request(params);
 	};
 };

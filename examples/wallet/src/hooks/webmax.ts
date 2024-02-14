@@ -1,9 +1,11 @@
+import { convertRpcReqToInternalReq } from "@/lib/blockchain/transaction";
 import { isConnected } from "@/lib/webmax";
 import { withResolvers } from "@/lib/withResolvers";
 import { useNetworksStore } from "@/stores/network";
 import { useWebmaxConnectionStore } from "@/stores/webmax";
 import { useLayoutEffect } from "react";
-import { Hex, LocalAccount, isAddressEqual } from "viem";
+import { Address, Hash, Hex, LocalAccount, isAddressEqual } from "viem";
+import { DappMetadata } from "webmax2";
 import { webmaxWalletClient } from "webmax2/wallet";
 import { useAccounts } from "./account";
 import { useDrawer } from "./drawer";
@@ -18,8 +20,6 @@ export const useWebmax = () => {
 	const { connections, setConnections } = useWebmaxConnectionStore();
 
 	useLayoutEffect(() => {
-		console.log("useWebmax");
-
 		const webmax = webmaxWalletClient();
 
 		const supportedChains = chains.map((chain) => `eip155:${chain.id}` as const);
@@ -85,19 +85,25 @@ export const useWebmax = () => {
 			}
 		});
 
-		webmax.on("eip155/eth_sign", async (c) => {
-			const [address, data] = c.req.params;
+		const findAccount = (address: Address) => {
+			const account = localAccounts.find((account) => isAddressEqual(account.address, address));
+			if (!account) throw new Error("Account Not found");
+			return account;
+		};
+
+		const signMessage = async (address: Address, data: Hex, metadata: DappMetadata | undefined) => {
+			const account = findAccount(address);
 			const { promise, resolve, reject } = withResolvers<Hex>();
 
-			if (!isConnected(c, connections)) return c.failure("Not connected", { code: 4100 });
+			open({ id: "sign-message", account, dappMetadata: metadata, data, onSign: resolve, onCancel: reject });
 
-			const account = localAccounts.find((account) => isAddressEqual(account.address, address));
-			if (!account) return c.failure("Account Not found", { code: 4001 });
+			return promise;
+		};
 
-			open({ id: "sign-message", account, dappMetadata: c.req.metadata, data, onSign: resolve, onCancel: reject });
-
+		webmax.on("eip155/eth_sign", async (c) => {
+			const [address, data] = c.req.params;
 			try {
-				const signature = await promise;
+				const signature = await signMessage(address, data, c.req.metadata);
 				return c.success(signature);
 			} catch {
 				return c.failure("", { code: 4001 });
@@ -106,18 +112,66 @@ export const useWebmax = () => {
 
 		webmax.on("eip155/personal_sign", async (c) => {
 			const [data, address] = c.req.params;
-			const { promise, resolve, reject } = withResolvers<Hex>();
+			try {
+				const signature = await signMessage(address, data, c.req.metadata);
+				return c.success(signature);
+			} catch {
+				return c.failure("", { code: 4001 });
+			}
+		});
 
-			if (!isConnected(c, connections)) return c.failure("Not connected", { code: 4100 });
+		webmax.on("eip155/eth_sendTransaction", async (c) => {
+			const [chainId, [rpcRequest]] = [c.req.chainId, c.req.params];
+			if (!chainId) return c.failure("Invalid chainId", { code: 4001 });
 
-			const account = localAccounts.find((account) => isAddressEqual(account.address, address));
-			if (!account) return c.failure("Account Not found", { code: 4001 });
-
-			open({ id: "sign-message", account, dappMetadata: c.req.metadata, data, onSign: resolve, onCancel: reject });
+			const account = findAccount(rpcRequest.from ?? ethereumAccounts[0]);
+			const { promise, resolve, reject } = withResolvers<Hash>();
 
 			try {
-				const signature = await promise;
-				return c.success(signature);
+				const transaction = convertRpcReqToInternalReq({ request: rpcRequest, account, chainId });
+				open({ id: "send-transaction", transaction, dappMetadata: c.req.metadata, onSign: resolve, onCancel: reject });
+
+				const hash = await promise;
+				return c.success(hash);
+			} catch {
+				return c.failure("", { code: 4001 });
+			}
+		});
+
+		webmax.on("eip155/eth_signTransaction", async (c) => {
+			const [chainId, [rpcRequest]] = [c.req.chainId, c.req.params];
+			if (!chainId) return c.failure("Invalid chainId", { code: 4001 });
+
+			const account = findAccount(rpcRequest.from ?? ethereumAccounts[0]);
+			const { promise, resolve, reject } = withResolvers<Hash>();
+
+			try {
+				const transaction = convertRpcReqToInternalReq({ request: rpcRequest, account, chainId });
+				open({ id: "sign-transaction", transaction, dappMetadata: c.req.metadata, onSign: resolve, onCancel: reject });
+
+				const hash = await promise;
+				return c.success(hash);
+			} catch {
+				return c.failure("", { code: 4001 });
+			}
+		});
+
+		webmax.on("eip155/eth_signTypedData_v4", async (c) => {
+			const [address, message_] = c.req.params;
+			const data = typeof message_ === "string" ? JSON.parse(message_) : message_;
+
+			const account = findAccount(address);
+			const { promise, resolve, reject } = withResolvers<Hash>();
+
+			try {
+				open({
+					...{ id: "sign-typed-data", account, data },
+					dappMetadata: c.req.metadata,
+					chainId: c.req.chainId ?? "1",
+					...{ onSign: resolve, onCancel: reject },
+				});
+				const hash = await promise;
+				return c.success(hash);
 			} catch {
 				return c.failure("", { code: 4001 });
 			}

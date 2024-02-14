@@ -1,4 +1,4 @@
-import { AbstractResponse } from "src";
+import { AbstractResponse } from "../types/messaging";
 import {
 	AbstractMessageSchema,
 	ChainedNamespace,
@@ -10,9 +10,18 @@ import {
 	WebmaxConnectResult,
 	WebmaxDefaultMessageSchema,
 } from "../types/protocol";
+import { parseChainedNamespace } from "../utils/parseChainedNamespace";
 import { WALLET_ACTION_METHODS, WALLET_READ_METHODS } from "./constants";
 import { RpcProviderError } from "./errors";
 import { WalletClientRef, callRequest } from "./messaging";
+
+const throwOrResult = (response: AbstractResponse) => {
+	if ("error" in response) {
+		console.error(response.error);
+		throw new RpcProviderError(response.error.message, response.error.code);
+	}
+	return response.result;
+};
 
 export type WebmaxDappClientOptions = {
 	wallet: {
@@ -72,25 +81,18 @@ export const webmaxDappClient = <
 			return response.result as WebmaxConnectResult;
 		},
 		provider: (chainedNamespace, providerOpt?: { lockChainId?: boolean }) => {
-			const [namespace, defaultChain] = chainedNamespace.split(":") as [SchemaNamespace<_TSchema>, string];
+			const { ns: namespace, chainId: defaultChain } =
+				parseChainedNamespace<SchemaNamespace<_TSchema>>(chainedNamespace);
 			if (namespace !== "eip155") throw new Error("Not implemented");
 
 			let chainId =
 				defaultChain ?? state.supportedChains.map((c) => c.split(":")).find((c) => c[0] === "eip155")?.[1] ?? "1";
 
-			const throwOrResult = (response: AbstractResponse) => {
-				if ("error" in response) {
-					console.error(response.error);
-					throw new RpcProviderError(response.error.message, response.error.code);
-				}
-				return response.result;
-			};
-
 			// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: This is a complex function
 			const request = async <TReturn = unknown>(args: { method: string; params?: unknown }): Promise<TReturn> => {
 				const { method, params } = args;
-				if (WALLET_ACTION_METHODS.includes(`${namespace}/${method}`)) {
-					const message = { namespace, method, params, metadata: opt.metadata };
+				if (WALLET_ACTION_METHODS.includes(`eip155/${method}`)) {
+					const message = { namespace: `eip155:${chainId}` as const, method, params, metadata: opt.metadata };
 					const response = await callRequest(ref, opt, message);
 					Object.assign(state, ref.handshake);
 					if (method === "eth_requestAccounts" && "result" in response) {
@@ -100,12 +102,13 @@ export const webmaxDappClient = <
 					return throwOrResult(response) as TReturn;
 				}
 
-				if (WALLET_READ_METHODS.includes(`${namespace}/${method}`)) {
+				if (WALLET_READ_METHODS.includes(`eip155/${method}`)) {
 					if (method === "eth_accounts") return state.accounts.eip155 as TReturn;
-					if (method === "eth_chainId") return chainId as unknown as TReturn;
+					if (method === "eth_chainId") return `0x${Number(chainId).toString(16)}` as TReturn;
 					if (method === "wallet_switchEthereumChain") {
 						if (providerOpt?.lockChainId) throw new RpcProviderError("Chain ID is locked", 4001);
-						chainId = String(params);
+						const [{ chainId: newChainId }] = params as [{ chainId: string }];
+						chainId = String(Number(newChainId));
 						return null as TReturn;
 					}
 				}
@@ -113,6 +116,7 @@ export const webmaxDappClient = <
 				const response = await callHttp(namespace, chainId, method, params);
 				return throwOrResult(response) as TReturn;
 			};
+
 			const on = () => {};
 			return { request, on };
 		},
