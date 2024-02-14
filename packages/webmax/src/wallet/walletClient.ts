@@ -1,5 +1,6 @@
 import { AbstractRequest, AbstractResponse } from "../types/messaging";
 import { AbstractMessageSchema, ExtractSchema, WalletHandleTypes, WebmaxDefaultMessageSchema } from "../types/protocol";
+import { parseChainedNamespace } from "../utils/parseChainedNamespace";
 import { WebmaxWalletContext, createWebmaxWalletContext } from "./context";
 import { onMessage, parentWindow, sendMessage } from "./messaging";
 
@@ -33,10 +34,10 @@ export const webmaxWalletClient = <
 	const handlers: [string, WebmaxWalletClientHandler][] = [];
 
 	const dispatch = async (request: AbstractRequest, origin: string) => {
-		const { namespace, method } = request;
+		const { namespace: nsLike, method } = request;
+		const { ns } = parseChainedNamespace(nsLike);
 		const context = createWebmaxWalletContext(request, origin);
-		const handler =
-			handlers.find(([path]) => path === `${namespace}/${method}`) ?? handlers.find(([path]) => path === namespace);
+		const handler = handlers.find(([path]) => path === `${ns}/${method}`) ?? handlers.find(([path]) => path === ns);
 		if (handler) return sendMessage(await handler[1](context));
 		return sendMessage(context.failure("method_not_supported"));
 	};

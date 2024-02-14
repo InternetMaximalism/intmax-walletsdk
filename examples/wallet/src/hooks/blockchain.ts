@@ -5,7 +5,7 @@ import { useNetworksStore } from "@/stores/network";
 import { InternalTxRequest, Token } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { Account, Chain } from "viem";
+import { Account, Chain, TransactionRequest, TypedDataDefinition } from "viem";
 
 export const useTokensWithChain = <T extends { token: Token }>(data: T[]): (T & { chain: Chain })[] => {
 	const chains = useNetworksStore((state) => state.networks);
@@ -82,4 +82,20 @@ export const useSendTransaction = () => {
 	};
 
 	return sendTransaction;
+};
+
+export const useSignTransaction = () => {
+	const chains = useNetworksStore((state) => state.networks);
+
+	const signTransaction = async (transaction: InternalTxRequest) => {
+		const { chainId, account, raw: request } = normalizeTxRequest(transaction);
+		const chain = chains.find((c) => c.id === chainId);
+		if (!chain) throw new Error("Invalid chain");
+
+		const clinet = createViemWalletClient(chain, account);
+		const signed = await clinet.signTransaction(request);
+		return signed;
+	};
+
+	return signTransaction;
 };

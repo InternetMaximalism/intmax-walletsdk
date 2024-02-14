@@ -74,7 +74,7 @@ export const staticSimulateTxRequest = (transaction: InternalTxRequest, tokens: 
 		const actions: SimulatedTxAction[] = [];
 
 		if (!raw.to) return [{ type: "contract-creation" }];
-		if (raw.value) {
+		if (raw.value !== undefined) {
 			const token = findToken(tokens, chainId);
 			actions.push({ type: "transfer", token, to: raw.to, amount: BigInt(raw.value) });
 		}
@@ -91,6 +91,8 @@ export const staticSimulateTxRequest = (transaction: InternalTxRequest, tokens: 
 				actions.push({ type: "approve", token, amount: BigInt(decoded.args[1]) });
 			}
 		} catch {}
+
+		return actions;
 	}
 
 	return [];
