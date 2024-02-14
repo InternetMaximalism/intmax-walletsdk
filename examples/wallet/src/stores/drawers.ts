@@ -47,7 +47,8 @@ export type DrawerPropsPattern =
 			id: "sign-typed-data";
 			dappMetadata?: DappMetadata;
 			account: Account;
-			data: string;
+			chainId: string;
+			data: object;
 			onSign?: (signature: Hex) => void;
 			onCancel?: () => void;
 	  }

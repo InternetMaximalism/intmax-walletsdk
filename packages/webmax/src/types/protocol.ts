@@ -93,7 +93,7 @@ export type EthApprovalMessageSchema = [
 		type: "approval";
 		namespace: Namespaces["EIP155"];
 		method: "eth_signTypedData_v4";
-		params: [address: EthereumAddress, message: string];
+		params: [address: EthereumAddress, message: string | object];
 		result: Hex;
 	},
 	{
