@@ -51,10 +51,11 @@ export const webmaxDappClient = <
 
 	const callWallet = async <T>(
 		namespace: Schema[number]["namespace"],
-		args: { method: string; params?: unknown },
+		args: { method: string; params?: unknown; chainId?: string },
 	): Promise<T> => {
-		const { method, params } = args;
-		const message = { namespace, method, params, metadata: opt.metadata } as const;
+		const { method, params, chainId } = args;
+		const chainedNamespace = chainId ? `${namespace}:${chainId}` : namespace;
+		const message = { namespace: chainedNamespace, method, params, metadata: opt.metadata } as const;
 		const response = await callRequest(ref, opt, message);
 		return throwOrResult(response) as T;
 	};

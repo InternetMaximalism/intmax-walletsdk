@@ -3,7 +3,7 @@ import { WebmaxStore } from "../store";
 
 export type WebmaxProviderOptions<NS extends string> = {
 	namespace: NS | ChainedNamespace<NS>;
-	callWallet: <T>(args: { method: string; params?: unknown }) => Promise<T>;
+	callWallet: <T>(args: { method: string; params?: unknown; chainId?: string }) => Promise<T>;
 	store: WebmaxStore;
 };
 

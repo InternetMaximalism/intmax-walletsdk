@@ -38,7 +38,12 @@ export const ethereumProvider =
 		const httpRpcClients: Map<number, HttpJsonRpcClient> = new Map();
 
 		let connected = initialState.accounts.length > 0;
-		let currentChainId = Number(chainId) ?? initialState.chainId ?? initialState.supportedChains[0] ?? 1;
+		let currentChainId = Number(chainId ?? initialState.chainId ?? initialState.supportedChains[0] ?? "1");
+
+		const chainedCallWallet = async <T>(args: { method: string; params?: unknown }) => {
+			const { method, params } = args;
+			return callWallet<T>({ method, params, chainId: currentChainId.toString() });
+		};
 
 		const getHttpRpcClient = (chainId: number) => {
 			if (!httpRpcClients.has(chainId)) {
@@ -69,6 +74,7 @@ export const ethereumProvider =
 			emitter.emit("connect", { chainId: getChainId() });
 		};
 
+		// biome-ignore lint/complexity/noExcessiveCognitiveComplexity:
 		const request = async <TReturn = unknown>(args: { method: string; params?: unknown }) => {
 			const { method, params } = args;
 			if (method === "eth_chainId") return getChainId() as TReturn;
@@ -79,12 +85,13 @@ export const ethereumProvider =
 				return null as TReturn;
 			}
 			if (method === "eth_requestAccounts") {
-				const accounts = await callWallet<string[]>({ method: "eth_requestAccounts", params: [] });
+				if (connected) return (await store.getState()).accounts as TReturn;
+				const accounts = await chainedCallWallet<string[]>({ method: "eth_requestAccounts", params: [] });
 				await updateAccounts(accounts);
 				return accounts as TReturn;
 			}
 			if (WALLET_APPROVAL_METHODS.includes(method)) {
-				const response = await callWallet<TReturn>({ method, params });
+				const response = await chainedCallWallet<TReturn>({ method, params });
 				emitter.emit("message", { type: "eth_subscription", data: response });
 				return response;
 			}
