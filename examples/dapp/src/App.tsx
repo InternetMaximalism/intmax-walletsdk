@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { webmaxDappClient } from "webmax2/dapp";
+import { ethereumProvider, webmaxDappClient } from "webmax2/dapp";
 
 const DEFAULT_WALLET_URL = import.meta.env.VITE_WALLET_URL || "https://webmax2-wallet.vercel.app/";
 const DEFAULT_DAPP_ICON = (import.meta.env.VITE_APP_ICON || `${window.location.origin}/vite.svg`) as string;
@@ -12,7 +12,11 @@ const DAPP_METADATA = {
 };
 
 const createWebmax = (walletUrl: string) => {
-	return webmaxDappClient({ wallet: { url: walletUrl, name: "DEMO Wallet" }, metadata: DAPP_METADATA });
+	return webmaxDappClient({
+		wallet: { url: walletUrl, name: "DEMO Wallet" },
+		metadata: DAPP_METADATA,
+		providers: { eip155: ethereumProvider() },
+	});
 };
 
 function App() {
@@ -29,7 +33,7 @@ function App() {
 	};
 
 	const handleConnect = async () => {
-		const ethereum = webmax.provider("eip155");
+		const ethereum = await webmax.provider("eip155");
 		await ethereum.request({ method: "eth_requestAccounts", params: [] });
 		const accounts = (await ethereum.request({ method: "eth_accounts", params: [] })) as string[];
 		setAccounts(accounts);
@@ -38,7 +42,7 @@ function App() {
 	const handleSignMessage = async () => {
 		if (accounts.length === 0) await handleConnect();
 
-		const ethereum = webmax.provider("eip155");
+		const ethereum = await webmax.provider("eip155");
 		const _accounts = (await ethereum.request({ method: "eth_accounts", params: [] })) as string[];
 		const result = await ethereum.request({ method: "eth_sign", params: [_accounts[0], "Hello Webmax"] });
 
@@ -48,24 +52,11 @@ function App() {
 	const handleSendTransaction = async () => {
 		if (accounts.length === 0) await handleConnect();
 
-		const ethereum = webmax.provider("eip155");
+		const ethereum = await webmax.provider("eip155");
 		const _accounts = (await ethereum.request({ method: "eth_accounts", params: [] })) as string[];
 		await ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x89" }] });
 		const result = await ethereum.request({
 			method: "eth_sendTransaction",
-			params: [{ from: _accounts[0], to: _accounts[0], value: "0x0" }],
-		});
-
-		setResult(result as string);
-	};
-
-	const handleSignTransaction = async () => {
-		if (accounts.length === 0) await handleConnect();
-
-		const ethereum = webmax.provider("eip155");
-		const _accounts = (await ethereum.request({ method: "eth_accounts", params: [] })) as string[];
-		const result = await ethereum.request({
-			method: "eth_signTransaction",
 			params: [{ from: _accounts[0], to: _accounts[0], value: "0x0" }],
 		});
 
@@ -91,7 +82,7 @@ function App() {
 			message: { name: "Bob", age: 25 },
 		};
 
-		const ethereum = webmax.provider("eip155");
+		const ethereum = await webmax.provider("eip155");
 		const _accounts = (await ethereum.request({ method: "eth_accounts", params: [] })) as string[];
 		const result = await ethereum.request({
 			method: "eth_signTypedData_v4",
@@ -123,11 +114,9 @@ function App() {
 				<div className="gap-2 grid grid-cols-2">
 					<Button onClick={handleConnect}>Connect</Button>
 					<Button onClick={handleSignMessage}>Sign Message</Button>
-					<Button onClick={handleSignTransaction}>Sign Transaction</Button>
+					<Button onClick={handleSignTypedData}> Sign Typed Data</Button>
 					<Button onClick={handleSendTransaction}>Send Transaction</Button>
-					<Button onClick={handleSignTypedData} className="col-span-2">
-						Sign Typed Data
-					</Button>
+
 					<div className="col-span-2">
 						<div className="font-semibold">Accounts:</div>
 						<div className="break-all text-muted-foreground">{accounts.join(", ")}</div>

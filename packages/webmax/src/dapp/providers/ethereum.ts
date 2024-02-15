@@ -6,13 +6,13 @@ import { HttpJsonRpcClient, httpJsonRpcClient } from "../utils";
 import { WebmaxProvider } from "./interface";
 
 export const WALLET_APPROVAL_METHODS = [
-	"eip155/eth_sign",
-	"eip155/eth_sendTransaction",
-	"eip155/eth_signTransaction",
-	"eip155/eth_signTypedData_v4",
-	"eip155/personal_sign",
-	"eip155/wallet_addEthereumChain",
-	"eip155/wallet_watchAsset",
+	"eth_sign",
+	"eth_sendTransaction",
+	"eth_signTransaction",
+	"eth_signTypedData_v4",
+	"personal_sign",
+	"wallet_addEthereumChain",
+	"wallet_watchAsset",
 ];
 
 export type EIP1193LikeProvider = {
@@ -23,13 +23,13 @@ export type EIP1193LikeProvider = {
 
 export type EthereumProviderOptions = {
 	lockChainId?: boolean;
-	httpRpcUrls: Record<number, string>;
+	httpRpcUrls?: Record<number, string>;
 };
 
 export type EthereumProvider = WebmaxProvider<EIP1193LikeProvider, "eip155">;
 
 export const ethereumProvider =
-	(options: EthereumProviderOptions): WebmaxProvider<EIP1193LikeProvider, "eip155"> =>
+	(options?: EthereumProviderOptions): WebmaxProvider<EIP1193LikeProvider, "eip155"> =>
 	async ({ store: _store, callWallet, namespace }) => {
 		const store = _ethStoreWrapper(_store);
 		const { chainId } = parseChainedNamespace(namespace);
@@ -42,7 +42,7 @@ export const ethereumProvider =
 
 		const getHttpRpcClient = (chainId: number) => {
 			if (!httpRpcClients.has(chainId)) {
-				if (!options.httpRpcUrls[chainId]) throw new RpcProviderError("HTTP RPC not provided for chain", 4001);
+				if (!options?.httpRpcUrls?.[chainId]) throw new RpcProviderError("HTTP RPC not provided for chain", 4001);
 				const newClient = httpJsonRpcClient(options.httpRpcUrls[chainId]);
 				httpRpcClients.set(chainId, newClient);
 			}
@@ -52,7 +52,7 @@ export const ethereumProvider =
 		const getChainId = () => `0x${Number(currentChainId).toString(16)}`;
 
 		const switchChain = async (chainId: number) => {
-			if (options.lockChainId) throw new RpcProviderError("Chain ID is locked", 4001);
+			if (options?.lockChainId) throw new RpcProviderError("Chain ID is locked", 4001);
 			currentChainId = chainId;
 			await store.setState((state) => ({ ...state, chainId }));
 			emitter.emit("chainChanged", chainId);
