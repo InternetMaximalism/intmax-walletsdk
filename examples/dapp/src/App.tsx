@@ -99,7 +99,7 @@ function App() {
 					<div className="text-2xl font-semibold">Webmax Dapp Example</div>
 					<div className="text-muted-foreground">This is a simple example of how to use the webmax dapp client.</div>
 				</div>
-				<div>
+				<div className="space-y-1">
 					<div className="font-semibold text-lg">Wallet URL</div>
 					<div className="flex gap-2">
 						<Input placeholder="Etner wallet url" onChange={(e) => setWalletUrl(e.target.value)} value={walletUrl} />
@@ -109,6 +109,16 @@ function App() {
 					</div>
 					<div className="text-muted-foreground">
 						The webmax protocol allows you to connect to a wallet of any URL by specifying the wallet's URL!
+					</div>
+				</div>
+				<div className="space-y-1">
+					<div className="font-semibold text-lg">Wallet URL</div>
+					<div className="gap-2 grid grid-cols-2">
+						<Button variant="link">Bookmarklet Link</Button>
+						<Button>Copy Bookmarklet</Button>
+					</div>
+					<div className="text-muted-foreground">
+						Copy it or whatever, register the bookmarklet above, and WebmaxWallet is available everywhere!
 					</div>
 				</div>
 				<div className="gap-2 grid grid-cols-2">
