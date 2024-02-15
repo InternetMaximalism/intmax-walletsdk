@@ -1,4 +1,4 @@
-import { webmaxDappClient } from "webmax2/dapp";
+import { ethereumProvider, webmaxDappClient } from "webmax2/dapp";
 
 const WALLET_URL = "http://localhost:5173";
 
@@ -18,16 +18,29 @@ const main = async () => {
 	const client = webmaxDappClient({
 		wallet: { name: "webmax", url: WALLET_URL },
 		metadata: getPageMetadata(),
-		httpRpc: {
-			"eip155:1": { url: "https://mainnet.infura.io/v3" },
-			"eip155:137": { url: "https://rpc-mainnet.maticvigil.com/" },
-		} as const,
+		providers: {
+			eip155: ethereumProvider({
+				httpRpcUrls: {
+					1: "https://mainnet.infura.io/v3",
+					137: "https://rpc-mainnet.maticvigil.com/",
+				},
+			}),
+		},
 	});
+
+	const provider = await client.provider("eip155");
 
 	// @ts-ignore
 	window.ethereum.request = (params) => {
-		console.log("Request", params);
-		return client.provider("eip155").request(params);
+		const result = provider.request(params);
+		console.log("Request", params, result);
+		return result;
+	};
+
+	// @ts-ignore
+	window.ethereum.on = (event, cb) => {
+		console.log("On", event);
+		return provider.on(event, cb);
 	};
 };
 
