@@ -1,30 +1,32 @@
-import { ChainedNamespace, Namespace } from "./protocol";
+import { ChainedNamespace } from "./protocol";
 
 export type ClientMode = "popup" | "iframe";
 export type WindowHandling = "keep" | "close";
 
-export type AbstractRequest<Params = unknown> = {
+export type AbstractRequest<NS extends string = string, Params = unknown> = {
 	id: number;
-	namespace: Namespace | ChainedNamespace;
+	namespace: NS | ChainedNamespace<NS>;
 	method: string;
 	params: Params;
 	metadata?: unknown;
 };
 
-export type AbstractSuccessResponse<Result = unknown> = {
+export type AbstractSuccessResponse<NS extends string = string, Result = unknown> = {
 	id: number;
-	namespace: Namespace | ChainedNamespace;
+	namespace: NS | ChainedNamespace<NS>;
 	method: string;
 	windowHandling: WindowHandling;
 	result: Result;
 };
 
-export type AbstractErrorResponse = {
+export type AbstractErrorResponse<NS extends string = string> = {
 	id: number;
-	namespace: Namespace | ChainedNamespace;
+	namespace: NS | ChainedNamespace<NS>;
 	method: string;
 	windowHandling: WindowHandling;
 	error: { code: number; message: string };
 };
 
-export type AbstractResponse<Result = unknown> = AbstractSuccessResponse<Result> | AbstractErrorResponse;
+export type AbstractResponse<NS extends string = string, Result = unknown> =
+	| AbstractSuccessResponse<NS, Result>
+	| AbstractErrorResponse<NS>;

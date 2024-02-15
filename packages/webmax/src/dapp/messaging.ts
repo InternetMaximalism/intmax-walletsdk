@@ -17,7 +17,8 @@ export type WalletClientRef = {
 	handshake?: WebmaxHandshakeResult;
 };
 
-const openWindow = (opt: WebmaxDappClientOptions) => {
+// biome-ignore lint/suspicious/noExplicitAny:
+const openWindow = (opt: WebmaxDappClientOptions<any, any>) => {
 	const { url, name, window: windowOpt } = opt.wallet;
 	const height = windowOpt?.height || DEFAULT_WALLET_WINDOW_HEIGHT;
 	const width = windowOpt?.width || DEFAULT_WALLET_WINDOW_WIDTH;
@@ -39,7 +40,8 @@ const waitForClose = (ref: WalletClientRef) => {
 	return promise;
 };
 
-const _callRequest = (ref: WalletClientRef, opt: WebmaxDappClientOptions, message: AbstractRequest) => {
+// biome-ignore lint/suspicious/noExplicitAny:
+const _callRequest = (ref: WalletClientRef, opt: WebmaxDappClientOptions<any, any>, message: AbstractRequest) => {
 	invariant(ref.window);
 	const { promise, resolve } = withResolvers<AbstractResponse>();
 
@@ -81,7 +83,8 @@ export const incrementId = (ref: WalletClientRef) => {
 
 export const callRequest = async (
 	ref: WalletClientRef,
-	opt: WebmaxDappClientOptions,
+	// biome-ignore lint/suspicious/noExplicitAny:
+	opt: WebmaxDappClientOptions<any, any>,
 	message: Omit<AbstractRequest, "id">,
 ) => {
 	const { promise, resolve } = withResolvers<void>();

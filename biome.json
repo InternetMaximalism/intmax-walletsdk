@@ -6,7 +6,7 @@
 		"useIgnoreFile": true
 	},
 	"files": {
-		"ignore": ["**/components/ui/**"]
+		"ignore": ["**/components/ui/**", "**/bookmarklet.js"]
 	},
 	"organizeImports": {
 		"enabled": true
