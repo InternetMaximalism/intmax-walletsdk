@@ -1,6 +1,6 @@
 import { ethereumProvider, webmaxDappClient } from "webmax2/dapp";
 
-const WALLET_URL = "http://localhost:5173";
+const WALLET_URL = "#WALLET_URL#";
 
 const getPageMetadata = () => {
 	const title = document.title;
@@ -22,6 +22,8 @@ const main = async () => {
 			eip155: ethereumProvider({
 				httpRpcUrls: {
 					1: "https://mainnet.infura.io/v3",
+					5: "https://goerli.infura.io/v3",
+					10: "https://mainnet.optimism.io",
 					137: "https://rpc-mainnet.maticvigil.com/",
 				},
 			}),
