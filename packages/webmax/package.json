@@ -36,5 +36,8 @@
 			"types": "./dist/types/index.d.ts",
 			"import": "./dist/esm/index.js"
 		}
+	},
+	"dependencies": {
+		"eventemitter3": "^5.0.1"
 	}
 }
