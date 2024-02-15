@@ -16,7 +16,7 @@ export type DappHandleTypes = "readonly";
 
 export type AbstractMessageSchema = {
 	type: WalletHandleTypes | DappHandleTypes;
-	namespace: Namespace;
+	namespace: string;
 	method: string;
 	params?: unknown;
 	result?: unknown;
