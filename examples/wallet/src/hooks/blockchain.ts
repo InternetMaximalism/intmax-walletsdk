@@ -5,7 +5,7 @@ import { useNetworksStore } from "@/stores/network";
 import { InternalTxRequest, Token } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { Account, Chain, TransactionRequest, TypedDataDefinition } from "viem";
+import { Account, Chain } from "viem";
 
 export const useTokensWithChain = <T extends { token: Token }>(data: T[]): (T & { chain: Chain })[] => {
 	const chains = useNetworksStore((state) => state.networks);
