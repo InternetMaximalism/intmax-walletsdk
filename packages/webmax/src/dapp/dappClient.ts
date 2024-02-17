@@ -57,7 +57,7 @@ export const webmaxDappClient = <
 		const chainedNamespace = chainId ? `${namespace}:${chainId}` : namespace;
 		const message = { namespace: chainedNamespace, method, params, metadata: opt.metadata } as const;
 		const response =
-			opt.wallet.window?.mode === "popup"
+			opt.wallet.window?.mode !== "iframe"
 				? await POPUP.callRequest(ref, opt, message)
 				: await IFRAME.callRequest(ref, opt, message);
 		return throwOrResult(response) as T;
