@@ -8,7 +8,7 @@ import {
 	WebmaxConnectResult,
 	WebmaxDefaultMessageSchema,
 } from "../types/protocol";
-import { WalletClientRef, callRequest } from "./messaging";
+import { IFRAME, POPUP, WalletClientRef } from "./messaging/index";
 import { WebmaxProvider } from "./providers";
 import { BaseStorage, createWebmaxStore, memoryStorage } from "./store";
 import { throwOrResult } from "./utils";
@@ -20,7 +20,7 @@ export type WebmaxDappClientOptions<
 	wallet: {
 		url: string;
 		name: string;
-		window?: { width: number; height: number; mode?: "popup" };
+		window?: { width: number; height: number; mode?: "popup" | "iframe" };
 	};
 	metadata: DappMetadata;
 	providers?: Providers;
@@ -56,7 +56,10 @@ export const webmaxDappClient = <
 		const { method, params, chainId } = args;
 		const chainedNamespace = chainId ? `${namespace}:${chainId}` : namespace;
 		const message = { namespace: chainedNamespace, method, params, metadata: opt.metadata } as const;
-		const response = await callRequest(ref, opt, message);
+		const response =
+			opt.wallet.window?.mode === "popup"
+				? await POPUP.callRequest(ref, opt, message)
+				: await IFRAME.callRequest(ref, opt, message);
 		return throwOrResult(response) as T;
 	};
 
