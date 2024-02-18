@@ -15,8 +15,10 @@
     "postinstall": "wxt prepare"
   },
   "dependencies": {
+    "mipd": "^0.0.5",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "webmax2": "workspace:^"
   },
   "devDependencies": {
     "@types/react": "^18.2.46",
