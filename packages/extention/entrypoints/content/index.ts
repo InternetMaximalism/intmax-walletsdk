@@ -1,6 +1,5 @@
 import { EIP1193Provider, announceProvider } from "mipd";
 import { ethereumProvider, webmaxDappClient } from "webmax2/dapp";
-import { browser } from "wxt/browser";
 import { defineContentScript } from "wxt/sandbox";
 
 declare global {
@@ -28,41 +27,49 @@ const getPageMetadata = () => {
 	return { name: title, description, icons };
 };
 
+const init = async () => {
+	if (!shouldInject()) return;
+
+	const client = webmaxDappClient({
+		wallet: { name: "webmax", url: WALLET_URL },
+		metadata: getPageMetadata(),
+		providers: {
+			eip155: ethereumProvider({
+				httpRpcUrls: {
+					1: "https://mainnet.infura.io/v3",
+					5: "https://goerli.infura.io/v3",
+					10: "https://mainnet.optimism.io",
+					137: "https://rpc-mainnet.maticvigil.com/",
+				},
+			}),
+		},
+	});
+
+	const provider = await client.provider("eip155");
+
+	Object.assign(provider, {
+		isMetaMask: true,
+	});
+
+	announceProvider({
+		info: {
+			icon: "https://webmax.io/favicon.ico",
+			name: "Webmax",
+			rdns: "io.webmax",
+			uuid: crypto.randomUUID(),
+		},
+		provider,
+	});
+
+	Object.defineProperties(window, {
+		ethereum: { value: provider, configurable: false },
+	});
+};
+
 export default defineContentScript({
 	matches: ["<all_urls>"],
-	main: async (args) => {
-		console.info("Hello webmax", { id: browser.runtime.id });
-		if (!shouldInject()) return;
-
-		const client = webmaxDappClient({
-			wallet: { name: "webmax", url: WALLET_URL },
-			metadata: getPageMetadata(),
-			providers: {
-				eip155: ethereumProvider({
-					httpRpcUrls: {
-						1: "https://mainnet.infura.io/v3",
-						5: "https://goerli.infura.io/v3",
-						10: "https://mainnet.optimism.io",
-						137: "https://rpc-mainnet.maticvigil.com/",
-					},
-				}),
-			},
-		});
-
-		const provider = await client.provider("eip155");
-
-		announceProvider({
-			info: {
-				icon: "https://webmax.io/favicon.ico",
-				name: "Webmax",
-				rdns: "io.webmax",
-				uuid: crypto.randomUUID(),
-			},
-			provider,
-		});
-
-		Object.defineProperties(window, {
-			ethereum: { value: provider, configurable: false },
-		});
+	world: "MAIN",
+	main: async () => {
+		await init();
 	},
 });
