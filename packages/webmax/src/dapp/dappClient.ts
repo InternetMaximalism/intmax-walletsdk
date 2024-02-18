@@ -20,7 +20,7 @@ export type WebmaxDappClientOptions<
 	wallet: {
 		url: string;
 		name: string;
-		window?: { width: number; height: number; mode?: "popup" | "iframe" };
+		window?: { width?: number; height?: number; mode?: "popup" | "iframe" };
 	};
 	metadata: DappMetadata;
 	providers?: Providers;
