@@ -24,6 +24,9 @@
 			},
 			"nursery": {
 				"useImportRestrictions": "off"
+			},
+			"correctness": {
+				"noUndeclaredVariables": "off"
 			}
 		}
 	}
