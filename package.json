@@ -2,7 +2,7 @@
 	"private": true,
 	"type": "module",
 	"engines": {
-		"pnpm": "8.7.5",
+		"pnpm": ">=8.0.0",
 		"npm": "please_use_pnpm_instead"
 	},
 	"packageManager": "pnpm@8.7.5",
