@@ -1,7 +1,8 @@
-import { AbstractRequest, AbstractResponse, WebmaxHandshakeResult } from "src";
-import invariant from "../utils/invariant";
-import { withResolvers } from "../utils/withResolvers";
-import { WebmaxDappClientOptions } from "./dappClient";
+import { AbstractRequest, AbstractResponse } from "src";
+import invariant from "../../utils/invariant";
+import { withResolvers } from "../../utils/withResolvers";
+import { WebmaxDappClientOptions } from "../dappClient";
+import { WalletClientRef } from "../messaging";
 
 const DEFAULT_WALLET_WINDOW_HEIGHT = 600;
 const DEFAULT_WALLET_WINDOW_WIDTH = 400;
@@ -9,13 +10,6 @@ const DEFAULT_WALLET_WINDOW_WIDTH = 400;
 const MESSAGE_INTERVAL = 1000;
 const CLOSE_WAITING = 100;
 const WINDOW_WATCH_INTERVAL = 100;
-
-export type WalletClientRef = {
-	window?: Window;
-	id?: number;
-	calls?: Promise<unknown>[];
-	handshake?: WebmaxHandshakeResult;
-};
 
 // biome-ignore lint/suspicious/noExplicitAny:
 const openWindow = (opt: WebmaxDappClientOptions<any, any>) => {
