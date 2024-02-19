@@ -1,6 +1,6 @@
 import { SiteMetadata } from "../types";
 
-export const getPageMetadata = (): SiteMetadata => {
+export const getSiteMetadata = (): SiteMetadata => {
 	const host = location.host;
 	const title = document.title;
 	const description = document.querySelector('meta[name="description"]')?.getAttribute("content") || "";
