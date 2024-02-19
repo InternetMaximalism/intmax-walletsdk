@@ -8,7 +8,7 @@ import {
 	WebmaxConnectResult,
 	WebmaxDefaultMessageSchema,
 } from "../types/protocol";
-import { IFRAME, POPUP, WalletClientRef } from "./messaging/index";
+import { CUSTOM, IFRAME, POPUP, WalletClientRef } from "./messaging/index";
 import { WebmaxProvider } from "./providers";
 import { BaseStorage, createWebmaxStore, memoryStorage } from "./store";
 import { throwOrResult } from "./utils";
@@ -20,7 +20,9 @@ export type WebmaxDappClientOptions<
 	wallet: {
 		url: string;
 		name: string;
-		window?: { width?: number; height?: number; mode?: "popup" | "iframe" };
+		window?:
+			| { width?: number; height?: number; mode?: "popup" | "iframe" }
+			| { window: Window; onClose: () => void; mode: "custom" };
 	};
 	metadata: DappMetadata;
 	providers?: Providers;
@@ -57,10 +59,13 @@ export const webmaxDappClient = <
 		const chainedNamespace = chainId ? `${namespace}:${chainId}` : namespace;
 		const message = { namespace: chainedNamespace, method, params, metadata: opt.metadata } as const;
 		const response =
-			opt.wallet.window?.mode !== "iframe"
-				? await POPUP.callRequest(ref, opt, message)
-				: await IFRAME.callRequest(ref, opt, message);
-		return throwOrResult(response) as T;
+			opt.wallet.window?.mode === "custom"
+				? CUSTOM.callRequest(ref, { wallet: opt.wallet, metadata: opt.metadata }, message)
+				: opt.wallet.window?.mode === "iframe"
+				  ? IFRAME.callRequest(ref, { wallet: opt.wallet, metadata: opt.metadata }, message)
+				  : POPUP.callRequest(ref, { wallet: opt.wallet, metadata: opt.metadata }, message);
+
+		return throwOrResult(await response) as T;
 	};
 
 	return {

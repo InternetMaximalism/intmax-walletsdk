@@ -4,24 +4,8 @@ import { withResolvers } from "../../utils/withResolvers";
 import { WebmaxDappClientOptions } from "../dappClient";
 import { WalletClientRef } from "../messaging";
 
-const DEFAULT_WALLET_WINDOW_HEIGHT = 600;
-const DEFAULT_WALLET_WINDOW_WIDTH = 400;
-
-const MESSAGE_INTERVAL = 1000;
-const CLOSE_WAITING = 100;
 const WINDOW_WATCH_INTERVAL = 100;
-
-// biome-ignore lint/suspicious/noExplicitAny:
-const openWindow = (opt: WebmaxDappClientOptions<any, any>) => {
-	const { url, name, window: windowOpt } = opt.wallet;
-	invariant(!windowOpt?.mode || windowOpt?.mode !== "custom");
-	const height = windowOpt?.height || DEFAULT_WALLET_WINDOW_HEIGHT;
-	const width = windowOpt?.width || DEFAULT_WALLET_WINDOW_WIDTH;
-	const [top, left] = [window.screenY, window.screenX + window.innerWidth - width];
-	const win = window.open(url, name, `top=${top}px, left=${left}px, height=${height}px, width=${width}px`);
-	if (!win) throw new Error("Failed to open window");
-	return win;
-};
+const CLOSE_WAITING = 100;
 
 const waitForClose = (ref: WalletClientRef) => {
 	const { promise, resolve } = withResolvers<void>();
@@ -71,33 +55,46 @@ const _callRequest = (ref: WalletClientRef, opt: WebmaxDappClientOptions<any, an
 	return Promise.race([promise, windowClosed]);
 };
 
+const _incrementId = (ref: WalletClientRef) => {
+	ref.id = ref.id ? ref.id + 1 : 1;
+	return ref.id;
+};
+
 export const callRequest = async (
 	ref: WalletClientRef,
 	// biome-ignore lint/suspicious/noExplicitAny:
 	opt: WebmaxDappClientOptions<any, any>,
 	message: Omit<AbstractRequest, "id">,
 ) => {
+	const { window: windowOpt } = opt.wallet;
+	invariant(windowOpt?.mode === "custom");
 	const { promise, resolve } = withResolvers<void>();
 	const waiting = Promise.allSettled(ref.calls || []);
 
-	ref.id = ref.id ? ref.id + 1 : 1;
 	ref.calls = [...(ref.calls || []), promise];
 
 	await waiting;
 
-	if (ref.window) await new Promise((r) => setTimeout(r, MESSAGE_INTERVAL));
+	if (windowOpt.window.closed) throw new Error("Window closed");
+	ref.window = windowOpt.window;
 
-	if (ref.window?.closed || !ref.window) ref.window = openWindow(opt);
+	if (!ref.handshake) {
+		const _handshake = {
+			id: _incrementId(ref),
+			namespace: "webmax",
+			method: "webmax_handshake",
+			params: [],
+		} satisfies AbstractRequest;
+		ref.window.postMessage(_handshake, new URL(opt.wallet.url).origin);
+	}
 
-	const _message = { ...message, id: ref.id };
+	const _message = { ...message, id: _incrementId(ref) };
 	const result = await _callRequest(ref, opt, _message);
 
 	ref.calls = ref.calls?.filter((p) => p !== promise);
 	setTimeout(() => {
 		if (ref.calls?.length !== 0 || result?.windowHandling !== "close") return;
-		ref.window?.close();
-		ref.window = undefined;
-		ref.handshake = undefined;
+		windowOpt.onClose?.();
 	}, CLOSE_WAITING);
 
 	resolve();
