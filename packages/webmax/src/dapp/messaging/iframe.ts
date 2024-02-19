@@ -20,6 +20,8 @@ const IFRAME_STYLE = `
 // biome-ignore lint/suspicious/noExplicitAny:
 const openIframe = (opt: WebmaxDappClientOptions<any, any>) => {
 	const { url, name, window: windowOpt } = opt.wallet;
+	invariant(!windowOpt?.mode || windowOpt?.mode !== "custom");
+
 	const existingIframe = document.getElementById(IFRAME_ID);
 	if (existingIframe) {
 		const iframe = existingIframe as HTMLIFrameElement;
