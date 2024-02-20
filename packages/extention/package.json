@@ -28,7 +28,8 @@
     "react-router-dom": "^6.22.0",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
-    "webmax2": "workspace:^"
+    "webmax2": "workspace:^",
+    "zustand": "^4.5.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.46",

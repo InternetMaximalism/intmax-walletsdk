@@ -7,6 +7,7 @@ export default defineConfig({
 	vite: () => ({ plugins: [react()] }),
 	imports: false,
 	manifest: {
+		permissions: ["activeTab", "clipboardWrite", "scripting", "storage", "tabs", "unlimitedStorage", "notifications"],
 		web_accessible_resources: [
 			{
 				resources: ["inpage.js"],
