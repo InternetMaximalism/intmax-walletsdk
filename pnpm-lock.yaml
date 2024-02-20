@@ -317,6 +317,9 @@ importers:
       eventemitter3:
         specifier: ^5.0.1
         version: 5.0.1
+      lucide-react:
+        specifier: ^0.321.0
+        version: 0.321.0(react@18.2.0)
       mipd:
         specifier: ^0.0.5
         version: 0.0.5(typescript@5.3.3)
@@ -326,6 +329,9 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
+      react-router-dom:
+        specifier: ^6.22.0
+        version: 6.22.0(react-dom@18.2.0)(react@18.2.0)
       tailwind-merge:
         specifier: ^2.2.1
         version: 2.2.1
