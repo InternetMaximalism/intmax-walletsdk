@@ -13,7 +13,7 @@ const shouldInject = () => {
 	return true;
 };
 
-export const init = async () => {
+export const initWebmaxProvider = async () => {
 	if (!shouldInject()) return;
 
 	const provider = await createInjectableProvider();
