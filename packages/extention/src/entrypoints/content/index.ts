@@ -1,4 +1,4 @@
-import { getSiteMetadata } from "@/core/libs/getSiteMetadata";
+import { getSiteMetadata } from "@/core/lib/getSiteMetadata";
 import { contentMessaging } from "@/core/messagings/content";
 import { inpageMessaging } from "@/core/messagings/inpage";
 import { browser } from "wxt/browser";
