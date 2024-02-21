@@ -1,7 +1,6 @@
 import { useWalletStore } from "@/popup/stores/wallet";
 import { HomeHeader } from "./header";
-
-const WALLET_URL = "http://localhost:5173";
+import { WalletIframe } from "./wallet-iframe";
 
 function HomePage() {
 	const currentWallet = useWalletStore((state) => state.current);
@@ -10,7 +9,13 @@ function HomePage() {
 		<div className="grid grid-rows-[auto,1fr] w-full h-full">
 			<HomeHeader />
 			<div>
-				<iframe title="Webmax Wallet" src={currentWallet?.url} className="w-full h-full" />
+				{currentWallet ? (
+					<WalletIframe wallet={currentWallet} className="w-full h-full" />
+				) : (
+					<div className="flex items-center justify-center w-full h-full text-2xl text-gray-400">
+						Select a wallet to connect
+					</div>
+				)}
 			</div>
 		</div>
 	);

@@ -12,9 +12,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { useWalletStore } from "@/popup/stores/wallet";
 import { CheckIcon, ChevronDown, PlusCircleIcon } from "lucide-react";
-import { useState } from "react";
+import { FC, useState } from "react";
 
-export const WalletSwitcher = () => {
+export const WalletSwitcher: FC = () => {
 	const [open, setOpen] = useState(false);
 	const current = useWalletStore((state) => state.current);
 	const wallets = useWalletStore((state) => state.wallets);

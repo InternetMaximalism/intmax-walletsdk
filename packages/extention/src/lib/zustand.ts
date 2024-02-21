@@ -6,18 +6,20 @@ type StoragesState<Storages extends { [key: string]: WxtStorageItem<unknown, Rec
 	[K in keyof Storages]: Storages[K] extends WxtStorageItem<infer S, any> ? S | null : never;
 };
 
+type Setter<T> = (state: T | ((state: T) => T)) => void;
+
 export const createStorageStore = <
 	Storages extends { [key: string]: WxtStorageItem<unknown, Record<string, unknown>> },
 	Actions,
 >(
 	storages: Storages,
-	actions: (setter: (state: Partial<StoragesState<Storages>>) => void) => Actions,
+	actions: (setter: Setter<Partial<StoragesState<Storages>>>) => Actions,
 ) => {
 	type State = StoragesState<Storages>;
 	const initialState = Object.fromEntries(Object.keys(storages).map((key) => [key, null])) as State;
 	const store = create<State & Actions>((set) => ({
 		...initialState,
-		...actions(set as (state: Partial<State>) => void),
+		...actions(set as Setter<Partial<State>>),
 	}));
 
 	const updateState = (key: keyof Storages, state: State[keyof Storages]) =>

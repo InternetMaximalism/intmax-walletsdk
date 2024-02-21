@@ -1,4 +1,4 @@
-import { Namespace } from "webmax2";
+import { Namespace, WebmaxHandshakeResult } from "webmax2";
 
 export type SiteMetadata = { host: string; name: string; description: string; icons: string[] };
 
@@ -6,6 +6,10 @@ export type WebmaxWallet = {
 	name: string;
 	url: string;
 };
+
+export type WalletMetadata = {
+	url: string;
+} & WebmaxHandshakeResult;
 
 export type Session = {
 	wallet: WebmaxWallet;
@@ -16,3 +20,9 @@ export type Session = {
 };
 
 export type SessionKey = { wallet: WebmaxWallet; host: string };
+
+export type Network = {
+	namespace: Namespace;
+	chainId: number;
+	httpRpcUrl: string;
+};
