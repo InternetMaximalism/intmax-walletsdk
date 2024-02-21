@@ -1,23 +1,20 @@
 {
-	"name": "webmax2",
-	"description": "",
+	"name": "@webmax/core",
+	"description": "A simplest protocol that way to wallet connect for dapp and web wallet",
 	"version": "0.0.1",
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
+	"keywords": ["wallet", "dapp", "web3", "web-wallet", "ethereum"],
+	"author": "Aoi Kimura <ecdfhacker@proton.me>",
+	"license": "MIT",
 	"sideEffects": false,
 	"type": "module",
-	"main": "dist/esm/index.js",
-	"types": "dist/types/index.d.ts",
+	"main": "./dist/esm/index.js",
+	"types": "./dist/types/index.d.ts",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"build": "npm run clean && npm run build:esm",
 		"build:esm": "tsc --project tsconfig.json",
 		"clean": "rimraf dist",
 		"typecheck": "tsc --noEmit"
-	},
-	"devDependencies": {
-		"viem": "^2.7.1"
 	},
 	"exports": {
 		".": {
@@ -36,6 +33,16 @@
 			"types": "./dist/types/index.d.ts",
 			"import": "./dist/esm/index.js"
 		}
+	},
+	"typesVersions": {
+		"*": {
+			"types": ["./dist/types/index.d.ts"],
+			"wallet": ["./dist/types/wallet/index.d.ts"],
+			"dapp": ["./dist/types/dapp/index.d.ts"]
+		}
+	},
+	"devDependencies": {
+		"viem": "^2.7.1"
 	},
 	"dependencies": {
 		"eventemitter3": "^5.0.1"
