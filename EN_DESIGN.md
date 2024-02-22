@@ -110,7 +110,7 @@ type Namespace = "eip155" | "webmax";
 type ChainedNamespace = `${Namespace}:${ChainId}`;
 ```
 
-**Window Handling**
+**Window Handling**  
 Specifies how to handle the Wallet's Window after sending a response.
 This is useful, for example, when the wallet wants to display an error message.
 
@@ -136,20 +136,20 @@ The Webmax protocol defines three types of JSON-RPC methods.
 - **approval**: Methods that request approval from the wallet.
 - **readonly**: Read-only methods resolved on the dapp side.
 
-**notice**
+**notice**  
 A slightly special method type representing notifications from the wallet.
 This type of method is implicitly fired by the wallet and notified to the dapp side.
 Basically, this type is not used except for methods defined in the webmax protocol.
 
-**approval**
+**approval**  
 Methods that require user approval, such as signing.
 
-**readonly**
+**readonly**  
 Read-only methods like `eip155/eth_accounts`. These are generally cached by the SDK on the dapp side and are not requested from the wallet. However, they are just methods, so it is also possible to handle them on the wallet side.
 
 ### Webmax Methods
 
-**webmax_ready**
+**webmax_ready**  
 A method notifying that the wallet has been initialized and is ready to communicate with the dapp.
 
 - **Params**: None
@@ -162,7 +162,7 @@ export type WebmaxReadyResult = {
 };
 ```
 
-**webmax_connect**
+**webmax_connect**  
 A method requesting the user to connect with the wallet.
 
 - **Params**: None
