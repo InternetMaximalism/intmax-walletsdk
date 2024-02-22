@@ -31,7 +31,8 @@ Child Window と Dapp の間でのクロスオリジン通信は、[postMessage]
 ただし、Child Window と Dapp 間は、Child Window が開かれている間のみ通信できますが、ウォレットは署名時などのユーザーの承認が必要な操作が必要なタイミングでのみ、開かれることが一般的です。そのため、アカウント情報などの読み取り系の操作は、いくつかの工夫が必要です。
 
 ### Summary of Protocol Flow
-あるDappから、Webウォレットに対して、eth_requestAccountsなどのメソッドを呼び出すときの流れを以下に示します。
+
+ある Dapp から、Web ウォレットに対して、eth_requestAccounts などのメソッドを呼び出すときの流れを以下に示します。
 
 ```mermaid
 sequenceDiagram
@@ -128,33 +129,36 @@ TODO: その他のエラーコードを追加する
 | 5100        | Popups blocked     | For some reason the wallet could not be opened.                 |
 
 ### Methods Types
-Webmaxプロトコルでは、JSON-RPCのメソッドに、三つの種類を定義します。
+
+Webmax プロトコルでは、JSON-RPC のメソッドに、三つの種類を定義します。
+
 - **notice**: ウォレットからの通知メッセージ
 - **approval**: ウォレットに対してのリクエストするメソッド
-- **readonly**: dapp側で解決する、読み取り系のメソッド
+- **readonly**: dapp 側で解決する、読み取り系のメソッド
 
 **notice**
 少し特殊なメソッドの種類で、ウォレットからの通知を表すメソッドです。
-このタイプのメソッドは、ウォレットで暗黙的に発火されて、dapp側に通知されます。
-基本的に、webmaxプロトコルで定義されいるメソッド以外で、このタイプを使用することはありません。
+このタイプのメソッドは、ウォレットで暗黙的に発火されて、dapp 側に通知されます。
+基本的に、webmax プロトコルで定義されいるメソッド以外で、このタイプを使用することはありません。
 
 **approval**
 署名などのユーザーの承認が必要なメソッドです。
 
 **readonly**
-`eip155/eth_accounts`などの読み取り系のメソッドです。基本的にdapp側のSDKでキャッシュされ、ウォレットにリクエストすることはありません。しかし、ただのメソッドではあるため、ウォレット側でハンドリングすることも可能です。
+`eip155/eth_accounts`などの読み取り系のメソッドです。基本的に dapp 側の SDK でキャッシュされ、ウォレットにリクエストすることはありません。しかし、ただのメソッドではあるため、ウォレット側でハンドリングすることも可能です。
 
 ### Webmax Methods
+
 **webmax_ready**
-ウォレットが初期化され、dappから通信が可能になったことを通知するメソッドです。
+ウォレットが初期化され、dapp から通信が可能になったことを通知するメソッドです。
 
 - **Params**: なし
 - **Result**: `WebmaxReadyResult`
 
 ```typescript
 export type WebmaxReadyResult = {
-	supportedNamespaces: Namespace[];
-	supportedChains: ChainedNamespace[];
+  supportedNamespaces: Namespace[];
+  supportedChains: ChainedNamespace[];
 };
 ```
 
@@ -166,16 +170,17 @@ export type WebmaxReadyResult = {
 
 ```typescript
 type WebmaxConnectResult = {
-    supportedNamespaces: Namespace[];
-    supportedChains: ChainedNamespace[];
-    accounts: {
-        eip155: EthereumAddress[];
-    };
-}
+  supportedNamespaces: Namespace[];
+  supportedChains: ChainedNamespace[];
+  accounts: {
+    eip155: EthereumAddress[];
+  };
+};
 ```
 
 ### Eth Approval Methods
-下記のメソッドは、dappからウォレットにユーザーの承認を要求するメソッドです。各EIPのスキーマを継承します。
+
+下記のメソッドは、dapp からウォレットにユーザーの承認を要求するメソッドです。各 EIP のスキーマを継承します。
 
 - **eth_requestAccounts** - EIP1102
 - **eth_sign** - EIP1474
@@ -186,31 +191,37 @@ type WebmaxConnectResult = {
 - **wallet_watchAsset** - EIP747
 
 ### Eth Readonly Methods
-下記のメソッドは、dapp側のSDKで解決されることを想定しています。ウォレットにリクエストすることはありません。
-readonlyという命名は後々変更される可能性があります。
+
+下記のメソッドは、dapp 側の SDK で解決されることを想定しています。ウォレットにリクエストすることはありません。
+readonly という命名は後々変更される可能性があります。
 
 - **eth_accounts** - EIP1193
 - **eth_chainId** - EIP1193
 - **wallet_switchEthereumChain** - EIP3085
 
 ## Note: EIP1193 Event Handling
-Webmaxプロトコルは、その特定からイベントの伝達が困難です。そのため、EIP1193のイベントについては、dapp側のSDKで解決することを想定しています。
+
+Webmax プロトコルは、その特定からイベントの伝達が困難です。そのため、EIP1193 のイベントについては、dapp 側の SDK で解決することを想定しています。
 
 ## Use Cases
-以下は、Webmaxプロトコルの利用例です。しかし、Wembaxプロトコルはただの通信規格であり、様々な応用が可能です。
+
+以下は、Webmax プロトコルの利用例です。しかし、Wembax プロトコルはただの通信規格であり、様々な応用が可能です。
 
 ### Connect with Web Wallet
-Dappに WebmaxのDappSDKを組み込むことで、Webmaxに対応したWebウォレットと接続することが出来ます。
-これは、WalletConnectのようなプロトコルと同様の利用方法です。
+
+Dapp に Webmax の DappSDK を組み込むことで、Webmax に対応した Web ウォレットと接続することが出来ます。
+これは、WalletConnect のようなプロトコルと同様の利用方法です。
 
 ### Bookmarklet Wallet
-ブックマークを利用することで、WebmaxのDappSDKのコードを、既存のDappに挿入することが出来ます。
-これにより、既存のほぼすべてのDappで、Metamaskと同じようにWebウォレットを利用することが出来ます。
+
+ブックマークを利用することで、Webmax の DappSDK のコードを、既存の Dapp に挿入することが出来ます。
+これにより、既存のほぼすべての Dapp で、Metamask と同じように Web ウォレットを利用することが出来ます。
 とても奇妙ですが、実際に動作することを確認しています。
-※CSPなどのセキュリティポリシーにより、一部のDappで利用できない場合があります。
+※CSP などのセキュリティポリシーにより、一部の Dapp で利用できない場合があります。
 
 ### Webmax Wallet Luncher
-前述のとおり、ブックマークレットウォレットは、UXなどの問題があります。
-そのため、Webmax対応のWebウォレットを管理する、ランチャーのような機能を持った拡張機能を一つ作成することで、
-Webmax対応のWebウォレットを、Metamaskと同じように利用することが出来ます。
-これは、Webウォレットの飛躍と普及につながると確信しており、現在開発中です。
+
+前述のとおり、ブックマークレットウォレットは、UX などの問題があります。
+そのため、Webmax 対応の Web ウォレットを管理する、ランチャーのような機能を持った拡張機能を一つ作成することで、
+Webmax 対応の Web ウォレットを、Metamask と同じように利用することが出来ます。
+これは、Web ウォレットの飛躍と普及につながると確信しており、現在開発中です。
