@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { ArrayUpdater, applyUpdater } from "./utils";
 
-export type WalletConnection = { origin: string; namespaces: string[] };
+export type WalletConnection = { host: string; namespaces: string[] };
 
 export type WebmaxConnectionState = {
 	connections: WalletConnection[];
@@ -20,6 +20,6 @@ export const useWebmaxConnectionStore = create(
 			setConnections: (cbOrConnections) =>
 				set((state) => ({ connections: applyUpdater(cbOrConnections, state.connections) })),
 		}),
-		{ name: "webmax-connection" },
+		{ name: "webmax-connections" },
 	),
 );

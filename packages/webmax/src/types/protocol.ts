@@ -1,7 +1,8 @@
 import type { AddEthereumChainParameter, RpcTransactionRequest, WatchAssetParams } from "viem";
 import { Prettify } from "./utils";
 
-export type DappMetadata = { name: string; description: string; icons: string[] };
+export type WebmaxHost = `origin:${string}` | `origin:${string}:url:${string}`;
+export type DappMetadata = { name: string; description: string; icons: string[]; overrideUrl?: string };
 
 export type Namespaces = { EIP155: "eip155"; WEBMAX: "webmax" };
 export type Namespace = Namespaces[keyof Namespaces];

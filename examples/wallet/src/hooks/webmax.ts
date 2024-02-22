@@ -36,7 +36,7 @@ export const useWebmax = () => {
 		});
 
 		webmax.on("webmax/webmax_connect", async (c) => {
-			const [origin, dappMetadata] = [c.req.origin, c.req.metadata];
+			const [host, dappMetadata] = [c.req.host, c.req.metadata];
 			if (!dappMetadata) return c.failure("Invalid metadata", { code: 4001 });
 
 			if (isConnected(c, connections)) {
@@ -49,11 +49,11 @@ export const useWebmax = () => {
 
 			const { promise, resolve, reject } = withResolvers<void>();
 
-			open({ id: "webmax-connect", origin, dappMetadata, onConnect: resolve, onCancel: reject });
+			open({ id: "webmax-connect", host, dappMetadata, onConnect: resolve, onCancel: reject });
 
 			try {
 				await promise;
-				setConnections((connections) => [...connections, { origin, namespaces: ["eip155", "webmax"] }]);
+				setConnections((connections) => [...connections, { host, namespaces: ["eip155", "webmax"] }]);
 
 				return c.success({
 					supportedNamespaces: ["eip155", "webmax"],
@@ -66,18 +66,18 @@ export const useWebmax = () => {
 		});
 
 		webmax.on("eip155/eth_requestAccounts", async (c) => {
-			const [origin, dappMetadata] = [c.req.origin, c.req.metadata];
+			const [host, dappMetadata] = [c.req.host, c.req.metadata];
 			if (!dappMetadata) return c.failure("Invalid metadata", { code: 4001 });
 
 			if (isConnected(c, connections)) return c.success(ethereumAccounts);
 
 			const { promise, resolve, reject } = withResolvers<void>();
 
-			open({ id: "webmax-connect", origin, dappMetadata, onConnect: resolve, onCancel: reject });
+			open({ id: "webmax-connect", host, dappMetadata, onConnect: resolve, onCancel: reject });
 
 			try {
 				await promise;
-				setConnections((connections) => [...connections, { origin, namespaces: ["eip155", "webmax"] }]);
+				setConnections((connections) => [...connections, { host, namespaces: ["eip155", "webmax"] }]);
 
 				return c.success(ethereumAccounts);
 			} catch {
