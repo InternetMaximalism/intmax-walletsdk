@@ -136,20 +136,20 @@ Webmax プロトコルでは、JSON-RPC のメソッドに、三つの種類を�
 - **approval**: ウォレットに対してのリクエストするメソッド
 - **readonly**: dapp 側で解決する、読み取り系のメソッド
 
-**notice**
+**notice**  
 少し特殊なメソッドの種類で、ウォレットからの通知を表すメソッドです。
 このタイプのメソッドは、ウォレットで暗黙的に発火されて、dapp 側に通知されます。
 基本的に、webmax プロトコルで定義されいるメソッド以外で、このタイプを使用することはありません。
 
-**approval**
+**approval**  
 署名などのユーザーの承認が必要なメソッドです。
 
-**readonly**
+**readonly**  
 `eip155/eth_accounts`などの読み取り系のメソッドです。基本的に dapp 側の SDK でキャッシュされ、ウォレットにリクエストすることはありません。しかし、ただのメソッドではあるため、ウォレット側でハンドリングすることも可能です。
 
 ### Webmax Methods
 
-**webmax_ready**
+**webmax_ready**  
 ウォレットが初期化され、dapp から通信が可能になったことを通知するメソッドです。
 
 - **Params**: なし
@@ -162,7 +162,7 @@ export type WebmaxReadyResult = {
 };
 ```
 
-**webmax_connect**
+**webmax_connect**  
 ユーザーにウォレットとの接続を要求するメソッドです。
 
 - **Params**: なし
