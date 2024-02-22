@@ -188,7 +188,7 @@ type Namespace = "eip155" | "webmax";
 type ChainedNamespace = `${Namespace}:${ChainId}`;
 ```
 
-**Window Handling**
+**Window Handling**  
 Specifies how to handle the Wallet's Window after sending a response.
 This is useful, for example, when the wallet wants to display an error message.
 
@@ -214,20 +214,20 @@ The Webmax protocol defines three types of JSON-RPC methods.
 - **approval**: Methods that request approval from the wallet.
 - **readonly**: Read-only methods resolved on the dapp side.
 
-**notice**
+**notice**  
 A slightly special method type representing notifications from the wallet.
 This type of method is implicitly fired by the wallet and notified to the dapp side.
 Basically, this type is not used except for methods defined in the webmax protocol.
 
-**approval**
+**approval**  
 Methods that require user approval, such as signing.
 
-**readonly**
+**readonly**  
 Read-only methods like `eip155/eth_accounts`. These are generally cached by the SDK on the dapp side and are not requested from the wallet. However, they are just methods, so it is also possible to handle them on the wallet side.
 
 ### Webmax Methods
 
-**webmax_ready**
+**webmax_ready**  
 A method notifying that the wallet has been initialized and is ready to communicate with the dapp.
 
 - **Params**: None
@@ -240,7 +240,7 @@ export type WebmaxReadyResult = {
 };
 ```
 
-**webmax_connect**
+**webmax_connect**  
 A method requesting the user to connect with the wallet.
 
 - **Params**: None
@@ -283,23 +283,16 @@ Due to its specificity, the Webmax protocol finds it difficult to transmit event
 
 ## Use Cases
 
-Below are examples of using the Webmax protocol. However, the Webmax protocol is merely a communication standard, allowing for various applications.
+Here are examples of using the Webmax protocol. However, the Webmax protocol is merely a communication standard, and various applications are possible.
 
 ### Connect with Web Wallet
 
-By incorporating the Webmax DappSDK into a Dapp, it is possible to connect with Web Wallets that support Webmax.
-This is a similar usage to protocols like WalletConnect.
+As the most orthodox usage, by integrating DappSDK from Webmax into a Dapp, it allows connection with web wallets compatible with Webmax. This usage is identical to how protocols like WalletConnect are utilized.
 
 ### Bookmarklet Wallet
 
-By using a bookmark, it is possible to insert the code of the Webmax DappSDK into existing Dapps.
-This allows almost all existing Dapps to use Web Wallets in the same way as Metamask.
-It's quite strange, but it has been confirmed to work.
-※Due to security policies such as CSP, it may not be available in some Dapps.
+By using bookmarks to insert Webmax's DappSDK into a Dapp page, it enables the use of web wallets compatible with Webmax from the page's window.ethereum. This allows for a user experience similar to browser extension wallets like Metamask. However, there are issues such as some Dapps being unusable due to security policies like CSP, and the user experience of the bookmarklet itself being poor.
 
 ### Webmax Wallet Launcher
 
-As mentioned earlier, the bookmarklet wallet has issues with UX, among others.
-Therefore, by creating an extension with a launcher-like function that manages Webmax-compatible Web Wallets,
-it is possible to use Webmax-compatible Web Wallets in the same way as Metamask.
-We are confident that this will lead to a leap and widespread adoption of Web Wallets and are currently developing it.
+As mentioned, bookmarklet wallets have issues with user experience and security. However, these issues can be resolved by providing a launcher that manages web wallets compatible with Webmax as a browser extension. With this extension, web wallets can be used with the same user experience as extension-based wallets, and security is assured at the same level. This use case is innovative for web wallets and is currently under development.
