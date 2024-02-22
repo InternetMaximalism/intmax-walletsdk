@@ -1,4 +1,6 @@
+import { EXTENSION_URL } from "@/constants";
 import { WebmaxWallet } from "@/core/types";
+import { useWalletMetadataStore } from "@/popup/stores/wallet";
 import { FC, useCallback, useEffect, useRef } from "react";
 import { webmaxDappClient } from "webmax2/dapp";
 
@@ -7,6 +9,7 @@ export const WalletIframe: FC<{
 	className?: string;
 }> = ({ wallet, className }) => {
 	const ref = useRef<HTMLIFrameElement>(null);
+	const setMetadata = useWalletMetadataStore((state) => state.setMetadata);
 
 	const handshake = useCallback(async () => {
 		if (!ref.current?.contentWindow) return;
@@ -17,11 +20,13 @@ export const WalletIframe: FC<{
 				url: wallet.url,
 				window: { mode: "custom", onClose: () => {}, window: ref.current.contentWindow },
 			},
-			metadata: { name: "Webmax Extension", description: "Webmax Extension", icons: [] },
+			metadata: { name: "Webmax Extension", description: "Webmax Extension", icons: [], overrideUrl: EXTENSION_URL },
 		});
 
 		const result = await client.connect();
-	}, [wallet]);
+		const metadata = { ...result, url: wallet.url };
+		setMetadata(wallet, metadata);
+	}, [wallet, setMetadata]);
 
 	useEffect(() => {
 		handshake();

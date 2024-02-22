@@ -5,7 +5,7 @@ export const WebmaxHost: FC<{
 	host: Host;
 }> = ({ host }) => {
 	const { origin, url } = parseWebmaxHost(host);
-	const dappUrl = origin || url;
+	const dappUrl = url ? url : origin;
 
 	return (
 		<div className="flex justify-between px-2 py-4 border rounded-md">
