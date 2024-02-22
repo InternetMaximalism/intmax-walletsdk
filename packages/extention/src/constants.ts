@@ -11,3 +11,5 @@ export const DEFAULT_NETWORKS = [
 	{ namespace: "eip155", chainId: 5, httpRpcUrl: "https://goerli.infura.io/v3" },
 	{ namespace: "eip155", chainId: 137, httpRpcUrl: "https://rpc-mainnet.maticvigil.com" },
 ] satisfies Network[];
+
+export const EXTENSION_URL = "https://intmax.io";
