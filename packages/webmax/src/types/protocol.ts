@@ -22,12 +22,12 @@ export type AbstractMessageSchema = {
 	result?: unknown;
 }[];
 
-export type WebmaxReadyResult = {
+export type WebmaxHandshakeResult = {
 	supportedNamespaces: Namespace[];
 	supportedChains: ChainedNamespace[];
 };
 
-export type WebmaxConnectResult = Prettify<WebmaxReadyResult & { accounts: { eip155: EthereumAddress[] } }>;
+export type WebmaxConnectResult = Prettify<WebmaxHandshakeResult & { accounts: { eip155: EthereumAddress[] } }>;
 
 export type WebmaxMessageSchema = [
 	/**
@@ -36,9 +36,9 @@ export type WebmaxMessageSchema = [
 	{
 		type: "notice";
 		namespace: Namespaces["WEBMAX"];
-		method: "webmax_ready";
+		method: "webmax_handshake";
 		params?: undefined;
-		result: WebmaxReadyResult;
+		result: WebmaxHandshakeResult;
 	},
 	/**
 	 * @description Handshake message sent when popup is opened and returns supported namespaces and chains to dApp.
@@ -49,16 +49,6 @@ export type WebmaxMessageSchema = [
 		method: "webmax_connect";
 		params?: undefined;
 		result: WebmaxConnectResult;
-	},
-	/**
-	 * @description Notice to dapp to close the window.
-	 */
-	{
-		type: "notice";
-		namespace: Namespaces["WEBMAX"];
-		method: "webmax_closeWindow";
-		params?: undefined;
-		result: null;
 	},
 ];
 

@@ -28,7 +28,7 @@ export const useWebmax = () => {
 
 		if (!(localAccounts.length && supportedChains.length)) return;
 
-		webmax.on("webmax/webmax_ready", (c) => {
+		webmax.on("webmax/webmax_handshake", (c) => {
 			return c.success({
 				supportedNamespaces: ["eip155", "webmax"],
 				supportedChains: supportedChains,
