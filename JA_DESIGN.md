@@ -1,4 +1,4 @@
-# Webmax Protocol
+# Webmax Protocol Proposal
 
 Wallet Connect with Web Wallets and more
 
@@ -12,7 +12,7 @@ Web ウォレットが Dapp と接続するためのプロトコルを提案し�
 Web ページとして提供されるウォレット(Web ウォレット)と、Dapp が直接通信して接続できるプロトコルを提案します。  
 このプロトコルは、Web ウォレットと Dapp の間で、EIP1193 ライクなやり取りを行えるように、通信方法とデータ構造を定義します。  
 本質的にこのプロトコルには、Web ウォレットと別のタブで動作する Web ページが、規格に従って通信するためのプロトコルです。  
-そのため、様々な拡張や応用が可能です。詳細はのちのセクションで述べます。
+そのため、様々な拡張や応用が可能です。詳細は、後述の Use Cases を参照してください。
 
 ## Specification
 
@@ -41,7 +41,7 @@ participant wallet as Wallet (Popup)
 	user ->> dapp: Click "Connect"
 	dapp ->> wallet: open wallet with window.open
 	Note right of wallet: Rendering wallet
-	wallet -->> dapp: webmax_handshake response
+	wallet -->> dapp: webmax_ready response
 	Note over dapp,wallet: Send a message after rendering is complete
 	dapp ->>+ wallet: Some request Message
 	Note right of wallet: Show approve Request for User
@@ -53,7 +53,7 @@ participant wallet as Wallet (Popup)
 1. ユーザーは dApp で「Connect」ボタンをクリック
 2. dApp はウォレットを開くために `window.open` を使用
 3. ウォレットが開かれ、初期化される
-4. 初期化後、ウォレットは `webmax_handshake` メッセージを送信
+4. 初期化後、ウォレットは `webmax_ready` メッセージを送信
 5. 初期化を確認後、dApp は`eth_requestAccounts` などのメッセージを送信
 6. ウォレットはユーザーにリクエストを表示
 7. ユーザーはリクエストを確認し、承認する
@@ -120,9 +120,97 @@ type WindowHandling = "keep" | "close";
 ### Error Codes
 
 エラーコードは EIP1193 を継承し、さらに下記のようなエラーコードを追加します。
-TODO: 更に詳細なエラーコードを追加する。
+TODO: その他のエラーコードを追加する
 
 | Status code | Name               | Description                                                     |
 | ----------- | ------------------ | --------------------------------------------------------------- |
 | 5001        | Chain not Suppoted | ChainID specified in namespace, but wallet does not support it. |
 | 5100        | Popups blocked     | For some reason the wallet could not be opened.                 |
+
+### Methods Types
+Webmaxプロトコルでは、JSON-RPCのメソッドに、三つの種類を定義します。
+- **notice**: ウォレットからの通知メッセージ
+- **approval**: ウォレットに対してのリクエストするメソッド
+- **readonly**: dapp側で解決する、読み取り系のメソッド
+
+**notice**
+少し特殊なメソッドの種類で、ウォレットからの通知を表すメソッドです。
+このタイプのメソッドは、ウォレットで暗黙的に発火されて、dapp側に通知されます。
+基本的に、webmaxプロトコルで定義されいるメソッド以外で、このタイプを使用することはありません。
+
+**approval**
+署名などのユーザーの承認が必要なメソッドです。
+
+**readonly**
+`eip155/eth_accounts`などの読み取り系のメソッドです。基本的にdapp側のSDKでキャッシュされ、ウォレットにリクエストすることはありません。しかし、ただのメソッドではあるため、ウォレット側でハンドリングすることも可能です。
+
+### Webmax Methods
+**webmax_ready**
+ウォレットが初期化され、dappから通信が可能になったことを通知するメソッドです。
+
+- **Params**: なし
+- **Result**: `WebmaxReadyResult`
+
+```typescript
+export type WebmaxReadyResult = {
+	supportedNamespaces: Namespace[];
+	supportedChains: ChainedNamespace[];
+};
+```
+
+**webmax_connect**
+ユーザーにウォレットとの接続を要求するメソッドです。
+
+- **Params**: なし
+- **Result**: `WebmaxConnectResult`
+
+```typescript
+type WebmaxConnectResult = {
+    supportedNamespaces: Namespace[];
+    supportedChains: ChainedNamespace[];
+    accounts: {
+        eip155: EthereumAddress[];
+    };
+}
+```
+
+### Eth Approval Methods
+下記のメソッドは、dappからウォレットにユーザーの承認を要求するメソッドです。各EIPのスキーマを継承します。
+
+- **eth_requestAccounts** - EIP1102
+- **eth_sign** - EIP1474
+- **eth_signTypedData_v4** - EIP712
+- **eth_signTransaction** - EIP1474
+- **eth_sendTransaction**- EIP1474
+- **wallet_addEthereumChain** - EIP3085
+- **wallet_watchAsset** - EIP747
+
+### Eth Readonly Methods
+下記のメソッドは、dapp側のSDKで解決されることを想定しています。ウォレットにリクエストすることはありません。
+readonlyという命名は後々変更される可能性があります。
+
+- **eth_accounts** - EIP1193
+- **eth_chainId** - EIP1193
+- **wallet_switchEthereumChain** - EIP3085
+
+## Note: EIP1193 Event Handling
+Webmaxプロトコルは、その特定からイベントの伝達が困難です。そのため、EIP1193のイベントについては、dapp側のSDKで解決することを想定しています。
+
+## Use Cases
+以下は、Webmaxプロトコルの利用例です。しかし、Wembaxプロトコルはただの通信規格であり、様々な応用が可能です。
+
+### Connect with Web Wallet
+Dappに WebmaxのDappSDKを組み込むことで、Webmaxに対応したWebウォレットと接続することが出来ます。
+これは、WalletConnectのようなプロトコルと同様の利用方法です。
+
+### Bookmarklet Wallet
+ブックマークを利用することで、WebmaxのDappSDKのコードを、既存のDappに挿入することが出来ます。
+これにより、既存のほぼすべてのDappで、Metamaskと同じようにWebウォレットを利用することが出来ます。
+とても奇妙ですが、実際に動作することを確認しています。
+※CSPなどのセキュリティポリシーにより、一部のDappで利用できない場合があります。
+
+### Webmax Wallet Luncher
+前述のとおり、ブックマークレットウォレットは、UXなどの問題があります。
+そのため、Webmax対応のWebウォレットを管理する、ランチャーのような機能を持った拡張機能を一つ作成することで、
+Webmax対応のWebウォレットを、Metamaskと同じように利用することが出来ます。
+これは、Webウォレットの飛躍と普及につながると確信しており、現在開発中です。
