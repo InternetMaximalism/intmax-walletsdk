@@ -1,9 +1,9 @@
 {
-	"name": "@webmax/core",
+	"name": "webmax",
 	"description": "A simplest protocol that way to wallet connect for dapp and web wallet",
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"keywords": ["wallet", "dapp", "web3", "web-wallet", "ethereum"],
-	"author": "Aoi Kimura <ecdfhacker@proton.me>",
+	"author": "",
 	"license": "MIT",
 	"sideEffects": false,
 	"type": "module",
