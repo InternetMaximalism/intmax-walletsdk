@@ -26,7 +26,10 @@ export const createStorageStore = <
 		store.setState((c) => ({ ...c, [key]: state }));
 
 	for (const [key, storage] of Object.entries(storages)) {
-		storage.watch((state) => updateState(key, state as State[keyof Storages]));
+		storage.watch((state) => {
+			if (state === null) return;
+			updateState(key, state as State[keyof Storages]);
+		});
 		storage.getValue().then((state) => updateState(key, state as State[keyof Storages]));
 		store.subscribe((state) => storage.setValue(state[key]));
 	}
