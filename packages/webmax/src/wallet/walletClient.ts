@@ -49,8 +49,8 @@ export const webmaxWalletClient = <
 		ready: () => {
 			const parent = parentWindow();
 			if (!parent) return;
-			const payload: AbstractRequest = { id: 0, namespace: "webmax", method: "webmax_ready", params: undefined };
-			dispatch(payload, "*");
+			const payload: AbstractRequest = { id: 0, namespace: "webmax", method: "webmax_handshake", params: undefined };
+			dispatch(payload, "internal");
 		},
 		destruct: () => clean(),
 	};
