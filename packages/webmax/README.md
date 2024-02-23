@@ -1,9 +1,9 @@
-# Webmax SDK
-A SDK implementation for Webmax Protocol.
+# Wallet Next SDK
+Wallet Next SDK is a implementation of the Webmax protocol for Dapp and Wallet.
 
 ## Overview
-このSDKはWebmaxプロトコルのDapp側とWallet側のそれぞれの通信を行いやすくするためのSDKです。
-Webmaxプロトコルについては、下記のProposalを参照してください。
+This SDK is designed to facilitate communication between the Dapp and Wallet sides of the Webmax protocol respectively.
+For more information on the Webmax protocol, see Proposal below.
 
 ## Demo URL
 
@@ -13,7 +13,7 @@ Webmaxプロトコルについては、下記のProposalを参照してくださ
 ## Dapp SDK Example
 
 ```typescript
-import { webmaxDappClient, ethereumProvider } from "@webmax/core/dapp";
+import { webmaxDappClient, ethereumProvider } from "walletnext/dapp";
 
 const DEFAULT_WALLET_URL = "YOUR_WALLET_URL" // e.g. https://webmax2-wallet.vercel.app
 const DEFAULT_DAPP_ICON = "YOUR_DAPP_ICON_URL"
@@ -51,7 +51,7 @@ console.log(result);
 ## Wallet SDK
 
 ```typescript
-import { webmaxWalletClient } from "@webmax/core/wallet";
+import { webmaxWalletClient } from "walletnext/wallet";
 
 const webmax = webmaxWalletClient();
 
