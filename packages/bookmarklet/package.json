@@ -11,7 +11,7 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"webmax2": "workspace:^"
+		"walletnext": "workspace:^"
 	},
 	"devDependencies": {
 		"esbuild": "^0.20.0",

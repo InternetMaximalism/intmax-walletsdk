@@ -1,4 +1,4 @@
-import { ethereumProvider, webmaxDappClient } from "webmax2/dapp";
+import { ethereumProvider, webmaxDappClient } from "walletnext/dapp";
 
 const WALLET_URL = "#WALLET_URL#";
 

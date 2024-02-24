@@ -5,8 +5,8 @@ import { useNetworksStore } from "@/stores/network";
 import { useWebmaxConnectionStore } from "@/stores/webmax";
 import { useLayoutEffect } from "react";
 import { Address, Hash, Hex, LocalAccount, isAddressEqual } from "viem";
-import { DappMetadata } from "webmax2";
-import { webmaxWalletClient } from "webmax2/wallet";
+import { DappMetadata } from "walletnext";
+import { webmaxWalletClient } from "walletnext/wallet";
 import { useAccounts } from "./account";
 import { useDrawer } from "./drawer";
 
