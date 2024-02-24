@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { ethereumProvider, webmaxDappClient } from "webmax2/dapp";
+import { ethereumProvider, webmaxDappClient } from "walletnext/dapp";
 
 const DEFAULT_WALLET_URL = import.meta.env.VITE_WALLET_URL || "https://webmax2-wallet.vercel.app/";
 const DEFAULT_DAPP_ICON = (import.meta.env.VITE_APP_ICON || `${window.location.origin}/vite.svg`) as string;
