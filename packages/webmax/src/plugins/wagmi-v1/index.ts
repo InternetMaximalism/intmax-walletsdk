@@ -3,7 +3,8 @@ import { InjectedConnector } from "wagmi-v1/connectors/injected";
 import { ethereumProvider, webmaxDappClient } from "../../dapp";
 import { DappMetadata } from "../../types/protocol";
 
-export type WebmaxConnectorOptions = {
+export type WalletNextConnectorOptions = {
+	chains?: Chain[];
 	metadata?: DappMetadata;
 	wallet: { name?: string; url: string };
 	defaultChainId?: number;
@@ -15,16 +16,13 @@ const DEFAULT_METADATA: DappMetadata = {
 	icons: [],
 };
 
-export class WebmaxConnector extends InjectedConnector {
+export class WalletNextConnector extends InjectedConnector {
 	readonly id = "metaMask";
 
 	protected shimDisconnectKey = `${this.id}.shimDisconnect`;
 
-	constructor(config: { chains?: Chain[]; options: WebmaxConnectorOptions }) {
-		const {
-			chains,
-			options: { wallet, metadata },
-		} = config;
+	constructor(config: WalletNextConnectorOptions) {
+		const { chains, wallet, metadata } = config;
 
 		const httpRpcUrls = Object.fromEntries(
 			(config.chains || []).map((chain) => [chain.id, chain.rpcUrls.default.http[0]]),
@@ -37,7 +35,7 @@ export class WebmaxConnector extends InjectedConnector {
 		const provider = clinet.provider("eip155");
 
 		const options = {
-			name: config.options.wallet.name,
+			name: wallet.name,
 			shimDisconnect: true,
 			getProvider: () => provider as WindowProvider,
 		};

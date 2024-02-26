@@ -36,6 +36,10 @@
 		"./wagmi-legacy": {
 			"types": "./dist/types/plugins/wagmi-v1/index.d.ts",
 			"import": "./dist/esm/plugins/wagmi-v1/index.js"
+		},
+		"./rainbowkit": {
+			"types": "./dist/types/plugins/rainbowkit/index.d.ts",
+			"import": "./dist/esm/plugins/rainbowkit/index.js"
 		}
 	},
 	"typesVersions": {
@@ -43,7 +47,8 @@
 			"types": ["./dist/types/index.d.ts"],
 			"wallet": ["./dist/types/wallet/index.d.ts"],
 			"dapp": ["./dist/types/dapp/index.d.ts"],
-			"./wagmi-legacy": ["./dist/types/plugins/wagmi-v1/index.d.ts"]
+			"./wagmi-legacy": ["./dist/types/plugins/wagmi-v1/index.d.ts"],
+			"./rainbowkit": ["./dist/types/plugins/rainbowkit/index.d.ts"]
 		}
 	},
 	"peerDependencies": {
