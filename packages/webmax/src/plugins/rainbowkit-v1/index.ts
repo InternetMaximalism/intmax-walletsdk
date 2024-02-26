@@ -11,7 +11,7 @@ export type WalletNextOptions = {
 };
 
 export const walletnext = (options: WalletNextOptions): Wallet => ({
-	id: "walletnext",
+	id: `walletnext-${options.wallet.url}-${options.mode}`,
 	name: options.wallet.name || "WalletNext",
 	iconUrl: options.wallet.iconUrl ?? "",
 	iconBackground: "#fff",
