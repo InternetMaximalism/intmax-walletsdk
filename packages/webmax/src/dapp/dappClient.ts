@@ -34,7 +34,7 @@ export type WebmaxDappClient<
 	connect: () => Promise<WebmaxConnectResult>;
 	provider: <NS extends Schema[number]["namespace"]>(
 		namespace: ChainedNamespace<NS> | NS,
-	) => Promise<Providers[NS] extends WebmaxProvider<infer T, NS> ? T : never>;
+	) => Providers[NS] extends WebmaxProvider<infer T, NS> ? T : never;
 };
 
 export const webmaxDappClient = <
@@ -69,12 +69,12 @@ export const webmaxDappClient = <
 			await store.setState((state) => ({ ...state, ...result }));
 			return result;
 		},
-		provider: async <NS extends Schema[number]["namespace"]>(namespace: ChainedNamespace<NS> | NS) => {
+		provider: <NS extends Schema[number]["namespace"]>(namespace: ChainedNamespace<NS> | NS) => {
 			const [ns] = namespace.split(":") as [NS];
 			const provider = providers?.[ns];
 			if (!provider) throw new Error(`Provider for namespace "${ns}" not found`);
 
-			return await provider({
+			return provider({
 				namespace: namespace,
 				callWallet: (args) => callWallet(ns, args),
 				store: store,
