@@ -18,7 +18,7 @@ const DEFAULT_METADATA: DappMetadata = {
 };
 
 export class WalletNextConnector extends InjectedConnector {
-	readonly id = `walletnext-${this.options.name || "wallet"}`;
+	readonly id;
 
 	protected shimDisconnectKey = `${this.id}.shimDisconnect`;
 
@@ -42,5 +42,7 @@ export class WalletNextConnector extends InjectedConnector {
 		};
 
 		super({ chains, options });
+
+		this.id = `walletnext:${wallet.url}`;
 	}
 }
