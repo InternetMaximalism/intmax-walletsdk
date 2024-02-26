@@ -32,6 +32,10 @@
 		"./types/": {
 			"types": "./dist/types/index.d.ts",
 			"import": "./dist/esm/index.js"
+		},
+		"./wagmi-legacy": {
+			"types": "./dist/types/wagmi-legacy/index.d.ts",
+			"import": "./dist/esm/plugins/wagmi-v1/index.js"
 		}
 	},
 	"typesVersions": {
