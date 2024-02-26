@@ -17,7 +17,7 @@ const DEFAULT_METADATA: DappMetadata = {
 };
 
 export class WalletNextConnector extends InjectedConnector {
-	readonly id = "metaMask";
+	readonly id = `walletnext-${this.options.name || "wallet"}`;
 
 	protected shimDisconnectKey = `${this.id}.shimDisconnect`;
 

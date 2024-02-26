@@ -1,5 +1,5 @@
+import { Chain, Wallet } from "rainbowkit-v1";
 import { DappMetadata } from "src";
-import { Chain } from "viem";
 import { WalletNextConnector } from "../wagmi-v1";
 
 export type WalletNextOptions = {
@@ -9,10 +9,10 @@ export type WalletNextOptions = {
 	defaultChainId?: number;
 };
 
-export const walletnext = (options: WalletNextOptions) => ({
+export const walletnext = (options: WalletNextOptions): Wallet => ({
 	id: "walletnext",
 	name: options.wallet.name || "WalletNext",
-	iconUrl: options.wallet.iconUrl,
+	iconUrl: options.wallet.iconUrl ?? "",
 	iconBackground: "#fff",
 	createConnector: () => {
 		return { connector: new WalletNextConnector(options) };
