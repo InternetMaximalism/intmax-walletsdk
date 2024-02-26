@@ -7,6 +7,7 @@ export type WalletNextConnectorOptions = {
 	chains?: Chain[];
 	metadata?: DappMetadata;
 	wallet: { name?: string; url: string };
+	mode?: "iframe" | "popup";
 	defaultChainId?: number;
 };
 
@@ -22,13 +23,13 @@ export class WalletNextConnector extends InjectedConnector {
 	protected shimDisconnectKey = `${this.id}.shimDisconnect`;
 
 	constructor(config: WalletNextConnectorOptions) {
-		const { chains, wallet, metadata } = config;
+		const { chains, wallet, metadata, mode } = config;
 
 		const httpRpcUrls = Object.fromEntries(
 			(config.chains || []).map((chain) => [chain.id, chain.rpcUrls.default.http[0]]),
 		);
 		const clinet = webmaxDappClient({
-			wallet: { url: wallet.url, name: wallet.name || "Webmax" },
+			wallet: { url: wallet.url, name: wallet.name || "Webmax", window: { mode } },
 			metadata: metadata || DEFAULT_METADATA,
 			providers: { eip155: ethereumProvider({ httpRpcUrls }) },
 		});

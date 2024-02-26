@@ -35,6 +35,7 @@ const openIframe = (opt: WebmaxDappClientOptions<any, any>) => {
 	iframe.name = name;
 	iframe.height = height.toString();
 	iframe.width = width.toString();
+	iframe.allow = "publickey-credentials-get *";
 	document.body.appendChild(iframe);
 
 	return iframe;

@@ -31,6 +31,20 @@ const additionalWallets = [
 	}),
 	walletnext({
 		chains,
+		mode: "iframe",
+		wallet: {
+			url: "https://webmax2-wallet.vercel.app",
+			name: "WalletNext Demo - IFrame",
+			iconUrl: "https://webmax2-wallet.vercel.app/vite.svg",
+		},
+		metadata: {
+			name: "Rainbow-Kit Legacy Demo",
+			description: "Rainbow-Kit Legacy Demo",
+			icons: ["https://webmax2-wallet.vercel.app/vite.svg"],
+		},
+	}),
+	walletnext({
+		chains,
 		wallet: {
 			url: "https://wallet.intmax.io",
 			name: "INTMAX Wallet",
