@@ -34,7 +34,7 @@
 			"import": "./dist/esm/index.js"
 		},
 		"./wagmi-legacy": {
-			"types": "./dist/types/wagmi-legacy/index.d.ts",
+			"types": "./dist/types/plugins/wagmi-v1/index.d.ts",
 			"import": "./dist/esm/plugins/wagmi-v1/index.js"
 		}
 	},
@@ -42,7 +42,8 @@
 		"*": {
 			"types": ["./dist/types/index.d.ts"],
 			"wallet": ["./dist/types/wallet/index.d.ts"],
-			"dapp": ["./dist/types/dapp/index.d.ts"]
+			"dapp": ["./dist/types/dapp/index.d.ts"],
+			"./wagmi-legacy": ["./dist/types/plugins/wagmi-v1/index.d.ts"]
 		}
 	},
 	"peerDependencies": {
