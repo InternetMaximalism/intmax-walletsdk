@@ -6,6 +6,7 @@ export type WalletNextOptions = {
 	chains?: Chain[];
 	metadata?: DappMetadata;
 	wallet: { name?: string; url: string; iconUrl?: string };
+	mode?: "iframe" | "popup";
 	defaultChainId?: number;
 };
 
