@@ -41,8 +41,14 @@
 			"dapp": ["./dist/types/dapp/index.d.ts"]
 		}
 	},
+	"peerDependencies": {
+		"wagmi-v1": "npm:wagmi@1.x",
+		"wagmi-v2": "npm:wagmi@2.x"
+	},
 	"devDependencies": {
-		"viem": "^2.7.1"
+		"viem": "^2.7.1",
+		"wagmi-v1": "npm:wagmi@1.4.12",
+		"wagmi-v2": "npm:wagmi@2.0.0"
 	},
 	"dependencies": {
 		"eventemitter3": "^5.0.1"
