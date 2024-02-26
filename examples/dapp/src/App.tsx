@@ -34,7 +34,7 @@ function App() {
 	};
 
 	const handleConnect = async () => {
-		const ethereum = await webmax.provider("eip155");
+		const ethereum = webmax.provider("eip155");
 		await ethereum.request({ method: "eth_requestAccounts", params: [] });
 		const accounts = (await ethereum.request({ method: "eth_accounts", params: [] })) as string[];
 		setAccounts(accounts);
@@ -43,7 +43,7 @@ function App() {
 	const handleSignMessage = async () => {
 		if (accounts.length === 0) await handleConnect();
 
-		const ethereum = await webmax.provider("eip155");
+		const ethereum = webmax.provider("eip155");
 		const _accounts = (await ethereum.request({ method: "eth_accounts", params: [] })) as string[];
 		const result = await ethereum.request({ method: "eth_sign", params: [_accounts[0], "Hello Webmax"] });
 
@@ -53,7 +53,7 @@ function App() {
 	const handleSendTransaction = async () => {
 		if (accounts.length === 0) await handleConnect();
 
-		const ethereum = await webmax.provider("eip155");
+		const ethereum = webmax.provider("eip155");
 		const _accounts = (await ethereum.request({ method: "eth_accounts", params: [] })) as string[];
 		await ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x89" }] });
 		const result = await ethereum.request({
