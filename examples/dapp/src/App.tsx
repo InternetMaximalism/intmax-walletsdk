@@ -29,6 +29,7 @@ function App() {
 	const isValidUrl = /https?:\/\/[^\s$.?#].[^\s]*$/.test(walletUrl);
 	const handleUpdateWalletUrl = (url: string) => {
 		if (!isValidUrl) return;
+		setAccounts([]);
 		setWebmax(createWebmax(url));
 	};
 
