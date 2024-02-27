@@ -1,8 +1,8 @@
 import { AbstractRequest, AbstractResponse } from "src";
-import invariant from "../../utils/invariant";
-import { withResolvers } from "../../utils/withResolvers";
-import { WebmaxDappClientOptions } from "../dappClient";
-import { WalletClientRef } from "./types";
+import invariant from "../../../utils/invariant";
+import { withResolvers } from "../../../utils/withResolvers";
+import { WebmaxDappClientOptions } from "../../dappClient";
+import { WalletClientRef } from "../types";
 
 const DEFAULT_WALLET_WINDOW_HEIGHT = 600;
 const DEFAULT_WALLET_WINDOW_WIDTH = 400;
