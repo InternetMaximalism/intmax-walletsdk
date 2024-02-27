@@ -1,9 +1,9 @@
-import { Chain, Wallet } from "rainbowkit-v1";
+import { Wallet } from "rainbowkit-v2";
 import { DappMetadata } from "src";
-import { WalletNextConnector } from "../wagmi-v1";
+import { createConnector } from "wagmi-v2";
+import { walletnext as walletnextConnector } from "../wagmi-v2";
 
 export type WalletNextOptions = {
-	chains?: Chain[];
 	metadata?: DappMetadata;
 	wallet: { name?: string; url: string; iconUrl?: string };
 	mode?: "iframe" | "popup";
@@ -15,5 +15,10 @@ export const walletnext = (options: WalletNextOptions): Wallet => ({
 	name: options.wallet.name || "WalletNext",
 	iconUrl: options.wallet.iconUrl ?? "",
 	iconBackground: "#fff",
-	createConnector: () => ({ connector: new WalletNextConnector(options) }),
+	createConnector: (walletDetails) => {
+		return createConnector((config) => ({
+			...walletnextConnector(options)(config),
+			...walletDetails,
+		}));
+	},
 });
