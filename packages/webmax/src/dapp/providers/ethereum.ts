@@ -33,11 +33,10 @@ export const ethereumProvider =
 	({ store: _store, callWallet, namespace }) => {
 		const store = _ethStoreWrapper(_store);
 		const { chainId } = parseChainedNamespace(namespace);
-		const initialState = store.getState();
 		const emitter = new EventEmitter();
 		const httpRpcClients: Map<number, HttpJsonRpcClient> = new Map();
 
-		let currentChainId = initialState.then((state) => {
+		let currentChainId = store.getState().then((state) => {
 			return Number(chainId ?? state.chainId ?? state.supportedChains[0] ?? "1");
 		});
 
@@ -59,6 +58,9 @@ export const ethereumProvider =
 
 		const switchChain = async (chainId: number) => {
 			if (options?.lockChainId) throw new RpcProviderError("Chain ID is locked", 4001);
+			const supportedChains = await store.getState().then((state) => state.supportedChains);
+			if (!supportedChains.includes(chainId)) throw new RpcProviderError("Chain ID not supported", 4001);
+
 			currentChainId = Promise.resolve(chainId);
 			await store.setState((state) => ({ ...state, chainId }));
 			emitter.emit("chainChanged", chainId);
