@@ -60,6 +60,7 @@ export const webmaxDappClient = <
 			opt.wallet.window?.mode !== "iframe"
 				? await POPUP.callRequest(ref, opt, message)
 				: await IFRAME.callRequest(ref, opt, message);
+
 		return throwOrResult(response) as T;
 	};
 
