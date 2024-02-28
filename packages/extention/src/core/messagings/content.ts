@@ -1,4 +1,4 @@
-import { defineExtensionMessaging } from "@webext-core/messaging";
+import { defineExtensionMessaging } from "@/lib/messaging/extensionMessaging";
 
 type ContentMessengerSchema = {
 	request: (data: {
@@ -9,4 +9,4 @@ type ContentMessengerSchema = {
 	event: (data: { event: string; data: unknown }) => void;
 };
 
-export const contentMessaging = defineExtensionMessaging<ContentMessengerSchema>();
+export const contentMessaging = defineExtensionMessaging<ContentMessengerSchema>("content");
