@@ -34,3 +34,8 @@ export type PendingRequest = {
 	method: string;
 	params: unknown;
 };
+
+export type RequestResult = {
+	id: string;
+	result: unknown;
+};

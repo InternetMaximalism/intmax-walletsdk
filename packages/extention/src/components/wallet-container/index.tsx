@@ -1,5 +1,6 @@
-import { EXTENSION_URL } from "@/constants";
+import { popupMessaging } from "@/core/messagings/popup";
 import { WebmaxWallet } from "@/core/types";
+import { waitIframeWindowReady } from "@/lib/utils";
 import { usePendingRequestStore } from "@/popup/stores/request";
 import { FC, useEffect, useRef } from "react";
 import { ethereumProvider, webmaxDappClient } from "walletnext/dapp";
@@ -22,10 +23,7 @@ export const WalletContainer: FC<{
 			if (!(requests?.length && ref.current?.contentWindow)) return;
 			const [request] = requests;
 
-			try {
-				ref.current?.contentWindow?.origin;
-				await new Promise((resolve) => ref.current?.addEventListener("load", resolve));
-			} catch {}
+			await waitIframeWindowReady(ref.current);
 			console.info("WalletContainer request", request, wallet, Date.now());
 
 			const client = webmaxDappClient({
@@ -40,6 +38,7 @@ export const WalletContainer: FC<{
 
 			const provider = await client.provider("eip155");
 			const result = await provider.request({ method: request.method, params: request.params });
+			await popupMessaging.sendMessage("onResult", { id: request.id, result });
 		})();
 	}, [requests, wallet, connect]);
 

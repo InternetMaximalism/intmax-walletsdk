@@ -1,5 +1,6 @@
 import { EXTENSION_URL } from "@/constants";
 import { WebmaxWallet } from "@/core/types";
+import { waitIframeWindowReady } from "@/lib/utils";
 import { useWalletMetadataStore } from "@/popup/stores/wallet";
 import { RefObject, useCallback } from "react";
 import { webmaxDappClient } from "walletnext/dapp";
@@ -11,10 +12,7 @@ export const useConnectExtension = (wallet: WebmaxWallet, ref: RefObject<HTMLIFr
 		if (!ref.current?.contentWindow) return;
 
 		console.info("WalletContainer connect", wallet);
-		try {
-			ref.current.contentWindow.origin;
-			await new Promise((resolve) => ref.current?.addEventListener("load", resolve));
-		} catch {}
+		await waitIframeWindowReady(ref.current);
 
 		const client = webmaxDappClient({
 			wallet: {
