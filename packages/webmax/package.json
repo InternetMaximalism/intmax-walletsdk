@@ -1,7 +1,7 @@
 {
 	"name": "walletnext",
 	"description": "Wallet Next SDK is a implementation of the Webmax protocol for Dapp and Wallet",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"keywords": ["wallet", "dapp", "web3", "web-wallet", "ethereum"],
 	"author": "Aoi Kimura <aoi.kimura@intmax.io>",
 	"license": "MIT",
