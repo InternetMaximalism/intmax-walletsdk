@@ -11,7 +11,7 @@ export default defineContentScript({
 	main: async (ctx) => {
 		console.info("Content script is running");
 		inpageMessaging.onMessage("request", async ({ data }) => {
-			console.info("Received request -content", data);
+			console.info("Content Received request", data);
 			const metadata = getSiteMetadata();
 			const response = await contentMessaging.sendMessage("request", { ...data, metadata });
 			return response;

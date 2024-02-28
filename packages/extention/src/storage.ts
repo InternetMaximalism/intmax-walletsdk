@@ -1,4 +1,4 @@
-import { Network, Session, WalletMetadata, WebmaxWallet } from "@/core/types";
+import { Network, PendingRequest, Session, WalletMetadata, WebmaxWallet } from "@/core/types";
 import { storage } from "wxt/storage";
 import { DEFAULT_NETWORKS, DEFAULT_WALLETS } from "./constants";
 
@@ -20,4 +20,8 @@ export const sessionsStorage = storage.defineItem<Record<string, Session>>("loca
 
 export const networksStorage = storage.defineItem<Network[]>("local:networks", {
 	defaultValue: DEFAULT_NETWORKS,
+});
+
+export const pendingRequestsStorage = storage.defineItem<PendingRequest[]>("local:pendingRequests", {
+	defaultValue: [],
 });

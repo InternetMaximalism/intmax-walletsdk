@@ -1,18 +1,20 @@
 import { EXTENSION_URL } from "@/constants";
 import { WebmaxWallet } from "@/core/types";
 import { useWalletMetadataStore } from "@/popup/stores/wallet";
-import { FC, useCallback, useEffect, useRef } from "react";
+import { RefObject, useCallback } from "react";
 import { webmaxDappClient } from "walletnext/dapp";
 
-export const WalletIframe: FC<{
-	wallet: WebmaxWallet;
-	className?: string;
-}> = ({ wallet, className }) => {
-	const ref = useRef<HTMLIFrameElement>(null);
+export const useConnectExtension = (wallet: WebmaxWallet, ref: RefObject<HTMLIFrameElement>) => {
 	const setMetadata = useWalletMetadataStore((state) => state.setMetadata);
 
-	const handshake = useCallback(async () => {
+	const connect = useCallback(async () => {
 		if (!ref.current?.contentWindow) return;
+
+		console.info("WalletContainer connect", wallet);
+		try {
+			ref.current.contentWindow.origin;
+			await new Promise((resolve) => ref.current?.addEventListener("load", resolve));
+		} catch {}
 
 		const client = webmaxDappClient({
 			wallet: {
@@ -26,11 +28,7 @@ export const WalletIframe: FC<{
 		const result = await client.connect();
 		const metadata = { ...result, url: wallet.url };
 		setMetadata(wallet, metadata);
-	}, [wallet, setMetadata]);
+	}, [wallet, setMetadata, ref]);
 
-	useEffect(() => {
-		handshake();
-	}, [handshake]);
-
-	return <iframe ref={ref} title={wallet.name} src={wallet.url} className={className} />;
+	return { connect };
 };

@@ -1,6 +1,6 @@
+import { WalletContainer } from "@/components/wallet-container";
 import { useWalletStore } from "@/popup/stores/wallet";
 import { HomeHeader } from "./header";
-import { WalletIframe } from "./wallet-iframe";
 
 function HomePage() {
 	const currentWallet = useWalletStore((state) => state.current);
@@ -10,7 +10,7 @@ function HomePage() {
 			<HomeHeader />
 			<div>
 				{currentWallet ? (
-					<WalletIframe wallet={currentWallet} className="w-full h-full" />
+					<WalletContainer wallet={currentWallet} className="w-full h-full" />
 				) : (
 					<div className="flex items-center justify-center w-full h-full text-2xl text-gray-400">
 						Select a wallet to connect

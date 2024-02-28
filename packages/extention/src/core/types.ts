@@ -26,3 +26,11 @@ export type Network = {
 	chainId: number;
 	httpRpcUrl: string;
 };
+
+export type PendingRequest = {
+	id: string;
+	wallet: WebmaxWallet;
+	metadata: SiteMetadata;
+	method: string;
+	params: unknown;
+};
