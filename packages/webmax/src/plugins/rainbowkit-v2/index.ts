@@ -10,7 +10,7 @@ export type WalletNextOptions = {
 	defaultChainId?: number;
 };
 
-export const walletnext = (options: WalletNextOptions): Wallet => ({
+export const walletnext = (options: WalletNextOptions) => (): Wallet => ({
 	id: `walletnext-${options.wallet.url}-${options.mode}`,
 	name: options.wallet.name || "WalletNext",
 	iconUrl: options.wallet.iconUrl ?? "",
