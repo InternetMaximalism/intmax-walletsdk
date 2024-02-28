@@ -1,7 +1,7 @@
 {
-	"name": "rainbow-kit-example",
+	"name": "rainbow-kit-legacy-example",
 	"private": true,
-	"version": "0.0.64",
+	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
