@@ -9,7 +9,7 @@ export const defineInpageMessaging = <T extends Record<string, any> = Record<str
 
 				const listener = (message: MessageEvent) => {
 					const { messagingId: responseMessagingId, id: responseId, result, error } = message.data;
-					if (responseMessagingId === messagingId && responseId === id) {
+					if (responseMessagingId === messagingId && responseId === id && (result || error)) {
 						window.removeEventListener("message", listener);
 						if (error) reject(new Error(error));
 						else resolve(result);
