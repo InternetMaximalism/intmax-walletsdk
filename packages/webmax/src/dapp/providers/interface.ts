@@ -8,6 +8,4 @@ export type WebmaxProviderOptions<NS extends string> = {
 };
 
 //TODO: Redesign
-export type WebmaxProvider<Provider, NS extends string = string> = (
-	options: WebmaxProviderOptions<NS>,
-) => Provider | Promise<Provider>;
+export type WebmaxProvider<Provider, NS extends string = string> = (options: WebmaxProviderOptions<NS>) => Provider;
