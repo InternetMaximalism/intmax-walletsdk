@@ -7,8 +7,9 @@ For more information on the Webmax protocol, see Proposal below.
 
 ## Demo URL
 
-- [Dapp Example](https://webmax2-dapp.vercel.app/)
-- [Wallet Example](https://webmax2-wallet.vercel.app/)
+- [Dapp Example](https://walletnext-dapp.vercel.app/)
+- [Wallet Example](https://walletnext-wallet.vercel.app/)
+- [Rainbow Kit Example](https://walletnext-rainbowkit.vercel.app/)
 
 ## Dapp SDK Example
 
@@ -46,6 +47,53 @@ console.log(accounts);
 
 const result = await ethereum.request({ method: "eth_sign", params: [accounts[0], "Hello Webmax"] });
 console.log(result);
+```
+
+## Dapp SDK with Rainbow Kit Example
+
+```typescript
+
+import { walletnext } from "walletnext/rainbowkit";
+
+...
+
+const walletnextWallets = [
+  walletnext({
+		wallet: {
+			url: "https://walletnext-wallet.vercel.app",
+			name: "WalletNext Demo",
+			iconUrl: "https://walletnext-wallet.vercel.app/vite.svg",
+		},
+		metadata: {
+			name: "Rainbow-Kit Demo",
+			description: "Rainbow-Kit Demo",
+			icons: ["https://walletnext-wallet.vercel.app/vite.svg"],
+		},
+	}),
+];
+
+const config = createConfig({
+	chains: [mainnet, polygon, optimism, arbitrum],
+	transports: {
+		[mainnet.id]: http(),
+		[polygon.id]: http(),
+		[optimism.id]: http(),
+		[arbitrum.id]: http(),
+	},
+	connectors: connectorsForWallets(
+		[
+			{
+				groupName: "WalletNext",
+				wallets: walletnextWallets,
+			},
+		],
+		{ projectId: "N/A", appName: "Rainbow-Kit Example" },
+	),
+});
+
+...
+
+
 ```
 
 ## Wallet SDK
