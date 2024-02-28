@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { ethereumProvider, webmaxDappClient } from "webmax2/dapp";
+import { ethereumProvider, webmaxDappClient } from "walletnext/dapp";
 
 const DEFAULT_WALLET_URL = import.meta.env.VITE_WALLET_URL || "https://webmax2-wallet.vercel.app/";
 const DEFAULT_DAPP_ICON = (import.meta.env.VITE_APP_ICON || `${window.location.origin}/vite.svg`) as string;
@@ -29,11 +29,12 @@ function App() {
 	const isValidUrl = /https?:\/\/[^\s$.?#].[^\s]*$/.test(walletUrl);
 	const handleUpdateWalletUrl = (url: string) => {
 		if (!isValidUrl) return;
+		setAccounts([]);
 		setWebmax(createWebmax(url));
 	};
 
 	const handleConnect = async () => {
-		const ethereum = await webmax.provider("eip155");
+		const ethereum = webmax.provider("eip155");
 		await ethereum.request({ method: "eth_requestAccounts", params: [] });
 		const accounts = (await ethereum.request({ method: "eth_accounts", params: [] })) as string[];
 		setAccounts(accounts);
@@ -42,7 +43,7 @@ function App() {
 	const handleSignMessage = async () => {
 		if (accounts.length === 0) await handleConnect();
 
-		const ethereum = await webmax.provider("eip155");
+		const ethereum = webmax.provider("eip155");
 		const _accounts = (await ethereum.request({ method: "eth_accounts", params: [] })) as string[];
 		const result = await ethereum.request({ method: "eth_sign", params: [_accounts[0], "Hello Webmax"] });
 
@@ -52,7 +53,7 @@ function App() {
 	const handleSendTransaction = async () => {
 		if (accounts.length === 0) await handleConnect();
 
-		const ethereum = await webmax.provider("eip155");
+		const ethereum = webmax.provider("eip155");
 		const _accounts = (await ethereum.request({ method: "eth_accounts", params: [] })) as string[];
 		await ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x89" }] });
 		const result = await ethereum.request({

@@ -30,19 +30,19 @@ export type EthereumProvider = WebmaxProvider<EIP1193LikeProvider, "eip155">;
 
 export const ethereumProvider =
 	(options?: EthereumProviderOptions): WebmaxProvider<EIP1193LikeProvider, "eip155"> =>
-	async ({ store: _store, callWallet, namespace }) => {
+	({ store: _store, callWallet, namespace }) => {
 		const store = _ethStoreWrapper(_store);
 		const { chainId } = parseChainedNamespace(namespace);
-		const initialState = await store.getState();
 		const emitter = new EventEmitter();
 		const httpRpcClients: Map<number, HttpJsonRpcClient> = new Map();
 
-		let connected = initialState.accounts.length > 0;
-		let currentChainId = Number(chainId ?? initialState.chainId ?? initialState.supportedChains[0] ?? "1");
+		let currentChainId = store.getState().then((state) => {
+			return Number(chainId ?? state.chainId ?? state.supportedChains[0] ?? "1");
+		});
 
 		const chainedCallWallet = async <T>(args: { method: string; params?: unknown }) => {
 			const { method, params } = args;
-			return callWallet<T>({ method, params, chainId: currentChainId.toString() });
+			return callWallet<T>({ method, params, chainId: String(await currentChainId) });
 		};
 
 		const getHttpRpcClient = (chainId: number) => {
@@ -54,13 +54,14 @@ export const ethereumProvider =
 			return httpRpcClients.get(chainId) as HttpJsonRpcClient;
 		};
 
-		const getChainId = () => `0x${Number(currentChainId).toString(16)}`;
+		const getChainId = async () => `0x${(await currentChainId).toString(16)}`;
 
 		const switchChain = async (chainId: number) => {
 			if (options?.lockChainId) throw new RpcProviderError("Chain ID is locked", 4001);
-			if (!initialState.supportedChains.includes(chainId))
-				throw new RpcProviderError("Chain ID is not supported", 4001);
-			currentChainId = chainId;
+			const supportedChains = await store.getState().then((state) => state.supportedChains);
+			if (!supportedChains.includes(chainId)) throw new RpcProviderError("Chain ID not supported", 4001);
+
+			currentChainId = Promise.resolve(chainId);
 			await store.setState((state) => ({ ...state, chainId }));
 			emitter.emit("chainChanged", chainId);
 		};
@@ -71,8 +72,7 @@ export const ethereumProvider =
 			if (!isChanged) return;
 			await store.setState((state) => ({ ...state, accounts }));
 			emitter.emit("accountsChanged", accounts);
-			if (connected) return;
-			connected = true;
+			if (oldAccounts.length > 0) return;
 			emitter.emit("connect", { chainId: getChainId() });
 		};
 
@@ -87,7 +87,8 @@ export const ethereumProvider =
 				return null as TReturn;
 			}
 			if (method === "eth_requestAccounts") {
-				if (connected) return (await store.getState()).accounts as TReturn;
+				const existingAccounts = (await store.getState()).accounts;
+				if (existingAccounts.length > 0) return existingAccounts as TReturn;
 				const accounts = await chainedCallWallet<string[]>({ method: "eth_requestAccounts", params: [] });
 				await updateAccounts(accounts);
 				return accounts as TReturn;
@@ -98,7 +99,7 @@ export const ethereumProvider =
 				return response;
 			}
 
-			const client = getHttpRpcClient(currentChainId);
+			const client = getHttpRpcClient(await currentChainId);
 			const response = await client<TReturn>(method, params);
 			return response;
 		};
