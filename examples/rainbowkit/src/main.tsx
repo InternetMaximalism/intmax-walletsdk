@@ -19,8 +19,8 @@ const additionalWallets = [
 			iconUrl: "https://webmax2-wallet.vercel.app/vite.svg",
 		},
 		metadata: {
-			name: "Rainbow-Kit Legacy Demo",
-			description: "Rainbow-Kit Legacy Demo",
+			name: "Rainbow-Kit Demo",
+			description: "Rainbow-Kit Demo",
 			icons: ["https://webmax2-wallet.vercel.app/vite.svg"],
 		},
 	}),
@@ -32,8 +32,8 @@ const additionalWallets = [
 			iconUrl: "https://webmax2-wallet.vercel.app/vite.svg",
 		},
 		metadata: {
-			name: "Rainbow-Kit Legacy Demo",
-			description: "Rainbow-Kit Legacy Demo",
+			name: "Rainbow-Kit Demo",
+			description: "Rainbow-Kit Demo",
 			icons: ["https://webmax2-wallet.vercel.app/vite.svg"],
 		},
 	}),
@@ -44,8 +44,8 @@ const additionalWallets = [
 			iconUrl: "https://wallet.intmax.io/favicon.ico",
 		},
 		metadata: {
-			name: "Rainbow-Kit Legacy Demo",
-			description: "Rainbow-Kit Legacy Demo",
+			name: "Rainbow-Kit Demo",
+			description: "Rainbow-Kit Demo",
 			icons: ["https://webmax2-wallet.vercel.app/vite.svg"],
 		},
 	}),
