@@ -1,5 +1,5 @@
 import EventEmitter from "eventemitter3";
-import { EIP1193LikeProvider } from "webmax2/dapp";
+import { EIP1193LikeProvider } from "walletnext/dapp";
 import { inpageMessaging } from "../messagings/inpage";
 
 export const createInjectableProvider = (): EIP1193LikeProvider => {

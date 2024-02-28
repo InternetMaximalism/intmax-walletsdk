@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { WebmaxHost as Host, parseWebmaxHost } from "webmax2";
+import { WebmaxHost as Host, parseWebmaxHost } from "walletnext";
 
 export const WebmaxHost: FC<{
 	host: Host;

@@ -2,7 +2,7 @@ import { EXTENSION_URL } from "@/constants";
 import { WebmaxWallet } from "@/core/types";
 import { useWalletMetadataStore } from "@/popup/stores/wallet";
 import { FC, useCallback, useEffect, useRef } from "react";
-import { webmaxDappClient } from "webmax2/dapp";
+import { webmaxDappClient } from "walletnext/dapp";
 
 export const WalletIframe: FC<{
 	wallet: WebmaxWallet;
