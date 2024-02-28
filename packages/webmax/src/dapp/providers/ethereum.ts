@@ -58,9 +58,6 @@ export const ethereumProvider =
 
 		const switchChain = async (chainId: number) => {
 			if (options?.lockChainId) throw new RpcProviderError("Chain ID is locked", 4001);
-			const supportedChains = await store.getState().then((state) => state.supportedChains);
-			if (!supportedChains.includes(chainId)) throw new RpcProviderError("Chain ID not supported", 4001);
-
 			currentChainId = Promise.resolve(chainId);
 			await store.setState((state) => ({ ...state, chainId }));
 			emitter.emit("chainChanged", chainId);
