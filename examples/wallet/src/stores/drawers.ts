@@ -1,7 +1,7 @@
 import { ENSAccount } from "@/lib/blockchain/ens";
 import { InternalTxRequest, Token } from "@/types";
 import { Account, Hash, Hex } from "viem";
-import { DappMetadata, WebmaxHost } from "webmax2";
+import { DappMetadata, WebmaxHost } from "walletnext";
 import { create } from "zustand";
 
 export type DrawerPropsPattern =

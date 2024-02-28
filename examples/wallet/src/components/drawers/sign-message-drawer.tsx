@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { createViemWalletClient } from "@/lib/viemClient";
 import { DrawerProps } from "@/stores/drawers";
 import { FC } from "react";
-import { isHex } from "viem";
+import { fromHex, isHex } from "viem";
 import { mainnet } from "viem/chains";
 import { DrawerFooter, DrawerHeader, DrawerTitle } from "../ui/drawer";
 import { WebmaxDappInfo } from "../webmax-dappinfo";
@@ -38,7 +38,7 @@ const SignMessageDrawer: FC<DrawerProps<"sign-message">> = ({
 
 				<div className="space-y-2">
 					<div className="font-semibold">Message</div>
-					<pre className="border p-4 rounded-md">{data}</pre>
+					<pre className="border p-4 rounded-md">{data.startsWith("0x") ? fromHex(data, "string") : data}</pre>
 				</div>
 			</div>
 			<DrawerFooter className="grid grid-cols-2">

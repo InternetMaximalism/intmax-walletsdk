@@ -1,8 +1,8 @@
 import { AbstractRequest, AbstractResponse } from "src";
-import invariant from "../../utils/invariant";
-import { withResolvers } from "../../utils/withResolvers";
-import { WebmaxDappClientOptions } from "../dappClient";
-import { WalletClientRef } from "./types";
+import invariant from "../../../utils/invariant";
+import { withResolvers } from "../../../utils/withResolvers";
+import { WebmaxDappClientOptions } from "../../dappClient";
+import { WalletClientRef } from "../types";
 
 const DEFAULT_WALLET_WINDOW_HEIGHT = 600;
 const DEFAULT_WALLET_WINDOW_WIDTH = 400;
@@ -37,6 +37,7 @@ const openIframe = (opt: WebmaxDappClientOptions<any, any>) => {
 	iframe.name = name;
 	iframe.height = height.toString();
 	iframe.width = width.toString();
+	iframe.allow = "publickey-credentials-get *";
 	document.body.appendChild(iframe);
 
 	return iframe;
@@ -66,7 +67,7 @@ const _callRequest = (ref: WalletClientRef, opt: WebmaxDappClientOptions<any, an
 	ref.handshake && sendMessageOnce();
 	const listener = (event: MessageEvent) => {
 		if (event.source !== walletWindow) return;
-		if (event.data.method === "webmax_handshake") {
+		if (event.data.method === "webmax_ready") {
 			ref.handshake = event.data.result;
 			sendMessageOnce();
 		}

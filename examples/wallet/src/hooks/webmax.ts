@@ -5,8 +5,8 @@ import { useNetworksStore } from "@/stores/network";
 import { useWebmaxConnectionStore } from "@/stores/webmax";
 import { useLayoutEffect } from "react";
 import { Address, Hash, Hex, LocalAccount, isAddressEqual } from "viem";
-import { DappMetadata } from "webmax2";
-import { webmaxWalletClient } from "webmax2/wallet";
+import { DappMetadata } from "walletnext";
+import { webmaxWalletClient } from "walletnext/wallet";
 import { useAccounts } from "./account";
 import { useDrawer } from "./drawer";
 
@@ -28,7 +28,7 @@ export const useWebmax = () => {
 
 		if (!(localAccounts.length && supportedChains.length)) return;
 
-		webmax.on("webmax/webmax_handshake", (c) => {
+		webmax.on("webmax/webmax_ready", (c) => {
 			return c.success({
 				supportedNamespaces: ["eip155", "webmax"],
 				supportedChains: supportedChains,
@@ -102,6 +102,9 @@ export const useWebmax = () => {
 
 		webmax.on("eip155/eth_sign", async (c) => {
 			const [address, data] = c.req.params;
+
+			if (!isConnected(c, connections)) return c.failure("Not connected", { code: 4100 });
+
 			try {
 				const signature = await signMessage(address, data, c.req.metadata);
 				return c.success(signature);
@@ -112,6 +115,9 @@ export const useWebmax = () => {
 
 		webmax.on("eip155/personal_sign", async (c) => {
 			const [data, address] = c.req.params;
+
+			if (!isConnected(c, connections)) return c.failure("Not connected", { code: 4100 });
+
 			try {
 				const signature = await signMessage(address, data, c.req.metadata);
 				return c.success(signature);
@@ -123,6 +129,7 @@ export const useWebmax = () => {
 		webmax.on("eip155/eth_sendTransaction", async (c) => {
 			const [chainId, [rpcRequest]] = [c.req.chainId, c.req.params];
 			if (!chainId) return c.failure("Invalid chainId", { code: 4001 });
+			if (!isConnected(c, connections)) return c.failure("Not connected", { code: 4100 });
 
 			const account = findAccount(rpcRequest.from ?? ethereumAccounts[0]);
 			const { promise, resolve, reject } = withResolvers<Hash>();
@@ -141,6 +148,7 @@ export const useWebmax = () => {
 		webmax.on("eip155/eth_signTransaction", async (c) => {
 			const [chainId, [rpcRequest]] = [c.req.chainId, c.req.params];
 			if (!chainId) return c.failure("Invalid chainId", { code: 4001 });
+			if (!isConnected(c, connections)) return c.failure("Not connected", { code: 4100 });
 
 			const account = findAccount(rpcRequest.from ?? ethereumAccounts[0]);
 			const { promise, resolve, reject } = withResolvers<Hash>();
@@ -158,9 +166,10 @@ export const useWebmax = () => {
 
 		webmax.on("eip155/eth_signTypedData_v4", async (c) => {
 			const [address, message_] = c.req.params;
-			const data = typeof message_ === "string" ? JSON.parse(message_) : message_;
+			if (!isConnected(c, connections)) return c.failure("Not connected", { code: 4100 });
 
 			const account = findAccount(address);
+			const data = typeof message_ === "string" ? JSON.parse(message_) : message_;
 			const { promise, resolve, reject } = withResolvers<Hash>();
 
 			try {
