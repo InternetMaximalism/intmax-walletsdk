@@ -1,0 +1,32 @@
+name: Vercel Rainbowkit Deployment
+env:
+  NODE_VERSION: "18.19.0"
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_RAINBOWKIT }}
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN_WEBMAX2 }}
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "examples/rainbowkit/**"
+      - "packages/**"
+
+jobs:
+  Deploy-Wallet:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+      - name: Authenticate and Deploy to Vercel
+        run: |
+          vercel pull --yes --environment=production --token ${{ env.VERCEL_TOKEN }}
+          vercel build --prod --token ${{ env.VERCEL_TOKEN }}
+          vercel deploy --prebuilt --prod --token ${{ env.VERCEL_TOKEN }}
