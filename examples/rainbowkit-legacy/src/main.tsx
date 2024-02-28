@@ -21,12 +21,12 @@ const additionalWallets = [
 		wallet: {
 			url: "https://webmax2-wallet.vercel.app",
 			name: "WalletNext Demo",
-			iconUrl: "https://webmax2-wallet.vercel.app/vite.svg",
+			iconUrl: "https://walletnext-wallet.vercel.app/vite.svg",
 		},
 		metadata: {
 			name: "Rainbow-Kit Legacy Demo",
 			description: "Rainbow-Kit Legacy Demo",
-			icons: ["https://webmax2-wallet.vercel.app/vite.svg"],
+			icons: ["https://walletnext-wallet.vercel.app/vite.svg"],
 		},
 	}),
 	walletnext({
@@ -35,12 +35,12 @@ const additionalWallets = [
 		wallet: {
 			url: "https://webmax2-wallet.vercel.app",
 			name: "WalletNext Demo - IFrame",
-			iconUrl: "https://webmax2-wallet.vercel.app/vite.svg",
+			iconUrl: "https://walletnext-wallet.vercel.app/vite.svg",
 		},
 		metadata: {
 			name: "Rainbow-Kit Legacy Demo",
 			description: "Rainbow-Kit Legacy Demo",
-			icons: ["https://webmax2-wallet.vercel.app/vite.svg"],
+			icons: ["https://walletnext-wallet.vercel.app/vite.svg"],
 		},
 	}),
 	walletnext({
@@ -53,7 +53,7 @@ const additionalWallets = [
 		metadata: {
 			name: "Rainbow-Kit Legacy Demo",
 			description: "Rainbow-Kit Legacy Demo",
-			icons: ["https://webmax2-wallet.vercel.app/vite.svg"],
+			icons: ["https://walletnext-wallet.vercel.app/vite.svg"],
 		},
 	}),
 ];

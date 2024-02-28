@@ -7,8 +7,8 @@ For more information on the Webmax protocol, see Proposal below.
 
 ## Demo URL
 
-- [Dapp Example](https://webmax2-dapp.vercel.app/)
-- [Wallet Example](https://webmax2-wallet.vercel.app/)
+- [Dapp Example](https://walletnext-dapp.vercel.app/)
+- [Wallet Example](https://walletnext-wallet.vercel.app/)
 
 ## Dapp SDK Example
 
