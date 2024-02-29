@@ -27,15 +27,23 @@ export type Network = {
 	httpRpcUrl: string;
 };
 
-export type PendingRequest = {
-	id: string;
-	wallet: WebmaxWallet;
-	metadata: SiteMetadata;
+export type SiteRequest = {
+	namespace: Namespace;
 	method: string;
-	params: unknown;
+	params?: unknown;
+	metadata: SiteMetadata;
 };
 
-export type RequestResult = {
+export type PendingRequest = {
 	id: string;
-	result: unknown;
+	namespace: Namespace;
+	method: string;
+	params: unknown;
+	wallet: WebmaxWallet;
+	metadata: SiteMetadata;
+};
+
+export type RequestResult<T = unknown> = {
+	id: string;
+	result: T;
 };

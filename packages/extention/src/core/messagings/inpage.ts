@@ -1,7 +1,8 @@
 import { defineInpageMessaging } from "@/lib/messaging/inpageMessaging";
+import { SiteRequest } from "../types";
 
 type InpageMessengerSchema = {
-	request: (data: { method: string; params?: unknown }) => Promise<unknown>;
+	request: (data: Omit<SiteRequest, "metadata">) => Promise<unknown>;
 	event: (data: { event: string; data: unknown }) => void;
 };
 

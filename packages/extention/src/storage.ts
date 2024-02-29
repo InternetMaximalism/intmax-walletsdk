@@ -14,8 +14,8 @@ export const currentWebmaxWalletStorage = storage.defineItem<WebmaxWallet | null
 	defaultValue: DEFAULT_WALLETS[0] ?? null,
 });
 
-export const sessionsStorage = storage.defineItem<Record<string, Session>>("local:session", {
-	defaultValue: {},
+export const sessionsStorage = storage.defineItem<Session[]>("local:session", {
+	defaultValue: [],
 });
 
 export const networksStorage = storage.defineItem<Network[]>("local:networks", {
