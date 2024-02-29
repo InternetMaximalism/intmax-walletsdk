@@ -7,9 +7,8 @@ export const DEFAULT_WALLETS = [
 ] satisfies WebmaxWallet[];
 
 export const DEFAULT_NETWORKS = [
-	{ namespace: "eip155", chainId: 1, httpRpcUrl: "https://mainnet.infura.io/v3" },
-	{ namespace: "eip155", chainId: 5, httpRpcUrl: "https://goerli.infura.io/v3" },
-	{ namespace: "eip155", chainId: 137, httpRpcUrl: "https://rpc-mainnet.maticvigil.com" },
+	{ namespace: "eip155", chainId: 1, httpRpcUrl: "https://eth.llamarpc.com" },
+	{ namespace: "eip155", chainId: 137, httpRpcUrl: "https://polygon.llamarpc.com" },
 ] satisfies Network[];
 
 export const EXTENSION_URL = "https://intmax.io";
