@@ -1,12 +1,55 @@
 import { contentMessaging } from "@/core/messagings/content";
 import { popupMessaging } from "@/core/messagings/popup";
-import { RequestResult } from "@/core/types";
-import { currentWebmaxWalletStorage, pendingRequestsStorage } from "@/storage";
+import { RequestResult, SiteRequest, WebmaxWallet } from "@/core/types";
+import { HttpJsonRpcClient, httpJsonRpcClient } from "@/lib/httpClient";
+import { normalizeChainId } from "@/lib/utils";
+import {
+	currentWebmaxWalletStorage,
+	networksStorage,
+	pendingRequestsStorage,
+	sessionsStorage,
+	walletMetadataStorage,
+} from "@/storage";
 import { uuidv7 } from "uuidv7";
+import { WALLET_APPROVAL_METHODS } from "walletnext/dapp";
 import { defineBackground } from "wxt/sandbox";
 
 export default defineBackground(() => {
 	const listeners: Map<string, (result: RequestResult) => Promise<void>> = new Map();
+	const clients = new Map<number, HttpJsonRpcClient>();
+
+	const walletRequest = async <T = unknown>(wallet: WebmaxWallet, data: SiteRequest) => {
+		const { namespace, metadata, method, params } = data;
+		const id = uuidv7();
+		const request = { id, namespace, wallet, metadata, method, params };
+		const existing = await pendingRequestsStorage.getValue();
+		await pendingRequestsStorage.setValue([...existing, request]);
+
+		const result = await new Promise<RequestResult<T>>((resolve) => {
+			listeners.set(id, async (result) => {
+				resolve(result as RequestResult<T>);
+				return;
+			});
+		});
+
+		await pendingRequestsStorage.setValue(existing.filter((r) => r.id !== id));
+		return result;
+	};
+
+	const emitEvent = async (tabId: number, event: string, data: unknown) => {};
+
+	const getHttpRpcClient = async (chainId: number) => {
+		const networks = await networksStorage.getValue();
+		const network = networks?.find((n) => n.chainId === chainId);
+		if (!network) throw new Error("No network found");
+
+		if (!clients.has(chainId)) {
+			const newClient = httpJsonRpcClient(network.httpRpcUrl);
+			clients.set(chainId, newClient);
+		}
+		return clients.get(chainId) as HttpJsonRpcClient;
+	};
+
 	popupMessaging.onMessage("onResult", async ({ data }) => {
 		try {
 			console.info("Background Received result", data);
@@ -25,30 +68,77 @@ export default defineBackground(() => {
 	contentMessaging.onMessage("request", async ({ sender, data }) => {
 		try {
 			console.info("Background Received request", data);
-			const { metadata, method, params } = data;
+			const { namespace, metadata, method, params } = data;
 
 			const currentWallet = await currentWebmaxWalletStorage.getValue();
 			if (!currentWallet) return console.error("No current wallet");
 
-			const id = uuidv7();
-			const request = { id, wallet: currentWallet, metadata, method, params };
-			console.info("New request", request);
-			const existing = await pendingRequestsStorage.getValue();
-			await pendingRequestsStorage.setValue([request]);
-			console.info("Pending requests", await pendingRequestsStorage.getValue());
+			const walletMetadataList = await walletMetadataStorage.getValue();
+			const walletMetadata = walletMetadataList?.find((w) => w.url === currentWallet.url);
 
-			const result = await new Promise<RequestResult>((resolve) => {
-				listeners.set(id, async (result) => {
-					resolve(result);
-					return;
-				});
-			});
-			console.info("Background Sending result", result);
+			const sessions = await sessionsStorage.getValue();
+			let session = sessions?.find((s) => s.wallet.url === currentWallet.url && s.host === metadata.host);
 
-			await pendingRequestsStorage.setValue(existing.filter((r) => r.id !== id));
-			return result;
+			if (!session) {
+				session = {
+					...{ wallet: currentWallet, host: metadata.host },
+					...{ namespaces: [], chainIds: {}, accounts: {} },
+				};
+				await sessionsStorage.setValue([...(sessions ?? []), session]);
+			}
+
+			const _getChainId = async () => {
+				if (session?.chainIds[namespace]) return session?.chainIds[namespace];
+				const supportedEthChains = walletMetadata?.supportedChains.filter((c) => c.startsWith("eip155"));
+				if (supportedEthChains) return Number(supportedEthChains[0].split(":")[1]);
+				return 1;
+			};
+
+			const switchChain = async (chainId: number) => {
+				if (!session) return;
+				const newSession = { ...session, chainIds: { ...session.chainIds, [namespace]: chainId } };
+				await sessionsStorage.setValue(sessions?.map((s) => (s === session ? newSession : s)));
+				sender?.tab?.id && emitEvent(sender.tab.id, "chainChanged", normalizeChainId(chainId));
+			};
+
+			const updateAccounts = async (accounts: string[]) => {
+				if (!session) return;
+				const { accounts: oldAccounts } = session;
+				const isChanged = oldAccounts?.eip155?.join(",") !== accounts.join(",");
+
+				if (!isChanged) return;
+				const newSession = { ...session, accounts: { ...session.accounts, eip155: accounts } };
+				await sessionsStorage.setValue(sessions?.map((s) => (s === session ? newSession : s)));
+				sender?.tab?.id && emitEvent(sender.tab.id, "accountsChanged", accounts);
+
+				if (oldAccounts?.eip155?.length === 0 && accounts.length > 0)
+					sender?.tab?.id && emitEvent(sender.tab.id, "connect", { chainId: normalizeChainId(await _getChainId()) });
+			};
+
+			if (method === "eth_chainId") return normalizeChainId(await _getChainId());
+			if (method === "eth_accounts") return session.accounts?.eip155 ?? [];
+			if (method === "wallet_switchEthereumChain") {
+				const [{ chainId: newChainId }] = params as [{ chainId: string }];
+				await switchChain(Number(newChainId));
+				return;
+			}
+			if (method === "eth_requestAccounts") {
+				const { result } = await walletRequest<string[]>(currentWallet, data);
+				await updateAccounts(result);
+				return result;
+			}
+			if (WALLET_APPROVAL_METHODS.includes(method)) {
+				const { result } = await walletRequest(currentWallet, data);
+				return result;
+			}
+
+			const chainId = await _getChainId();
+			const client = await getHttpRpcClient(chainId);
+			const response = await client(method, params);
+			return response;
 		} catch (e) {
 			console.error(e);
+			return { error: { message: String(e), code: 500 } };
 		}
 	});
 });

@@ -12,7 +12,7 @@ export const createInjectableProvider = (): EIP1193LikeProvider => {
 	const request = async (args: { method: string; params?: unknown }) => {
 		const { method, params } = args;
 		console.info("provider Received request", method, params);
-		const response = await inpageMessaging.sendMessage("request", args);
+		const response = await inpageMessaging.sendMessage("request", { namespace: "eip155", method, params });
 		console.info("provider Received response", response);
 		return response;
 	};

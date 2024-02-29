@@ -12,3 +12,7 @@ export const waitIframeWindowReady = async (iframe: HTMLIFrameElement) => {
 		await new Promise((resolve) => setTimeout(resolve, 100));
 	} catch {}
 };
+
+export const normalizeChainId = (chainId: string | number) => {
+	return `0x${Number(chainId).toString(16)}`;
+};
