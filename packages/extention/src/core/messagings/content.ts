@@ -2,7 +2,7 @@ import { defineExtensionMessaging } from "@/lib/messaging/extensionMessaging";
 import { SiteRequest } from "../types";
 
 type ContentMessengerSchema = {
-	request: (data: SiteRequest) => Promise<unknown>;
+	request: (data: SiteRequest) => unknown;
 	event: (data: { event: string; data: unknown }) => void;
 };
 
