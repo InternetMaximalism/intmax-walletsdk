@@ -5,7 +5,8 @@ export const defineExtensionMessaging = <T extends Record<string, any> = Record<
 	return {
 		async sendMessage<K extends keyof T>(method: K, data: Parameters<T[K]>[0]): Promise<ReturnType<T[K]>> {
 			const response = await browser.runtime.sendMessage({ messagingId, method, data });
-			return response as ReturnType<T[K]>;
+			if (response.error) throw new Error(response.error);
+			return response.result;
 		},
 		async sendEvent<K extends keyof T>(event: K, data: Parameters<T[K]>[0]): Promise<void> {
 			await browser.runtime.sendMessage({ messagingId, event, data });
