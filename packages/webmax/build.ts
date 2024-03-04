@@ -1,28 +1,65 @@
 import { exec } from "child_process";
+import fs from "fs";
+import path from "path";
 import arg from "arg";
 import { context } from "esbuild";
-import type { BuildOptions } from "esbuild";
+import type { Location, PartialMessage, Plugin, PluginBuild } from "esbuild";
 import { glob } from "glob";
+import * as svelte from "svelte/compiler";
+import { Warning } from "svelte/types/compiler/interfaces";
 
 const args = arg({ "--watch": Boolean });
 
 const isWatch = args["--watch"];
 
-const entryPoints = glob.sync("./src/**/*.ts", { ignore: [] });
+const entryPoints = glob.sync(["./src/**/*.ts", "./src/**/*.svelte"], { ignore: [] });
 
-const commonOptions: BuildOptions = {
-	entryPoints,
-	logLevel: "info",
-	platform: "node",
+const sveltePlugin: Plugin = {
+	name: "svelte",
+	setup(build: PluginBuild) {
+		build.onLoad({ filter: /\.svelte$/ }, async (args) => {
+			const convertMessage = ({ message, start, end }: Warning): PartialMessage => {
+				let location: Partial<Location> | undefined;
+				if (start && end) {
+					const lineText = source.split(/\r\n|\r|\n/g)[start.line - 1];
+					const lineEnd = start.line === end.line ? end.column : lineText.length;
+					location = {
+						file: filename,
+						line: start.line,
+						column: start.column,
+						length: lineEnd - start.column,
+						lineText,
+					};
+				}
+				return { text: message, location };
+			};
+
+			const source = await fs.promises.readFile(args.path, "utf8");
+			const filename = path.relative(process.cwd(), args.path);
+
+			try {
+				const { js, warnings } = svelte.compile(source, { filename, css: "injected" });
+				const contents = `${js.code}//# sourceMappingURL=${js.map.toUrl()}`;
+				return { contents, warnings: warnings.map(convertMessage), loader: "js" };
+			} catch (e) {
+				return { errors: [convertMessage(e as Warning)] };
+			}
+		});
+
+		build.onLoad({ filter: /\.ts$/ }, async (args) => {
+			const source = await fs.promises.readFile(args.path, "utf8");
+			return { contents: source.replace(/.svelte/g, ".js"), loader: "ts" };
+		});
+	},
 };
 
 const buildContext = await context({
-	...commonOptions,
-	bundle: true,
+	entryPoints,
 	outbase: "./src",
 	outdir: "./dist/esm",
 	format: "esm",
-	plugins: [],
+	logLevel: "info",
+	plugins: [sveltePlugin],
 });
 
 if (isWatch) {

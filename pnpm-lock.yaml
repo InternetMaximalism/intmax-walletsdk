@@ -392,6 +392,9 @@ importers:
       esbuild:
         specifier: ^0.20.0
         version: 0.20.0
+      esbuild-svelte:
+        specifier: ^0.8.0
+        version: 0.8.0(esbuild@0.20.0)(svelte@4.2.12)
       glob:
         specifier: ^10.3.10
         version: 10.3.10
@@ -7458,6 +7461,18 @@ packages:
     resolution: {integrity: sha512-C+d6UdsYDk0lMebHNR4S2NybQMMngAOnOwYBQjTOiv0MkoJMP0Myw2mgpDLBcpfCmRLxyFqYhS/CfOENq4SJhQ==}
     dependencies:
       es6-promise: 4.2.8
+
+  /esbuild-svelte@0.8.0(esbuild@0.20.0)(svelte@4.2.12):
+    resolution: {integrity: sha512-uKcPf1kl2UGMjrfHChv4dLxGAvCNhf9s72mHo19ZhKP+LrVOuQkOM/g8GE7MiGpoqjpk8UHqL08uLRbSKXhmhw==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      esbuild: '>=0.9.6'
+      svelte: '>=3.43.0 <5'
+    dependencies:
+      '@jridgewell/trace-mapping': 0.3.22
+      esbuild: 0.20.0
+      svelte: 4.2.12
+    dev: true
 
   /esbuild@0.19.12:
     resolution: {integrity: sha512-aARqgq8roFBj054KvQr5f1sFu0D65G+miZRCuJyJ0G13Zwx7vRar5Zhn2tkQNzIXcBrNVsv/8stehpj+GAjgbg==}
