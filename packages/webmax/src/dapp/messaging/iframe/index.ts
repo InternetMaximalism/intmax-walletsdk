@@ -3,6 +3,7 @@ import invariant from "../../../utils/invariant";
 import { withResolvers } from "../../../utils/withResolvers";
 import { WebmaxDappClientOptions } from "../../dappClient";
 import { WalletClientRef } from "../types";
+import Component from "./Component.svelte";
 
 const DEFAULT_WALLET_WINDOW_HEIGHT = 600;
 const DEFAULT_WALLET_WINDOW_WIDTH = 400;
@@ -19,6 +20,11 @@ const IFRAME_STYLE = `
 
 // biome-ignore lint/suspicious/noExplicitAny:
 const openIframe = (opt: WebmaxDappClientOptions<any, any>) => {
+	new Component({
+		target: document.body,
+		props: {},
+	});
+
 	const { url, name, window: windowOpt } = opt.wallet;
 	const existingIframe = document.getElementById(IFRAME_ID);
 	if (existingIframe) {
