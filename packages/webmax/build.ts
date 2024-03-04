@@ -5,6 +5,7 @@ import arg from "arg";
 import { context } from "esbuild";
 import type { Location, PartialMessage, Plugin, PluginBuild } from "esbuild";
 import { glob } from "glob";
+import sveltePreprocess from "svelte-preprocess";
 import * as svelte from "svelte/compiler";
 import { Warning } from "svelte/types/compiler/interfaces";
 
@@ -17,6 +18,8 @@ const entryPoints = glob.sync(["./src/**/*.ts", "./src/**/*.svelte"], { ignore: 
 const sveltePlugin: Plugin = {
 	name: "svelte",
 	setup(build: PluginBuild) {
+		const preprocess = sveltePreprocess({ sourceMap: true });
+
 		build.onLoad({ filter: /\.svelte$/ }, async (args) => {
 			const convertMessage = ({ message, start, end }: Warning): PartialMessage => {
 				let location: Partial<Location> | undefined;
@@ -38,7 +41,8 @@ const sveltePlugin: Plugin = {
 			const filename = path.relative(process.cwd(), args.path);
 
 			try {
-				const { js, warnings } = svelte.compile(source, { filename, css: "injected" });
+				const processed = await svelte.preprocess(source, preprocess, { filename });
+				const { js, warnings } = svelte.compile(processed.code, { filename, css: "injected" });
 				const contents = `${js.code}//# sourceMappingURL=${js.map.toUrl()}`;
 				return { contents, warnings: warnings.map(convertMessage), loader: "js" };
 			} catch (e) {
