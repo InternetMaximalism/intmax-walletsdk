@@ -1,7 +1,9 @@
 # Wallet Next SDK
+
 Wallet Next SDK is a implementation of the Webmax protocol for Dapp and Wallet.
 
 ## Overview
+
 This SDK is designed to facilitate communication between the Dapp and Wallet sides of the Webmax protocol respectively.
 For more information on the Webmax protocol, see Proposal below.
 
@@ -27,13 +29,13 @@ const DAPP_METADATA = {
 const client = webmaxDappClient({
 	wallet: { url: walletUrl, name: "DEMO Wallet" },
 	metadata: DAPP_METADATA,
-	providers: { 
+	providers: {
         eip155: ethereumProvider({
             httpRpcUrls: {
                 1: "https://mainnet.infura.io/v3"
                 137: "https://rpc-mainnet.maticvigil.com"
-            } 
-        }) 
+            }
+        })
     },
 });
 
@@ -122,22 +124,20 @@ webmax.ready();
 
 ```
 
-
-
 # Webmax Protocol Proposal
 
 Wallet Connect with Web Wallets and more
 
 ## Summary
 
-We propose a protocol for connecting Web Wallets with Dapps.  
+We propose a protocol for connecting Web Wallets with Dapps.
 This protocol is simple, allowing for various applications.
 
 ## Abstract
 
-We propose a protocol that enables direct communication and connection between Web Wallets (wallets provided as web pages) and Dapps.  
-This protocol defines the communication methods and data structures to facilitate EIP1193-like interactions between Web Wallets and Dapps.  
-Essentially, this protocol is for communication between a Web Wallet and another web page operating in a separate tab, in accordance with the standard.  
+We propose a protocol that enables direct communication and connection between Web Wallets (wallets provided as web pages) and Dapps.
+This protocol defines the communication methods and data structures to facilitate EIP1193-like interactions between Web Wallets and Dapps.
+Essentially, this protocol is for communication between a Web Wallet and another web page operating in a separate tab, in accordance with the standard.
 Therefore, various extensions and applications are possible. For details, please refer to the Use Cases described later.
 
 ## Specification
@@ -189,7 +189,7 @@ participant wallet as Wallet (Popup)
 
 ### Message Format
 
-**Extended JSON-RPC**  
+**Extended JSON-RPC**
 Many wallets for blockchains like Ethereum provide their operations as JSON-RPC methods.
 Based on these, we define a message format that inherits from JSON-RPC as follows.
 
@@ -226,7 +226,7 @@ export type AbstractResponse<NS extends string = string, Result = unknown> =
   | AbstractErrorResponse<NS>;
 ```
 
-**Namespace**  
+**Namespace**
 Each method requires a Namespace, defining the group of methods.
 The Namespace must be included in each request, and it can also include ChainID information.
 
@@ -236,7 +236,7 @@ type Namespace = "eip155" | "webmax";
 type ChainedNamespace = `${Namespace}:${ChainId}`;
 ```
 
-**Window Handling**  
+**Window Handling**
 Specifies how to handle the Wallet's Window after sending a response.
 This is useful, for example, when the wallet wants to display an error message.
 
@@ -262,20 +262,20 @@ The Webmax protocol defines three types of JSON-RPC methods.
 - **approval**: Methods that request approval from the wallet.
 - **readonly**: Read-only methods resolved on the dapp side.
 
-**notice**  
+**notice**
 A slightly special method type representing notifications from the wallet.
 This type of method is implicitly fired by the wallet and notified to the dapp side.
 Basically, this type is not used except for methods defined in the webmax protocol.
 
-**approval**  
+**approval**
 Methods that require user approval, such as signing.
 
-**readonly**  
+**readonly**
 Read-only methods like `eip155/eth_accounts`. These are generally cached by the SDK on the dapp side and are not requested from the wallet. However, they are just methods, so it is also possible to handle them on the wallet side.
 
 ### Webmax Methods
 
-**webmax_ready**  
+**webmax_ready**
 A method notifying that the wallet has been initialized and is ready to communicate with the dapp.
 
 - **Params**: None
@@ -288,7 +288,7 @@ export type WebmaxReadyResult = {
 };
 ```
 
-**webmax_connect**  
+**webmax_connect**
 A method requesting the user to connect with the wallet.
 
 - **Params**: None
