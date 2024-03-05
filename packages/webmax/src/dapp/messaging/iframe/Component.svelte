@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
-
   export let show = false;
   export let iframeName: string;
   export let iframeSrc: string;
@@ -8,6 +6,7 @@
   export let handleClose: () => void;
 
   let iframeRef: HTMLIFrameElement;
+  let dialogRef: HTMLDialogElement;
 
   let dragging = false;
   let startX = 0;
@@ -16,6 +15,7 @@
   let offsetY = 20;
 
   $: if (iframeRef) handleIframeRef(iframeRef);
+  $: show ? dialogRef?.showModal() : dialogRef?.close();
 
   const onMouseDown = (e: MouseEvent) => {
     dragging = true;
@@ -32,16 +32,15 @@
   };
 
   const onClose = () => {
-    show = false;
+    dialogRef?.close();
     handleClose();
   };
 </script>
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-<div
-  role="dialog"
+<dialog
+  bind:this={dialogRef}
   class="popup_container"
-  style:display={show ? "grid" : "none"}
   style="left: {offsetX}px; top: {offsetY}px"
   on:mousedown|preventDefault|stopPropagation={onMouseDown}
   on:mouseup|preventDefault|stopPropagation={onMouseUp}
@@ -58,10 +57,27 @@
       src={iframeSrc}
     />
   </div>
-</div>
+</dialog>
 
 <style>
-  .popup_container {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    outline: none;
+    border: none;
+  }
+
+  dialog {
+    box-shadow: none;
+  }
+  dialog::backdrop {
+    background-color: transparent;
+  }
+
+  .popup_container[open] {
+    z-index: 2147483646;
+    display: grid;
     position: fixed;
     grid-template-rows: auto 1fr;
     width: 400px;
@@ -72,7 +88,9 @@
     cursor: move;
     filter: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04))
       drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));
+    animation: zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
+
   .popup_nav {
     padding-top: 0.5rem;
     padding-left: 1rem;
@@ -81,7 +99,7 @@
   }
   .popup_nav_close {
     border-radius: 1rem;
-    width: 1rem;
+    width: 2rem;
     height: 1rem;
     background-color: #ef4444;
   }
@@ -94,5 +112,14 @@
     width: 100%;
     height: 100%;
     border: none;
+  }
+
+  @keyframes zoom {
+    from {
+      transform: scale(0.9);
+    }
+    to {
+      transform: scale(1);
+    }
   }
 </style>

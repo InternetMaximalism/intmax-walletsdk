@@ -2,9 +2,10 @@ import { AbstractRequest, AbstractResponse } from "src";
 import invariant from "../../../utils/invariant";
 import { withResolvers } from "../../../utils/withResolvers";
 import { WebmaxDappClientOptions } from "../../dappClient";
-import { RpcProviderError } from "../../errors";
 import { WalletClientRef } from "../types";
 import Component from "./Component.svelte";
+
+const CLOSE_WAITING = 100;
 
 // biome-ignore lint/suspicious/noExplicitAny:
 const openIframe = async (opt: WebmaxDappClientOptions<any, any>) => {
@@ -13,7 +14,7 @@ const openIframe = async (opt: WebmaxDappClientOptions<any, any>) => {
 	const component = new Component({
 		target: document.getElementById("walletnext_popup") || document.body,
 		props: {
-			show: true,
+			show: false,
 			iframeName: opt.wallet.name,
 			iframeSrc: opt.wallet.url,
 			handleIframeRef: resolve,
@@ -90,7 +91,11 @@ export const callRequest = async (
 	const result = await _callRequest(ref, opt, _message);
 
 	ref.calls = ref.calls?.filter((p) => p !== promise);
-	if (result?.windowHandling === "close") ref.iframe.component.$set({ show: false });
+
+	setTimeout(() => {
+		if (ref.calls?.length !== 0 || result?.windowHandling !== "close") return;
+		ref.iframe?.component.$set({ show: false });
+	}, CLOSE_WAITING);
 
 	resolve();
 
