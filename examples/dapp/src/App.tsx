@@ -13,7 +13,7 @@ const DAPP_METADATA = {
 
 const createWebmax = (walletUrl: string) => {
 	return webmaxDappClient({
-		wallet: { url: walletUrl, name: "DEMO Wallet", window: { mode: "iframe" } },
+		wallet: { url: walletUrl, name: "DEMO Wallet", window: { mode: "popup" } },
 		metadata: DAPP_METADATA,
 		providers: { eip155: ethereumProvider() },
 	});
