@@ -3,56 +3,40 @@ import invariant from "../../../utils/invariant";
 import { withResolvers } from "../../../utils/withResolvers";
 import { WebmaxDappClientOptions } from "../../dappClient";
 import { WalletClientRef } from "../types";
+import Component from "./Component.svelte";
 
-const DEFAULT_WALLET_WINDOW_HEIGHT = 600;
-const DEFAULT_WALLET_WINDOW_WIDTH = 400;
-
-const IFRAME_ID = "webmax-dapp-iframe";
-const IFRAME_STYLE = `
-    position: fixed;
-    top: 0;
-    right: 0;
-    border: none;
-    display: block;
-	z-index: 2147483647;
-`;
+const CLOSE_WAITING = 100;
 
 // biome-ignore lint/suspicious/noExplicitAny:
-const openIframe = (opt: WebmaxDappClientOptions<any, any>) => {
-	const { url, name, window: windowOpt } = opt.wallet;
-	const existingIframe = document.getElementById(IFRAME_ID);
-	if (existingIframe) {
-		const iframe = existingIframe as HTMLIFrameElement;
-		return iframe;
-	}
+const openIframe = async (opt: WebmaxDappClientOptions<any, any>) => {
+	const { promise, resolve } = withResolvers<HTMLIFrameElement>();
 
-	const height = windowOpt?.height || DEFAULT_WALLET_WINDOW_HEIGHT;
-	const width = windowOpt?.width || DEFAULT_WALLET_WINDOW_WIDTH;
-	const iframe = document.createElement("iframe");
-	iframe.style.cssText = IFRAME_STYLE;
-	iframe.id = IFRAME_ID;
-	iframe.src = url;
-	iframe.name = name;
-	iframe.height = height.toString();
-	iframe.width = width.toString();
-	iframe.allow = "publickey-credentials-get *";
-	document.body.appendChild(iframe);
+	const component = new Component({
+		target: document.getElementById("walletnext_popup") || document.body,
+		props: {
+			show: false,
+			iframeName: opt.wallet.name,
+			iframeSrc: opt.wallet.url,
+			handleIframeRef: resolve,
+			handleClose: () => {},
+		},
+	});
 
-	return iframe;
+	const iframeRef = await promise;
+
+	return { iframeRef, component };
 };
 
-const showIframe = (ref: WalletClientRef) => {
-	if (ref.iframe) ref.iframe.style.display = "block";
-};
-
-const hideIframe = (ref: WalletClientRef) => {
-	if (ref.iframe) ref.iframe.style.display = "none";
+const waitForClose = (ref: WalletClientRef) => {
+	return new Promise<void>((resolve) => {
+		ref.iframe?.component.$set({ handleClose: resolve });
+	});
 };
 
 // biome-ignore lint/suspicious/noExplicitAny:
-const _callRequest = (ref: WalletClientRef, opt: WebmaxDappClientOptions<any, any>, message: AbstractRequest) => {
-	invariant(ref.iframe?.contentWindow);
-	const walletWindow = ref.iframe.contentWindow;
+const _callRequest = async (ref: WalletClientRef, opt: WebmaxDappClientOptions<any, any>, message: AbstractRequest) => {
+	invariant(ref.iframe?.iframeRef.contentWindow);
+	const walletWindow = ref.iframe?.iframeRef.contentWindow;
 	const { promise, resolve } = withResolvers<AbstractResponse>();
 
 	let sensed = false;
@@ -77,7 +61,13 @@ const _callRequest = (ref: WalletClientRef, opt: WebmaxDappClientOptions<any, an
 
 	window.addEventListener("message", listener);
 
-	return promise;
+	const windowClosed = waitForClose(ref).then(() => ({
+		...{ id: message.id, method: message.method, namespace: message.namespace },
+		windowHandling: "close" as const,
+		error: { code: -32000, message: "Window closed" },
+	}));
+
+	return Promise.race([promise, windowClosed]);
 };
 
 export const callRequest = async (
@@ -93,14 +83,19 @@ export const callRequest = async (
 	ref.calls = [...(ref.calls || []), promise];
 
 	await waiting;
-	if (!ref.iframe) ref.iframe = openIframe(opt);
-	showIframe(ref);
+
+	if (!ref.iframe) ref.iframe = await openIframe(opt);
+	ref.iframe.component.$set({ show: true });
 
 	const _message = { ...message, id: ref.id };
 	const result = await _callRequest(ref, opt, _message);
 
 	ref.calls = ref.calls?.filter((p) => p !== promise);
-	if (result?.windowHandling === "close") hideIframe(ref);
+
+	setTimeout(() => {
+		if (ref.calls?.length !== 0 || result?.windowHandling !== "close") return;
+		ref.iframe?.component.$set({ show: false });
+	}, CLOSE_WAITING);
 
 	resolve();
 
