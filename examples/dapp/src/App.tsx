@@ -64,11 +64,6 @@ function App() {
 		setResult(result as string);
 	};
 
-	const copyBookmarklet = async () => {
-		const bookmarkletScript = await fetch("/bookmarklet.js").then((res) => res.text());
-		await navigator.clipboard.writeText(`javascript:${bookmarkletScript}`.replace("#WALLET_URL#", walletUrl));
-	};
-
 	const handleSignTypedData = async () => {
 		if (accounts.length === 0) await handleConnect();
 
@@ -119,9 +114,7 @@ function App() {
 				</div>
 				<div className="space-y-1">
 					<div className="font-semibold text-lg">Wallet URL</div>
-					<div className="gap-2 grid grid-cols-1">
-						<Button onClick={copyBookmarklet}>Copy Bookmarklet</Button>
-					</div>
+
 					<div className="text-muted-foreground">
 						Copy it or whatever, register the bookmarklet above, and WebmaxWallet is available everywhere!
 					</div>
