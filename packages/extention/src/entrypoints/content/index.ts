@@ -12,19 +12,20 @@ export default defineContentScript({
 		console.info("Content script is running");
 		inpageMessaging.onMessage("request", async ({ data }) => {
 			try {
-				console.info("Content Received request", data);
+				//console.info("Content Received request", data);
 				const metadata = getSiteMetadata();
 				const response = await contentMessaging.sendMessage("request", { ...data, metadata });
-				console.info("Content Sending result", response);
+				//	console.info("Content Sending result", response);
 				return response;
 			} catch (e) {
 				console.error(e);
 			}
 		});
 
-		contentMessaging.onMessage("event", async ({ data }) => {
+		contentMessaging.onEvent("onEvent", async ({ data }) => {
 			const { event: eventName, data: eventData } = data;
-			inpageMessaging.sendMessage("event", { event: eventName, data: eventData });
+			console.log("Content Received event", eventName, eventData);
+			inpageMessaging.sendEvent("onEvent", { event: eventName, data: eventData });
 		});
 
 		const ui = createIntegratedUi(ctx, {

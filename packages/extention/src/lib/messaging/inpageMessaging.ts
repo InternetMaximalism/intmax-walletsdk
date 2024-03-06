@@ -37,10 +37,10 @@ export const defineInpageMessaging = <T extends Record<string, any> = Record<str
 			};
 			window.addEventListener("message", listener);
 		},
-		async onEvent<K extends keyof T>(event: K, cb: (data: Parameters<T[K]>[0]) => void): Promise<void> {
+		async onEvent<K extends keyof T>(event: K, cb: (data: { data: Parameters<T[K]>[0] }) => void): Promise<void> {
 			const listener = (message: MessageEvent) => {
 				const { messagingId: responseMessagingId, event: responseEvent, data } = message.data;
-				if (responseMessagingId === messagingId && responseEvent === event) cb(data);
+				if (responseMessagingId === messagingId && responseEvent === event) cb({ data });
 			};
 			window.addEventListener("message", listener);
 		},

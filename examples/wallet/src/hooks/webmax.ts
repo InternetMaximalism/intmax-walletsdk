@@ -108,8 +108,8 @@ export const useWebmax = () => {
 			try {
 				const signature = await signMessage(address, data, c.req.metadata);
 				return c.success(signature);
-			} catch {
-				return c.failure("", { code: 4001 });
+			} catch (e) {
+				return c.failure(String(e), { code: 4001 });
 			}
 		});
 
@@ -121,8 +121,8 @@ export const useWebmax = () => {
 			try {
 				const signature = await signMessage(address, data, c.req.metadata);
 				return c.success(signature);
-			} catch {
-				return c.failure("", { code: 4001 });
+			} catch (e) {
+				return c.failure(String(e), { code: 4001 });
 			}
 		});
 

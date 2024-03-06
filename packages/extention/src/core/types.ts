@@ -37,6 +37,7 @@ export type SiteRequest = {
 export type PendingRequest = {
 	id: string;
 	namespace: Namespace;
+	chainId?: string;
 	method: string;
 	params: unknown;
 	wallet: WebmaxWallet;
@@ -45,5 +46,6 @@ export type PendingRequest = {
 
 export type RequestResult<T = unknown> = {
 	id: string;
-	result: T;
+	result?: T;
+	error?: unknown;
 };

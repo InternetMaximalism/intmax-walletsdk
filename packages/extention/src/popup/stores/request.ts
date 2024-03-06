@@ -1,9 +1,10 @@
+import { PendingRequest } from "@/core/types";
 import { createStorageStore } from "@/lib/zustand";
-import { pendingRequestsStorage } from "@/storage";
+import { pendingRequestStorage } from "@/storage";
 
-export const usePendingRequestStore = createStorageStore(
+export const useRequestStore = createStorageStore(
 	{
-		pendingRequests: pendingRequestsStorage,
+		pendingRequest: pendingRequestStorage,
 	},
 	(set) => ({}),
 );
