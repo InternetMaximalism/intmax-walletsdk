@@ -22,6 +22,6 @@ export const networksStorage = storage.defineItem<Network[]>("local:networks", {
 	defaultValue: DEFAULT_NETWORKS,
 });
 
-export const pendingRequestsStorage = storage.defineItem<PendingRequest[]>("local:pendingRequests", {
-	defaultValue: [],
+export const pendingRequestStorage = storage.defineItem<PendingRequest | null>("local:pendingRequests", {
+	defaultValue: null,
 });

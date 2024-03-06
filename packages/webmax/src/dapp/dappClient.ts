@@ -46,7 +46,7 @@ export const webmaxDappClient = <
 >(
 	opt: WebmaxDappClientOptions<_Schema, Providers>,
 ): WebmaxDappClient<_Schema, Providers> => {
-	const { storage = memoryStorage(), providers } = opt;
+	let { storage = memoryStorage(), providers, wallet, metadata } = opt;
 
 	const ref: WalletClientRef = {};
 	const store = createWebmaxStore(storage);
@@ -57,13 +57,13 @@ export const webmaxDappClient = <
 	): Promise<T> => {
 		const { method, params, chainId } = args;
 		const chainedNamespace = chainId ? `${namespace}:${chainId}` : namespace;
-		const message = { namespace: chainedNamespace, method, params, metadata: opt.metadata } as const;
+		const message = { namespace: chainedNamespace, method, params, metadata } as const;
 		const response =
-			opt.wallet.window?.mode === "custom"
-				? CUSTOM.callRequest(ref, { wallet: opt.wallet, metadata: opt.metadata }, message)
-				: opt.wallet.window?.mode === "iframe"
-				  ? IFRAME.callRequest(ref, { wallet: opt.wallet, metadata: opt.metadata }, message)
-				  : POPUP.callRequest(ref, { wallet: opt.wallet, metadata: opt.metadata }, message);
+			wallet.window?.mode === "custom"
+				? CUSTOM.callRequest(ref, { wallet, metadata }, message)
+				: wallet.window?.mode === "iframe"
+				  ? IFRAME.callRequest(ref, { wallet, metadata }, message)
+				  : POPUP.callRequest(ref, { wallet, metadata }, message);
 
 		return throwOrResult(await response) as T;
 	};
@@ -73,6 +73,12 @@ export const webmaxDappClient = <
 			const result = await callWallet<WebmaxConnectResult>("webmax", { method: "webmax_connect", params: [] });
 			await store.setState((state) => ({ ...state, ...result }));
 			return result;
+		},
+		setMetadata: (metadata_: DappMetadata) => {
+			metadata = metadata_;
+		},
+		setWallet: (wallet_: WebmaxDappClientOptions<_Schema, Providers>["wallet"]) => {
+			wallet = wallet_;
 		},
 		provider: <NS extends Schema[number]["namespace"]>(namespace: ChainedNamespace<NS> | NS) => {
 			const [ns] = namespace.split(":") as [NS];
