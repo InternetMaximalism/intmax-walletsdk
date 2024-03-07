@@ -18,11 +18,11 @@ const SendTransactionDrawer: FC<DrawerProps<"send-transaction">> = ({
 	onSign,
 }) => {
 	const [loading, setLoading] = useState(false);
-	const sendTransaciton = useSendTransaction();
+	const sendTransaction = useSendTransaction();
 
 	const handleSendTransaction = async () => {
 		setLoading(true);
-		const hash = await sendTransaciton(transaction);
+		const hash = await sendTransaction(transaction);
 		onSign?.(hash);
 		onOpenChange(false);
 	};
