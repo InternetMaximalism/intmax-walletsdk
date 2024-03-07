@@ -19,7 +19,11 @@ export const WalletContainer: FC<{
 	console.info("WalletContainer", request);
 
 	useEffect(() => {
-		if (!(request && ref.current?.contentWindow)) return;
+		if (!ref.current?.contentWindow) return;
+		if (!request) {
+			connect();
+			return;
+		}
 
 		const [iframe, contentWindow] = [ref.current, ref.current.contentWindow];
 		if (approvingRequestsRef.current.has(request.id)) return;
@@ -45,6 +49,7 @@ export const WalletContainer: FC<{
 			await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: request.chainId }] });
 
 			const result = await provider.request({ method: request.method, params: request.params });
+
 			await popupMessaging.sendMessage("onResult", { id: request.id, result });
 		})().catch((error) => {
 			console.error("WalletContainer error", error);

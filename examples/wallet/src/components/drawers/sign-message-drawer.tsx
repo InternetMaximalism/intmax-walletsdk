@@ -24,7 +24,7 @@ const SignMessageDrawer: FC<DrawerProps<"sign-message">> = ({
 		const client = createViemWalletClient(mainnet, account);
 		const signature = await client.signMessage({ message: isHex(data) ? { raw: data } : data });
 		onSign?.(signature);
-		!dappMetadata && onOpenChange?.(false);
+		onOpenChange?.(false);
 	};
 
 	return (

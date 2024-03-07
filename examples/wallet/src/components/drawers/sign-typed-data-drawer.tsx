@@ -29,7 +29,7 @@ const SignTransactionDrawer: FC<DrawerProps<"sign-typed-data">> = ({
 		const clinet = createViemWalletClient(chain, account);
 		const signed = await clinet.signTypedData(data as TypedDataDefinition);
 		onSign?.(signed);
-		!onSign && onOpenChange(false);
+		onOpenChange(false);
 	};
 
 	return (
