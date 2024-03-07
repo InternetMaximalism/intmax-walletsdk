@@ -1,7 +1,7 @@
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { useDrawer } from "@/hooks/drawer";
 import { useDrawerStore } from "@/stores/drawers";
-import { Suspense, lazy, useState } from "react";
+import { Suspense, lazy } from "react";
 import { Loading } from "../loading";
 
 const ProfileDrawer = lazy(() => import("./profile-drawer"));
