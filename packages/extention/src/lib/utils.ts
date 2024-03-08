@@ -5,6 +5,16 @@ export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
+export const withResolvers = <T = void, E = unknown>() => {
+	let resolve: (value: T) => void = () => {};
+	let reject: (reason?: E) => void = () => {};
+	const promise = new Promise<T>((res, rej) => {
+		resolve = res;
+		reject = rej;
+	});
+	return { promise, resolve, reject };
+};
+
 export const waitIframeWindowReady = async (iframe: HTMLIFrameElement) => {
 	try {
 		iframe?.contentWindow?.origin;

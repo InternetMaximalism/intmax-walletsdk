@@ -3,6 +3,7 @@ import { popupMessaging } from "@/core/messagings/popup";
 import { RequestResult, SiteRequest, WebmaxWallet } from "@/core/types";
 import { HttpJsonRpcClient, httpJsonRpcClient } from "@/lib/httpClient";
 import { normalizeChainId } from "@/lib/utils";
+import { withResolvers } from "@/lib/utils";
 import {
 	currentWebmaxWalletStorage,
 	networksStorage,
@@ -11,7 +12,6 @@ import {
 	walletMetadataStorage,
 } from "@/storage";
 import { uuidv7 } from "uuidv7";
-import { withResolvers } from "walletnext";
 import { RpcProviderError, WALLET_APPROVAL_METHODS } from "walletnext/dapp";
 import { defineBackground } from "wxt/sandbox";
 
