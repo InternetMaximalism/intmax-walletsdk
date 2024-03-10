@@ -47,5 +47,5 @@ export type PendingRequest = {
 export type RequestResult<T = unknown> = {
 	id: string;
 	result?: T;
-	error?: unknown;
+	error?: { message: string; code: number };
 };

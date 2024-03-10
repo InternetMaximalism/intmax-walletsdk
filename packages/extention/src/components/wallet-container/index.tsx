@@ -2,7 +2,7 @@ import { popupMessaging } from "@/core/messagings/popup";
 import { WebmaxWallet } from "@/core/types";
 import { waitIframeWindowReady } from "@/lib/utils";
 import { useRequestStore } from "@/popup/stores/request";
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef } from "react";
 import { ethereumProvider, webmaxDappClient } from "walletnext/dapp";
 import { useConnectExtension } from "./useConnectExtension";
 
@@ -10,20 +10,17 @@ export const WalletContainer: FC<{
 	wallet: WebmaxWallet;
 	className?: string;
 }> = ({ wallet, className }) => {
-	const request = useRequestStore((state) => state.pendingRequest);
+	const requests = useRequestStore((state) => state.pendingRequest);
 	const ref = useRef<HTMLIFrameElement>(null);
 	const approvingRequestsRef = useRef<Set<string>>(new Set());
-
 	const { connect } = useConnectExtension(wallet, ref);
+
+	const request = requests?.[wallet.url];
 
 	console.info("WalletContainer", request);
 
 	useEffect(() => {
-		if (!ref.current?.contentWindow) return;
-		if (!request) {
-			connect();
-			return;
-		}
+		if (!(ref.current?.contentWindow && request)) return;
 
 		const [iframe, contentWindow] = [ref.current, ref.current.contentWindow];
 		if (approvingRequestsRef.current.has(request.id)) return;
