@@ -10,11 +10,20 @@ export const createInjectableProvider = (): EIP1193LikeProvider => {
 		emitter.emit(data.event, data.data);
 	});
 
+	const log = (method: string, ...args: unknown[]) => {
+		if (method === "eth_chainId") return;
+		if (method === "eth_call") return;
+		if (method === "web3_clientVersion") return;
+		if (method === "eth_blockNumber") return;
+		console.info(...args);
+	};
+
 	const request = async (args: { method: string; params?: unknown }) => {
 		const { method, params } = args;
-		console.info("provider Sending request", method, params);
+		const id = Math.floor(Math.random() * 1000000).toString();
+		log(method, "provider Sending request", method, id, params);
 		const response = await inpageMessaging.sendMessage("request", { namespace: "eip155", method, params });
-		console.info("provider Received request", JSON.stringify(response).slice(0, 100));
+		log(method, "provider Received request", method, id, JSON.stringify(response).slice(0, 100));
 		if (response.error) throw new RpcProviderError(response.error.message, response.error.code);
 		return response.result;
 	};

@@ -25,3 +25,9 @@ export const networksStorage = storage.defineItem<Network[]>("local:networks", {
 export const pendingRequestStorage = storage.defineItem<PendingRequest | null>("local:pendingRequests", {
 	defaultValue: null,
 });
+
+export const openingPopupWindowStorage = storage.defineItem<{
+	tabId: number;
+} | null>("session:openingPopupWindow", {
+	defaultValue: null,
+});
