@@ -33,7 +33,6 @@ export const WalletContainer: FC<{
 			await connect().then(() => new Promise((resolve) => setTimeout(resolve, 500)));
 
 			await waitIframeWindowReady(iframe);
-			console.info("WalletContainer request", request, wallet, Date.now());
 
 			const client = webmaxDappClient({
 				wallet: {

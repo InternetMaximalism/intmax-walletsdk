@@ -4,44 +4,81 @@ import { RequestResult, SiteRequest, WebmaxWallet } from "@/core/types";
 import { HttpJsonRpcClient, httpJsonRpcClient } from "@/lib/httpClient";
 import { normalizeChainId } from "@/lib/utils";
 import { withResolvers } from "@/lib/utils";
+import { POPUP_SIZE } from "@/popup/constants";
 import {
 	currentWebmaxWalletStorage,
 	networksStorage,
+	openingPopupWindowStorage,
 	pendingRequestStorage,
 	sessionsStorage,
 	walletMetadataStorage,
 } from "@/storage";
 import { uuidv7 } from "uuidv7";
 import { RpcProviderError, WALLET_APPROVAL_METHODS } from "walletnext/dapp";
+import { browser } from "wxt/browser";
 import { defineBackground } from "wxt/sandbox";
+
+const openPopupWindow = async () => {
+	const openingPopup = await openingPopupWindowStorage.getValue();
+	if (openingPopup) {
+		const existingTab = await browser.windows.get(openingPopup.tabId).catch(() => null);
+		if (existingTab) return await browser.windows.update(openingPopup.tabId, { focused: true });
+		await openingPopupWindowStorage.setValue(null);
+	}
+
+	const currentWindow = await browser.windows.getCurrent();
+	const window = await browser.windows.create({
+		url: browser.runtime.getURL("/popup.html"),
+		type: "panel",
+		height: POPUP_SIZE.height + 28,
+		width: POPUP_SIZE.width,
+		left: (currentWindow.left ?? 0) + (currentWindow.width ? currentWindow.width - currentWindow.width : 0),
+		top: currentWindow.top ?? 0,
+	});
+	if (!window.id) throw new Error("No window id");
+	await openingPopupWindowStorage.setValue({ tabId: window.id });
+};
+
+const closePopupWindow = async () => {
+	const openingPopup = await openingPopupWindowStorage.getValue();
+	if (!openingPopup) return;
+	await browser.windows.remove(openingPopup.tabId);
+	await openingPopupWindowStorage.setValue(null);
+};
+
+let walletRequestQueues: Promise<true>[] = [];
 
 export default defineBackground(() => {
 	const listeners: Map<string, (result: RequestResult) => Promise<void>> = new Map();
 	const clients = new Map<number, HttpJsonRpcClient>();
 
-	let walletRequestQueues: Promise<true>[] = [];
-
 	const walletRequest = async <T = unknown>(wallet: WebmaxWallet, data: SiteRequest, chainId?: string) => {
+		console.log("Wallet Request", wallet, data, chainId);
 		await Promise.all(walletRequestQueues);
+		await openPopupWindow();
+
 		const { promise, resolve } = withResolvers<true>();
 		walletRequestQueues.push(promise);
 
 		const { namespace, metadata, method, params } = data;
 		const id = uuidv7();
 		const request = { id, namespace, wallet, metadata, method, params, chainId };
+
 		await pendingRequestStorage.setValue(request);
 
 		const response = await new Promise<RequestResult<T>>((resolve) => {
-			listeners.set(id, async (result) => {
-				resolve(result as RequestResult<T>);
-				return;
-			});
+			listeners.set(id, async (result) => resolve(result as RequestResult<T>));
 		});
 
 		await pendingRequestStorage.setValue(null);
 
+		resolve(true);
 		walletRequestQueues = walletRequestQueues.filter((p) => p !== promise);
-		setTimeout(() => resolve(true), 1000);
+		setTimeout(() => {
+			if (walletRequestQueues.length === 0) closePopupWindow();
+		}, 300);
+
+		console.log("Wallet Request Response", response);
 
 		if (response.error) throw new Error(String(response.error));
 		return response.result as T;
