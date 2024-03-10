@@ -28,7 +28,7 @@ const openPopupWindow = async () => {
 
 	const currentWindow = await browser.windows.getCurrent();
 	const window = await browser.windows.create({
-		url: browser.runtime.getURL("/popup.html"),
+		url: browser.runtime.getURL("/popup.html?create=true"),
 		type: "panel",
 		height: POPUP_SIZE.height + 28,
 		width: POPUP_SIZE.width,
@@ -46,41 +46,42 @@ const closePopupWindow = async () => {
 	await openingPopupWindowStorage.setValue(null);
 };
 
-let walletRequestQueues: Promise<true>[] = [];
+const walletRequestQueues: Map<string, Promise<true>[]> = new Map();
 
 export default defineBackground(() => {
 	const listeners: Map<string, (result: RequestResult) => Promise<void>> = new Map();
 	const clients = new Map<number, HttpJsonRpcClient>();
 
 	const walletRequest = async <T = unknown>(wallet: WebmaxWallet, data: SiteRequest, chainId?: string) => {
-		console.log("Wallet Request", wallet, data, chainId);
-		await Promise.all(walletRequestQueues);
+		await Promise.all(walletRequestQueues.get(wallet.url) ?? []);
 		await openPopupWindow();
 
 		const { promise, resolve } = withResolvers<true>();
-		walletRequestQueues.push(promise);
+		if (!walletRequestQueues.has(wallet.url)) walletRequestQueues.set(wallet.url, []);
+		walletRequestQueues.get(wallet.url)?.push(promise);
 
 		const { namespace, metadata, method, params } = data;
 		const id = uuidv7();
 		const request = { id, namespace, wallet, metadata, method, params, chainId };
 
-		await pendingRequestStorage.setValue(request);
+		const existingRequest = await pendingRequestStorage.getValue();
+		await pendingRequestStorage.setValue({ ...existingRequest, [wallet.url]: request });
 
 		const response = await new Promise<RequestResult<T>>((resolve) => {
 			listeners.set(id, async (result) => resolve(result as RequestResult<T>));
 		});
 
-		await pendingRequestStorage.setValue(null);
+		const pendingRequest = await pendingRequestStorage.getValue();
+		const { [wallet.url]: _, ...rest } = pendingRequest;
+		await pendingRequestStorage.setValue(rest);
 
 		resolve(true);
-		walletRequestQueues = walletRequestQueues.filter((p) => p !== promise);
+		walletRequestQueues.set(wallet.url, walletRequestQueues.get(wallet.url)?.filter((p) => p !== promise) ?? []);
 		setTimeout(() => {
-			if (walletRequestQueues.length === 0) closePopupWindow();
+			if (walletRequestQueues.get(wallet.url)?.length === 0) closePopupWindow();
 		}, 300);
 
-		console.log("Wallet Request Response", response);
-
-		if (response.error) throw new Error(String(response.error));
+		if (response.error) throw new RpcProviderError(response.error.message, response.error.code);
 		return response.result as T;
 	};
 
@@ -100,6 +101,20 @@ export default defineBackground(() => {
 		}
 		return clients.get(chainId) as HttpJsonRpcClient;
 	};
+
+	currentWebmaxWalletStorage.watch(async (wallet) => {
+		const tabs = await browser.tabs.query({ active: true });
+		for (const tab of tabs) {
+			if (!tab.id) continue;
+			emitEvent(tab.id, "disconnect", { error: { message: "Wallet switched", code: 4900 } });
+			const sessions = await sessionsStorage.getValue();
+			const session = sessions?.find((s) => s.wallet.url === wallet?.url);
+			if (!session) return;
+			emitEvent(tab.id, "connect", { chainId: normalizeChainId(session.chainIds.eip155) });
+			emitEvent(tab.id, "accountsChanged", session.accounts.eip155);
+			emitEvent(tab.id, "chainChanged", normalizeChainId(session.chainIds.eip155));
+		}
+	});
 
 	popupMessaging.onMessage("onResult", async ({ data }) => {
 		try {

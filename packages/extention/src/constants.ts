@@ -2,8 +2,8 @@ import { Network, WebmaxWallet } from "./core/types";
 
 export const DEFAULT_WALLETS = [
 	{ name: "Local Wallet", url: "http://localhost:5173" },
+	{ name: "Demo Wallet", url: "http://localhost:4444/" },
 	{ name: "INTMAX", url: "https://wallet.intmax.io" },
-	{ name: "Demo Wallet", url: "https://webmax2-wallet.vercel.app/" },
 ] satisfies WebmaxWallet[];
 
 export const DEFAULT_NETWORKS = [
