@@ -29,6 +29,7 @@ export const createInjectableProvider = (): EIP1193LikeProvider => {
 	};
 
 	return {
+		isMetamask: true,
 		request,
 		on: (event, cb) => emitter.on(event, cb),
 		removeListener: (event, cb) => emitter.removeListener(event, cb),

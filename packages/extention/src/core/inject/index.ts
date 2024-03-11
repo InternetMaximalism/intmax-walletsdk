@@ -18,8 +18,9 @@ export const initWebmaxProvider = async () => {
 
 	const provider = await createInjectableProvider();
 
-	Object.assign(provider, {
-		isMetaMask: true,
+	Object.defineProperties(window, {
+		ethereum: { value: provider, configurable: false },
+		walletnext: { value: provider, configurable: false },
 	});
 
 	announceProvider({
@@ -32,8 +33,5 @@ export const initWebmaxProvider = async () => {
 		provider,
 	});
 
-	Object.defineProperties(window, {
-		ethereum: { value: provider, configurable: false },
-		webmax_ext: { value: provider, configurable: false },
-	});
+	window.dispatchEvent(new Event("ethereum#initialized"));
 };
