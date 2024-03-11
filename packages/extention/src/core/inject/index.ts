@@ -16,7 +16,7 @@ const shouldInject = () => {
 export const initWebmaxProvider = async () => {
 	if (!shouldInject()) return;
 
-	const provider = await createInjectableProvider();
+	const provider = createInjectableProvider();
 
 	Object.defineProperties(window, {
 		ethereum: { value: provider, configurable: false },

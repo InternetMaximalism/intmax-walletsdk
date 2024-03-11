@@ -16,7 +16,6 @@ import {
 import { uuidv7 } from "uuidv7";
 import { RpcProviderError, WALLET_APPROVAL_METHODS } from "walletnext/dapp";
 import { browser } from "wxt/browser";
-import { defineBackground } from "wxt/sandbox";
 
 const openPopupWindow = async () => {
 	const openingPopup = await openingPopupWindowStorage.getValue();
@@ -46,63 +45,62 @@ const closePopupWindow = async () => {
 	await openingPopupWindowStorage.setValue(null);
 };
 
+const clients = new Map<number, HttpJsonRpcClient>();
+const listeners: Map<string, (result: RequestResult) => Promise<void>> = new Map();
 const walletRequestQueues: Map<string, Promise<true>[]> = new Map();
 
-export default defineBackground(() => {
-	const listeners: Map<string, (result: RequestResult) => Promise<void>> = new Map();
-	const clients = new Map<number, HttpJsonRpcClient>();
+const getHttpRpcClient = async (chainId: number) => {
+	const networks = await networksStorage.getValue();
+	const network = networks?.find((n) => n.chainId === chainId);
+	if (!network) throw new Error("No network found");
 
-	const walletRequest = async <T = unknown>(wallet: WebmaxWallet, data: SiteRequest, chainId?: string) => {
-		await openPopupWindow();
-		await Promise.all(walletRequestQueues.get(wallet.url) ?? []);
-		await openPopupWindow();
+	if (!clients.has(chainId)) {
+		const newClient = httpJsonRpcClient(network.httpRpcUrl);
+		clients.set(chainId, newClient);
+	}
+	return clients.get(chainId) as HttpJsonRpcClient;
+};
 
-		const { promise, resolve } = withResolvers<true>();
-		if (!walletRequestQueues.has(wallet.url)) walletRequestQueues.set(wallet.url, []);
-		walletRequestQueues.get(wallet.url)?.push(promise);
+const walletRequest = async <T = unknown>(wallet: WebmaxWallet, data: SiteRequest, chainId?: string) => {
+	await openPopupWindow();
+	await Promise.all(walletRequestQueues.get(wallet.url) ?? []);
+	await openPopupWindow();
 
-		const { namespace, metadata, method, params } = data;
-		const id = uuidv7();
-		const request = { id, namespace, wallet, metadata, method, params, chainId };
+	const { promise, resolve } = withResolvers<true>();
+	if (!walletRequestQueues.has(wallet.url)) walletRequestQueues.set(wallet.url, []);
+	walletRequestQueues.get(wallet.url)?.push(promise);
 
-		const existingRequest = await pendingRequestStorage.getValue();
-		await pendingRequestStorage.setValue({ ...existingRequest, [wallet.url]: request });
+	const { namespace, metadata, method, params } = data;
+	const id = uuidv7();
+	const request = { id, namespace, wallet, metadata, method, params, chainId };
 
-		const response = await new Promise<RequestResult<T>>((resolve) => {
-			listeners.set(id, async (result) => resolve(result as RequestResult<T>));
-		});
+	const existingRequest = await pendingRequestStorage.getValue();
+	await pendingRequestStorage.setValue({ ...existingRequest, [wallet.url]: request });
 
-		const pendingRequest = await pendingRequestStorage.getValue();
-		const { [wallet.url]: _, ...rest } = pendingRequest;
-		await pendingRequestStorage.setValue(rest);
+	const response = await new Promise<RequestResult<T>>((resolve) => {
+		listeners.set(id, async (result) => resolve(result as RequestResult<T>));
+	});
 
-		resolve(true);
-		walletRequestQueues.set(wallet.url, walletRequestQueues.get(wallet.url)?.filter((p) => p !== promise) ?? []);
-		setTimeout(() => {
-			if (walletRequestQueues.get(wallet.url)?.length === 0) closePopupWindow();
-		}, 300);
+	const pendingRequest = await pendingRequestStorage.getValue();
+	const { [wallet.url]: _, ...rest } = pendingRequest;
+	await pendingRequestStorage.setValue(rest);
 
-		if (response.error) throw new RpcProviderError(response.error.message, response.error.code);
-		return response.result as T;
-	};
+	resolve(true);
+	walletRequestQueues.set(wallet.url, walletRequestQueues.get(wallet.url)?.filter((p) => p !== promise) ?? []);
+	setTimeout(() => {
+		if (walletRequestQueues.get(wallet.url)?.length === 0) closePopupWindow();
+	}, 300);
 
-	const emitEvent = async (tabId: number, event: string, data: unknown) => {
-		console.info("Emitting event", event, data, tabId);
-		await contentMessaging.sendEvent("onEvent", { event, data }, tabId);
-	};
+	if (response.error) throw new RpcProviderError(response.error.message, response.error.code);
+	return response.result as T;
+};
 
-	const getHttpRpcClient = async (chainId: number) => {
-		const networks = await networksStorage.getValue();
-		const network = networks?.find((n) => n.chainId === chainId);
-		if (!network) throw new Error("No network found");
+const emitEvent = async (tabId: number, event: string, data: unknown) => {
+	console.info("Emitting event", event, data, tabId);
+	await contentMessaging.sendEvent("onEvent", { event, data }, tabId);
+};
 
-		if (!clients.has(chainId)) {
-			const newClient = httpJsonRpcClient(network.httpRpcUrl);
-			clients.set(chainId, newClient);
-		}
-		return clients.get(chainId) as HttpJsonRpcClient;
-	};
-
+export const startHandleRequest = () => {
 	currentWebmaxWalletStorage.watch(async (wallet) => {
 		const tabs = await browser.tabs.query({ active: true });
 		for (const tab of tabs) {
@@ -111,6 +109,7 @@ export default defineBackground(() => {
 			const sessions = await sessionsStorage.getValue();
 			const session = sessions?.find((s) => s.wallet.url === wallet?.url);
 			if (!session) return;
+			await new Promise((resolve) => setTimeout(resolve, 200));
 			emitEvent(tab.id, "connect", { chainId: normalizeChainId(session.chainIds.eip155) });
 			emitEvent(tab.id, "accountsChanged", session.accounts.eip155);
 			emitEvent(tab.id, "chainChanged", normalizeChainId(session.chainIds.eip155));
@@ -132,6 +131,7 @@ export default defineBackground(() => {
 		}
 	});
 
+	// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: main logic
 	contentMessaging.onMessage("request", async ({ sender, data }) => {
 		try {
 			const { namespace, metadata, method, params } = data;
@@ -227,4 +227,4 @@ export default defineBackground(() => {
 			return { error: { message: String(e), code: 500 } };
 		}
 	});
-});
+};
