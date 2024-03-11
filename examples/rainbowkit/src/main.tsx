@@ -1,7 +1,7 @@
 import "@rainbow-me/rainbowkit/styles.css";
 import "./global.css";
 
-import { RainbowKitProvider, connectorsForWallets } from "@rainbow-me/rainbowkit";
+import { RainbowKitProvider, connectorsForWallets, getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
 import ReactDOM from "react-dom/client";
@@ -51,23 +51,10 @@ const additionalWallets = [
 	}),
 ];
 
-const config = createConfig({
+const config = getDefaultConfig({
 	chains: [mainnet, polygon, optimism, arbitrum],
-	transports: {
-		[mainnet.id]: http(),
-		[polygon.id]: http(),
-		[optimism.id]: http(),
-		[arbitrum.id]: http(),
-	},
-	connectors: connectorsForWallets(
-		[
-			{
-				groupName: "WalletNext",
-				wallets: additionalWallets,
-			},
-		],
-		{ projectId: "N/A", appName: "Rainbow-Kit Example" },
-	),
+	projectId: "YOUR_PROJECT_ID",
+	appName: "YOUR_APP",
 });
 
 const queryClient = new QueryClient();

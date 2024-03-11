@@ -1,6 +1,6 @@
 import { contentMessaging } from "@/core/messagings/content";
 import { popupMessaging } from "@/core/messagings/popup";
-import { RequestResult, SiteRequest, WebmaxWallet } from "@/core/types";
+import { RequestResult, Session, SiteRequest, WebmaxWallet } from "@/core/types";
 import { HttpJsonRpcClient, httpJsonRpcClient } from "@/lib/httpClient";
 import { normalizeChainId } from "@/lib/utils";
 import { withResolvers } from "@/lib/utils";
@@ -53,6 +53,7 @@ export default defineBackground(() => {
 	const clients = new Map<number, HttpJsonRpcClient>();
 
 	const walletRequest = async <T = unknown>(wallet: WebmaxWallet, data: SiteRequest, chainId?: string) => {
+		await openPopupWindow();
 		await Promise.all(walletRequestQueues.get(wallet.url) ?? []);
 		await openPopupWindow();
 
@@ -138,21 +139,35 @@ export default defineBackground(() => {
 			const currentWallet = await currentWebmaxWalletStorage.getValue();
 			if (!currentWallet) throw new Error("No wallet found");
 
-			const walletMetadataList = await walletMetadataStorage.getValue();
-			const walletMetadata = walletMetadataList?.find((w) => w.url === currentWallet.url);
+			const getWalletMetadata = async () => {
+				const walletMetadata = await walletMetadataStorage.getValue();
+				return walletMetadata?.find((w) => w.url === currentWallet.url);
+			};
 
-			const sessions = await sessionsStorage.getValue();
-			let session = sessions?.find((s) => s.wallet.url === currentWallet.url && s.host === metadata.host);
+			const getSession = async () => {
+				const sessions = await sessionsStorage.getValue();
+				let session = sessions?.find((s) => s.wallet.url === currentWallet.url && s.host === metadata.host);
 
-			if (!session) {
-				session = {
-					...{ wallet: currentWallet, host: metadata.host },
-					...{ namespaces: [], chainIds: {}, accounts: {} },
-				};
-				await sessionsStorage.setValue([...(sessions ?? []), session]);
-			}
+				if (!session) {
+					session = {
+						...{ wallet: currentWallet, host: metadata.host },
+						...{ namespaces: [], chainIds: {}, accounts: {} },
+					};
+					await sessionsStorage.setValue([...(sessions ?? []), session]);
+				}
+				console.info("Session", session);
+				return session;
+			};
+
+			const updateSession = async (session: Session) => {
+				const sessions = await sessionsStorage.getValue();
+				await sessionsStorage.setValue(
+					sessions?.map((s) => (s.host === session.host && s.wallet.url === session.wallet.url ? session : s)) ?? [],
+				);
+			};
 
 			const _getChainId = async () => {
+				const [session, walletMetadata] = [await getSession(), await getWalletMetadata()];
 				if (session?.chainIds[namespace]) return session?.chainIds[namespace];
 				const supportedEthChains = walletMetadata?.supportedChains.filter((c) => c.startsWith("eip155"));
 				if (supportedEthChains) return Number(supportedEthChains[0].split(":")[1]);
@@ -160,21 +175,24 @@ export default defineBackground(() => {
 			};
 
 			const switchChain = async (chainId: number) => {
+				const session = await getSession();
 				if (!session) return;
 				console.info("Switching chain", chainId);
 				const newSession = { ...session, chainIds: { ...session.chainIds, [namespace]: chainId } };
-				await sessionsStorage.setValue(sessions?.map((s) => (s === session ? newSession : s)));
+				await updateSession(newSession);
 				sender?.tab?.id && emitEvent(sender.tab.id, "chainChanged", normalizeChainId(chainId));
 			};
 
 			const updateAccounts = async (accounts: string[]) => {
+				const session = await getSession();
 				if (!session) return;
 				const { accounts: oldAccounts } = session;
 				const isChanged = oldAccounts?.eip155?.join(",") !== accounts.join(",");
+				console.info("Accounts changed", isChanged, oldAccounts?.eip155, accounts);
 				if (!isChanged) return;
 
 				const newSession = { ...session, accounts: { ...session.accounts, eip155: accounts } };
-				await sessionsStorage.setValue(sessions?.map((s) => (s === session ? newSession : s)));
+				await updateSession(newSession);
 				sender?.tab?.id && emitEvent(sender.tab.id, "accountsChanged", accounts);
 
 				if (oldAccounts?.eip155?.length === 0 && accounts.length > 0)
@@ -182,7 +200,7 @@ export default defineBackground(() => {
 			};
 
 			if (method === "eth_chainId") return { result: normalizeChainId(await _getChainId()) };
-			if (method === "eth_accounts") return { result: session.accounts?.eip155 ?? [] };
+			if (method === "eth_accounts") return { result: (await getSession()).accounts?.eip155 ?? [] };
 			if (method === "wallet_switchEthereumChain") {
 				const [{ chainId: newChainId }] = params as [{ chainId: string }];
 				await switchChain(Number(newChainId));
