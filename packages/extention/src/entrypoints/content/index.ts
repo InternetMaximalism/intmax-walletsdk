@@ -7,11 +7,11 @@ import { defineContentScript } from "wxt/sandbox";
 export default defineContentScript({
 	matches: ["<all_urls>"],
 	runAt: "document_start",
-	main: async (_ctx) => {
+	main: async () => {
 		console.info("Content script is running");
 		inpageMessaging.onMessage("request", async ({ data }) => {
 			try {
-				//console.info("Content Received request", data);
+				console.info("Content Received request", data);
 				const metadata = getSiteMetadata();
 				const response = await contentMessaging.sendMessage("request", { ...data, metadata });
 				//	console.info("Content Sending result", response);
@@ -28,10 +28,12 @@ export default defineContentScript({
 			inpageMessaging.sendEvent("onEvent", { event: eventName, data: eventData });
 		});
 
-		const container = document.head || document.documentElement;
-		const script = document.createElement("script");
-		script.src = browser.runtime.getURL("/inpage.js");
-		container.insertBefore(script, container.children[0]);
-		container.removeChild(script);
+		if (navigator.userAgent.toLowerCase().includes("firefox")) {
+			const container = document.head || document.documentElement;
+			const script = document.createElement("script");
+			script.src = browser.runtime.getURL("/inpage.js");
+			container.insertBefore(script, container.children[0]);
+			container.removeChild(script);
+		}
 	},
 });
