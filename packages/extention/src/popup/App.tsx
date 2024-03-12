@@ -3,7 +3,8 @@ import { RouterProvider, createHashRouter } from "react-router-dom";
 import GlobalLayout from "./app/layout";
 
 const HomePage = lazy(() => import("./app/home"));
-const SettingsPage = lazy(() => import("./app/settings"));
+const WalletSettingsPage = lazy(() => import("./app/settings/wallets"));
+const NetworksSettingsPage = lazy(() => import("./app/settings/networks"));
 
 const router = createHashRouter([
 	{
@@ -11,7 +12,8 @@ const router = createHashRouter([
 		element: <GlobalLayout />,
 		children: [
 			{ path: "/", element: <HomePage /> },
-			{ path: "/settings", element: <SettingsPage /> },
+			{ path: "/settings/wallet", element: <WalletSettingsPage /> },
+			{ path: "/settings/networks", element: <NetworksSettingsPage /> },
 		],
 	},
 ]);

@@ -3,8 +3,15 @@ import { Namespace, WebmaxReadyResult } from "walletnext";
 export type SiteMetadata = { host: string; name: string; description: string; icons: string[] };
 
 export type WebmaxWallet = {
+	type: "webmax";
 	name: string;
 	url: string;
+};
+
+export type InjectedWallet = {
+	type: "injected";
+	name: string;
+	flag: string;
 };
 
 export type WalletMetadata = {

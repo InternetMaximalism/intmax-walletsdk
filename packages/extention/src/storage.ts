@@ -6,7 +6,7 @@ export const webmaxWalletsStorage = storage.defineItem<WebmaxWallet[]>("sync:wal
 	defaultValue: DEFAULT_WALLETS,
 });
 
-export const walletMetadataStorage = storage.defineItem<WalletMetadata[]>("sync:walletMetadata", {
+export const walletMetadataStorage = storage.defineItem<WalletMetadata[]>("local:walletMetadata", {
 	defaultValue: [],
 });
 
@@ -18,7 +18,7 @@ export const sessionsStorage = storage.defineItem<Session[]>("local:session", {
 	defaultValue: [],
 });
 
-export const networksStorage = storage.defineItem<Network[]>("local:networks", {
+export const networksStorage = storage.defineItem<Network[]>("sync:networks", {
 	defaultValue: DEFAULT_NETWORKS,
 });
 
