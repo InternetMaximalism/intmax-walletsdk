@@ -7,10 +7,7 @@ export default defineContentScript({
 	matches: ["<all_urls>"],
 	main: async () => {
 		console.info("Content script is running");
-		inpageMessaging.onMessage("request", ({ data }) => {
-			console.info("Content script received request", data.method, data.params);
-			return contentMessaging.sendMessage("request", data);
-		});
+		inpageMessaging.onMessage("request", ({ data }) => contentMessaging.sendMessage("request", data));
 		contentMessaging.onEvent("onEvent", ({ data }) => inpageMessaging.sendEvent("onEvent", data));
 
 		if (navigator.userAgent.toLowerCase().includes("firefox")) {

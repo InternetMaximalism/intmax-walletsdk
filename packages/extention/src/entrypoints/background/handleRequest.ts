@@ -55,6 +55,7 @@ const getHttpRpcClient = async (chainId: number) => {
 	if (!network) throw new Error("No network found");
 
 	if (!clients.has(chainId)) {
+		console.info("Creating new client", network.httpRpcUrl);
 		const newClient = httpJsonRpcClient(network.httpRpcUrl);
 		clients.set(chainId, newClient);
 	}
