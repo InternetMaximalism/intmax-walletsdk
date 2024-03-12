@@ -3,6 +3,6 @@ import { startHandleRequest } from "./handleRequest";
 import { setupContentScript } from "./setupContentScript";
 
 export default defineBackground(() => {
-	//setupContentScript();
+	setupContentScript();
 	startHandleRequest();
 });

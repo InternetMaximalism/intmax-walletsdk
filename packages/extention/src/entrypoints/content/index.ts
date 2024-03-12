@@ -6,7 +6,7 @@ import { defineContentScript } from "wxt/sandbox";
 export default defineContentScript({
 	matches: ["<all_urls>"],
 	main: async () => {
-		console.error("Content script is running");
+		console.info("Content script is running");
 		inpageMessaging.onMessage("request", ({ data }) => {
 			console.info("Content script received request", data.method, data.params);
 			return contentMessaging.sendMessage("request", data);
