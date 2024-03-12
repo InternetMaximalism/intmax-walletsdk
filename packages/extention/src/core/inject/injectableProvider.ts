@@ -1,5 +1,6 @@
 import EventEmitter from "eventemitter3";
 import { EIP1193LikeProvider, RpcProviderError } from "walletnext/dapp";
+import { getSiteMetadata } from "../lib/getSiteMetadata";
 import { inpageMessaging } from "../messagings/inpage";
 
 export const createInjectableProvider = (): EIP1193LikeProvider => {
@@ -22,7 +23,8 @@ export const createInjectableProvider = (): EIP1193LikeProvider => {
 		const { method, params } = args;
 		const id = Math.floor(Math.random() * 1000000).toString();
 		log(method, "provider Sending request", method, id, params);
-		const response = await inpageMessaging.sendMessage("request", { namespace: "eip155", method, params });
+		const metadata = getSiteMetadata();
+		const response = await inpageMessaging.sendMessage("request", { metadata, namespace: "eip155", method, params });
 		log(method, "provider Received request", method, id, JSON.stringify(response).slice(0, 100));
 		if (response.error) throw new RpcProviderError(response.error.message, response.error.code);
 		return response.result;
