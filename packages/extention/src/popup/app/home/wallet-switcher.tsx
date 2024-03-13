@@ -1,3 +1,4 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
 	Command,
@@ -24,7 +25,11 @@ export const WalletSwitcher: FC = () => {
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
 				<Button variant="outline" role="combobox" aria-expanded={open} className="w-40 justify-between overflow-hidden">
-					{current?.name || "Select Wallet"}
+					<Avatar className="mr-2 h-5 w-5">
+						{current?.logoUrl && <AvatarImage src={current.logoUrl} />}
+						<AvatarFallback>{current?.name.slice(0, 2)}</AvatarFallback>
+					</Avatar>
+					<span className="truncate">{current?.name || "Select Wallet"}</span>
 					<ChevronDown className="ml-auto h-5 w-5 shrink-0 opacity-50" />
 				</Button>
 			</PopoverTrigger>
@@ -35,8 +40,12 @@ export const WalletSwitcher: FC = () => {
 						<CommandEmpty>No results found.</CommandEmpty>
 						<CommandGroup heading="Wallets">
 							{(wallets || []).map((wallet) => (
-								<CommandItem key={wallet?.url} className="text-sm" onSelect={() => setCurrent(wallet)}>
-									{wallet.name}
+								<CommandItem key={wallet?.url} className="text-sm overflow-hidden" onSelect={() => setCurrent(wallet)}>
+									<Avatar className="mr-2 h-5 w-5">
+										{wallet?.logoUrl && <AvatarImage src={wallet.logoUrl} />}
+										<AvatarFallback>{wallet?.name.slice(0, 2)}</AvatarFallback>
+									</Avatar>
+									<span className="truncate">{wallet.name}</span>
 									<CheckIcon
 										className={cn(
 											"ml-auto h-4 w-4 shrink-0",

@@ -5,6 +5,7 @@ export type SiteMetadata = { host: string; name: string; description: string; ic
 export type WebmaxWallet = {
 	type: "webmax";
 	name: string;
+	logoUrl: string | null;
 	url: string;
 };
 

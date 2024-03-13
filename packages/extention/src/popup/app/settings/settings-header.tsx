@@ -8,13 +8,13 @@ export const SettingsHeader: FC<{
 	title: ReactNode;
 }> = ({ backTo, title }) => {
 	return (
-		<header className="p-2 flex items-center gap-2">
+		<header className="border-b p-2 flex items-center gap-2">
 			<Button size="icon" variant="ghost" asChild>
 				<Link to={backTo}>
 					<ArrowLeft />
 				</Link>
 			</Button>
-			<h2 className="text-xl font-semibold">{title}</h2>
+			<h2 className="text-lg font-semibold">{title}</h2>
 		</header>
 	);
 };
