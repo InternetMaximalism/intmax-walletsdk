@@ -1,3 +1,4 @@
+import { WEBMAX_WALLET_UUID, WEMAX_WALLET_LOGO } from "@/constants";
 import { EIP1193Provider, announceProvider } from "mipd";
 import { createInjectableProvider } from "./injectableProvider";
 
@@ -29,10 +30,10 @@ export const initWebmaxProvider = async () => {
 
 	announceProvider({
 		info: {
-			icon: "https://webmax.io/favicon.ico",
-			name: "Webmax",
+			icon: WEMAX_WALLET_LOGO,
+			name: "INTMAX Wallet",
 			rdns: "io.webmax",
-			uuid: crypto.randomUUID(),
+			uuid: WEBMAX_WALLET_UUID,
 		},
 		provider,
 	});
