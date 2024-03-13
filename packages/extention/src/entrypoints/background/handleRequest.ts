@@ -157,7 +157,7 @@ export const startHandleRequest = () => {
 					};
 					await sessionsStorage.setValue([...(sessions ?? []), session]);
 				}
-				console.info("Session", session);
+
 				return session;
 			};
 
