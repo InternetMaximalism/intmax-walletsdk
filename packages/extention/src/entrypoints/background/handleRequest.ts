@@ -1,3 +1,4 @@
+import { isEqNetwork } from "@/core/lib/network";
 import { contentMessaging } from "@/core/messagings/content";
 import { popupMessaging } from "@/core/messagings/popup";
 import { RequestResult, Session, SiteRequest, WebmaxWallet } from "@/core/types";
@@ -51,7 +52,7 @@ const walletRequestQueues: Map<string, Promise<true>[]> = new Map();
 
 const getHttpRpcClient = async (chainId: number) => {
 	const networks = await networksStorage.getValue();
-	const network = networks?.find((n) => n.chainId === chainId);
+	const network = networks?.find((n) => isEqNetwork(n, { namespace: "eip155", chainId }));
 	if (!network) throw new Error("No network found");
 
 	if (!clients.has(chainId)) {

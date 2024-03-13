@@ -32,6 +32,8 @@ export type SessionKey = { wallet: WebmaxWallet; host: string };
 export type Network = {
 	namespace: Namespace;
 	chainId: number;
+	name?: string;
+	logoUrl?: string;
 	httpRpcUrl: string;
 };
 
