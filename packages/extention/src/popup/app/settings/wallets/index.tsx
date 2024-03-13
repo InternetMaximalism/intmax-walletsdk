@@ -10,11 +10,10 @@ function WalletSettingsPage() {
 	const wallets = useWalletStore((state) => state.wallets);
 	const setWallets = useWalletStore((state) => state.setWallets);
 
-	const handleWalletChange = (wallet: WebmaxWallet | null) => {
+	const handleWalletChange = (before: WebmaxWallet | null, wallet: WebmaxWallet | null) => {
 		if (!wallet) return;
-		const existingWallet = wallets?.find((w) => w.url === wallet.url);
-		if (existingWallet) setWallets(wallets?.map((w) => (w.url === wallet.url ? wallet : w)) ?? []);
-		else setWallets([...(wallets ?? []), wallet]);
+		if (before) setWallets(wallets?.map((w) => (w.url === before.url ? wallet : w)) ?? [wallet]);
+		else setWallets(wallets ? [...wallets, wallet] : [wallet]);
 	};
 
 	const handleWalletRemove = (wallet: WebmaxWallet) => {
@@ -41,7 +40,7 @@ function WalletSettingsPage() {
 						<div>
 							<WalletDialog
 								wallet={wallet}
-								onWalletChange={handleWalletChange}
+								onWalletChange={(w) => handleWalletChange(wallet, w)}
 								onRemove={() => handleWalletRemove(wallet)}
 							>
 								<Button variant="outline">Edit</Button>
@@ -49,7 +48,7 @@ function WalletSettingsPage() {
 						</div>
 					</div>
 				))}
-				<WalletDialog wallet={null} onWalletChange={handleWalletChange}>
+				<WalletDialog wallet={null} onWalletChange={(w) => handleWalletChange(null, w)}>
 					<Button variant="outline">
 						<PlusCircle className="mr-2" />
 						Add New Wallet
