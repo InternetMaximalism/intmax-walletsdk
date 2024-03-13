@@ -5,6 +5,7 @@ import { FC } from "react";
 import { fromHex, isHex } from "viem";
 import { mainnet } from "viem/chains";
 import { DrawerFooter, DrawerHeader, DrawerTitle } from "../ui/drawer";
+import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { WebmaxDappInfo } from "../webmax-dappinfo";
 
 const SignMessageDrawer: FC<DrawerProps<"sign-message">> = ({
@@ -38,7 +39,13 @@ const SignMessageDrawer: FC<DrawerProps<"sign-message">> = ({
 
 				<div className="space-y-2">
 					<div className="font-semibold">Message</div>
-					<pre className="border p-4 rounded-md">{data.startsWith("0x") ? fromHex(data, "string") : data}</pre>
+					<ScrollArea className="h-48 overflow-hidden border p-4 rounded-md text-sm">
+						<pre className="text-sm overscroll-none" data-vaul-no-drag>
+							{data.startsWith("0x") ? fromHex(data, "string") : data}
+						</pre>
+						<ScrollBar className="overscroll-none" data-vaul-no-drag />
+						<ScrollBar orientation="horizontal" className="overscroll-none" data-vaul-no-drag />
+					</ScrollArea>
 				</div>
 			</div>
 			<DrawerFooter className="grid grid-cols-2">

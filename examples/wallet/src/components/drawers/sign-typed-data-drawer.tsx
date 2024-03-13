@@ -45,13 +45,14 @@ const SignTransactionDrawer: FC<DrawerProps<"sign-typed-data">> = ({
 			<div className="px-4 space-y-4">
 				{dappMetadata && <WebmaxDappInfo dappMetadata={dappMetadata} size="sm" />}
 				<ScrollArea
-					className="h-48 bg-muted rounded-md p-2 text-muted-foreground overflow-y-auto overscroll-none border"
+					className="h-48 bg-muted rounded-md p-2 text-muted-foreground overscroll-none border"
 					data-vaul-no-drag
 				>
 					<pre className="text-sm overscroll-none" data-vaul-no-drag>
 						{JSON.stringify(data, null, 2)}
 					</pre>
 					<ScrollBar className="overscroll-none" data-vaul-no-drag />
+					<ScrollBar orientation="horizontal" className="overscroll-none" data-vaul-no-drag />
 				</ScrollArea>
 			</div>
 			<DrawerFooter className="grid grid-cols-2">

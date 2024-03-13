@@ -16,8 +16,8 @@ export const WebmaxDappInfo: FC<{ dappMetadata: DappMetadata; size?: "sm" | "def
 				<AvatarFallback>{name.slice(0, 2).toUpperCase()}</AvatarFallback>
 			</Avatar>
 			<div>
-				<h2 className={cn("font-semibold", size === "default" ? "text-lg" : "text-base")}>{name}</h2>
-				{size === "default" && <p className="text-muted-foreground text-sm line-clamp-1">{description}</p>}
+				<h2 className={cn("font-semibold line-clamp-1")}>{name}</h2>
+				{size === "default" && <p className="text-muted-foreground text-sm line-clamp-2">{description}</p>}
 			</div>
 		</div>
 	);
