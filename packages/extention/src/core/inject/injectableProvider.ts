@@ -10,7 +10,7 @@ export const createInjectableProvider = (): EIP1193LikeProvider => {
 
 	const request = async (args: { method: string; params?: unknown }) => {
 		const { method, params } = args;
-		const metadata = getSiteMetadata();
+		const metadata = await getSiteMetadata();
 		const response = await inpageMessaging.sendMessage("request", { metadata, namespace: "eip155", method, params });
 		if (response.error) throw new RpcProviderError(response.error.message, response.error.code);
 		return response.result;
@@ -18,7 +18,6 @@ export const createInjectableProvider = (): EIP1193LikeProvider => {
 
 	return {
 		isMetaMask: true,
-		isWalletNext: true,
 		request,
 		on: (event, cb) => emitter.on(event, cb),
 		removeListener: (event, cb) => emitter.removeListener(event, cb),
