@@ -11,9 +11,10 @@ function WalletSettingsPage() {
 	const setWallets = useWalletStore((state) => state.setWallets);
 
 	const handleWalletChange = (wallet: WebmaxWallet | null) => {
-		if (wallet) {
-			setWallets(wallets?.map((w) => (w.url === wallet.url ? wallet : w)) ?? []);
-		}
+		if (!wallet) return;
+		const existingWallet = wallets?.find((w) => w.url === wallet.url);
+		if (existingWallet) setWallets(wallets?.map((w) => (w.url === wallet.url ? wallet : w)) ?? []);
+		else setWallets([...(wallets ?? []), wallet]);
 	};
 
 	const handleWalletRemove = (wallet: WebmaxWallet) => {

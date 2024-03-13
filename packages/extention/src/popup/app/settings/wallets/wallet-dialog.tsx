@@ -45,7 +45,7 @@ export const WalletDialog: FC<{
 							id="name"
 							placeholder="Wallet Display Name"
 							value={wallet?.name ?? ""}
-							onChange={(e) => e.target.value && setWallet({ ...wallet, name: e.target.value })}
+							onChange={(e) => setWallet({ ...wallet, name: e.target.value })}
 						/>
 					</div>
 					<div className="grid w-full max-w-sm items-center gap-1.5">
@@ -54,7 +54,7 @@ export const WalletDialog: FC<{
 							id="logo"
 							placeholder="Logo URL (optional)"
 							value={wallet?.logoUrl ?? ""}
-							onChange={(e) => e.target.value && setWallet({ ...wallet, logoUrl: e.target.value })}
+							onChange={(e) => setWallet({ ...wallet, logoUrl: e.target.value })}
 						/>
 					</div>
 					<div className="grid w-full max-w-sm items-center gap-1.5">
@@ -63,7 +63,7 @@ export const WalletDialog: FC<{
 							id="url"
 							placeholder="Wallet URL"
 							value={wallet?.url ?? ""}
-							onChange={(e) => e.target.value && setWallet({ ...wallet, url: e.target.value })}
+							onChange={(e) => setWallet({ ...wallet, url: e.target.value })}
 						/>
 					</div>
 				</div>
