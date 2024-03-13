@@ -18,10 +18,14 @@ export const initWebmaxProvider = async () => {
 
 	const provider = createInjectableProvider();
 
+	//console.log("before", window.ethereum, window.ethereum?.providers);
+
 	Object.defineProperties(window, {
 		ethereum: { value: provider, configurable: false },
 		walletnext: { value: provider, configurable: false },
 	});
+
+	//console.log("after", window.ethereum, window.ethereum?.providers);
 
 	announceProvider({
 		info: {
