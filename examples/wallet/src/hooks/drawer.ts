@@ -10,7 +10,9 @@ export const useDrawer = () => {
 			else if (store.props) {
 				store.setDrawerProps({ ...props, previos: store.props });
 				store.setLock(false);
-			} else store.setDrawerProps(props);
+			} else {
+				setTimeout(() => store.setDrawerProps(props), 500);
+			}
 		},
 		[store.setDrawerProps, store.setLock, store.props],
 	);
@@ -25,5 +27,5 @@ export const useDrawer = () => {
 		else close();
 	}, [store.props?.previos, close, store.setDrawerProps]);
 
-	return { open, close, back };
+	return { open, close, back, props: store.props };
 };
