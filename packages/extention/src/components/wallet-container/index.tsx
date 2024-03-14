@@ -6,10 +6,6 @@ import { FC, useEffect, useRef } from "react";
 import { ethereumProvider, webmaxDappClient } from "walletnext/dapp";
 import { useConnectExtension } from "./useConnectExtension";
 
-window.addEventListener("message", (event) => {
-	console.log("Received message", event);
-});
-
 export const WalletContainer: FC<{
 	wallet: WebmaxWallet;
 	className?: string;

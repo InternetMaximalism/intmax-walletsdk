@@ -8,7 +8,7 @@ function App() {
 
 	const handleSignMessage = async () => {
 		const result = await signMessage();
-		console.log(result);
+		console.info(result);
 	};
 
 	return (

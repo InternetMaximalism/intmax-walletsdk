@@ -3,7 +3,7 @@ import { isConnected } from "@/lib/webmax";
 import { withResolvers } from "@/lib/withResolvers";
 import { useNetworksStore } from "@/stores/network";
 import { useWebmaxConnectionStore } from "@/stores/webmax";
-import { useLayoutEffect } from "react";
+import { useEffect } from "react";
 import { Address, Hash, Hex, LocalAccount, isAddressEqual } from "viem";
 import { DappMetadata } from "walletnext";
 import { webmaxWalletClient } from "walletnext/wallet";
@@ -13,20 +13,21 @@ import { useDrawer } from "./drawer";
 // Note: In an environment like NextJS, where SSRs can occur, a little ingenuity is required.
 
 export const useWebmax = () => {
-	const { open } = useDrawer();
+	const { open, props } = useDrawer();
 	const accounts = useAccounts();
 
 	const chains = useNetworksStore((state) => state.networks);
 	const { connections, setConnections } = useWebmaxConnectionStore();
 
-	useLayoutEffect(() => {
-		const webmax = webmaxWalletClient();
-
+	useEffect(() => {
 		const supportedChains = chains.map((chain) => `eip155:${chain.id}` as const);
 		const localAccounts = accounts.filter((account) => account.type === "local") as LocalAccount[];
 		const ethereumAccounts = localAccounts.map((account) => account.address);
 
 		if (!(localAccounts.length && supportedChains.length)) return;
+		if (props?.id === "onboarding") return;
+
+		const webmax = webmaxWalletClient();
 
 		webmax.on("webmax/webmax_ready", (c) => {
 			return c.success({
@@ -189,5 +190,5 @@ export const useWebmax = () => {
 		webmax.ready();
 
 		return () => webmax.destruct();
-	}, [chains, accounts, open, connections, setConnections]);
+	}, [chains, accounts, open, connections, setConnections, props]);
 };
