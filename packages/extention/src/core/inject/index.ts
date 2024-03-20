@@ -23,7 +23,7 @@ export const initWebmaxProvider = async () => {
 
 	Object.defineProperties(window, {
 		ethereum: { value: provider, configurable: false },
-		walletnext: { value: provider, configurable: false },
+		intmax: { value: provider, configurable: false },
 	});
 
 	//console.log("after", window.ethereum, window.ethereum?.providers);
@@ -32,7 +32,7 @@ export const initWebmaxProvider = async () => {
 		info: {
 			icon: WEMAX_WALLET_LOGO,
 			name: "INTMAX Wallet",
-			rdns: "io.webmax",
+			rdns: "io.intmax-walletsdk",
 			uuid: WEBMAX_WALLET_UUID,
 		},
 		provider,

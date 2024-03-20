@@ -1,8 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Network, WebmaxWallet } from "@/core/types";
+import { Network } from "@/core/types";
 import { useNetworksStore } from "@/popup/stores/network";
-import { useWalletStore } from "@/popup/stores/wallet";
 import { PlusCircle } from "lucide-react";
 import { SettingsHeader } from "../settings-header";
 import { NetworkDialog } from "./network-dialog";

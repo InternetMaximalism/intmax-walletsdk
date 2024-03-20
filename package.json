@@ -11,7 +11,7 @@
 		"format": "biome format . --write",
 		"lint": "biome check .",
 		"build": "pnpm -r --filter \"./packages/**\" run build",
-		"build:walletnext": "pnpm -r --filter \"./packages/webmax\" run build",
+		"build:sdk": "pnpm -r --filter \"./packages/intmax-walletsdk\" run build",
 		"typecheck": "pnpm -r --filter \"./packages/**\" run typecheck",
 		"prepare": "husky"
 	},

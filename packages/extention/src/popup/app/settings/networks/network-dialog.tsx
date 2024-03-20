@@ -3,7 +3,6 @@ import {
 	Dialog,
 	DialogClose,
 	DialogContent,
-	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
@@ -11,10 +10,10 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Network, WebmaxWallet } from "@/core/types";
+import { Network } from "@/core/types";
 import { cn } from "@/lib/utils";
+import { Namespace } from "intmax-walletsdk";
 import { FC, ReactNode, useState } from "react";
-import { Namespace } from "walletnext";
 
 export const NetworkDialog: FC<{
 	children: ReactNode;
