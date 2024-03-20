@@ -1,13 +1,13 @@
 import { EXTENSION_URL } from "@/constants";
 import { WebmaxWallet } from "@/core/types";
+import { intmaxDappClient } from "intmax-walletsdk/dapp";
 import { RefObject } from "react";
-import { webmaxDappClient } from "walletnext/dapp";
 
 export const connectExtension = async (params: { wallet: WebmaxWallet; ref: RefObject<HTMLIFrameElement> }) => {
 	const { wallet, ref } = params;
 	if (!ref.current?.contentWindow) return;
 
-	const client = webmaxDappClient({
+	const client = intmaxDappClient({
 		wallet: {
 			name: wallet.name,
 			url: wallet.url,

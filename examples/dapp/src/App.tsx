@@ -3,15 +3,15 @@ import { Input } from "@/components/ui/input";
 import { ethereumProvider, intmaxDappClient } from "intmax-walletsdk/dapp";
 import { useState } from "react";
 
-const DEFAULT_WALLET_URL = import.meta.env.VITE_WALLET_URL || "https://walletnext-wallet.vercel.app/";
+const DEFAULT_WALLET_URL = import.meta.env.VITE_WALLET_URL || " https://intmaxwallet-sdk-wallet.vercel.app/";
 const DEFAULT_DAPP_ICON = (import.meta.env.VITE_APP_ICON || `${window.location.origin}/vite.svg`) as string;
 const DAPP_METADATA = {
-	name: "Webmax Dapp Example",
-	description: "This is a simple example of how to use the webmax dapp client.",
+	name: "sdk Dapp Example",
+	description: "This is a simple example of how to use the sdk dapp client.",
 	icons: [DEFAULT_DAPP_ICON],
 };
 
-const createWebmax = (walletUrl: string) => {
+const createsdk = (walletUrl: string) => {
 	return intmaxDappClient({
 		wallet: { url: walletUrl, name: "DEMO Wallet", window: { mode: "iframe" } },
 		metadata: DAPP_METADATA,
@@ -21,7 +21,7 @@ const createWebmax = (walletUrl: string) => {
 
 function App() {
 	const [walletUrl, setWalletUrl] = useState(DEFAULT_WALLET_URL);
-	const [webmax, setWebmax] = useState(createWebmax(DEFAULT_WALLET_URL));
+	const [sdk, setsdk] = useState(createsdk(DEFAULT_WALLET_URL));
 
 	const [accounts, setAccounts] = useState<string[]>([]);
 	const [result, setResult] = useState<string>("");
@@ -30,11 +30,11 @@ function App() {
 	const handleUpdateWalletUrl = (url: string) => {
 		if (!isValidUrl) return;
 		setAccounts([]);
-		setWebmax(createWebmax(url));
+		setsdk(createsdk(url));
 	};
 
 	const handleConnect = async () => {
-		const ethereum = webmax.provider("eip155");
+		const ethereum = sdk.provider("eip155");
 		await ethereum.request({ method: "eth_requestAccounts", params: [] });
 		const accounts = (await ethereum.request({ method: "eth_accounts", params: [] })) as string[];
 		setAccounts(accounts);
@@ -43,9 +43,9 @@ function App() {
 	const handleSignMessage = async () => {
 		if (accounts.length === 0) await handleConnect();
 
-		const ethereum = webmax.provider("eip155");
+		const ethereum = sdk.provider("eip155");
 		const _accounts = (await ethereum.request({ method: "eth_accounts", params: [] })) as string[];
-		const result = await ethereum.request({ method: "eth_sign", params: [_accounts[0], "Hello Webmax"] });
+		const result = await ethereum.request({ method: "eth_sign", params: [_accounts[0], "Hello sdk"] });
 
 		setResult(result as string);
 	};
@@ -53,7 +53,7 @@ function App() {
 	const handleSendTransaction = async () => {
 		if (accounts.length === 0) await handleConnect();
 
-		const ethereum = webmax.provider("eip155");
+		const ethereum = sdk.provider("eip155");
 		const _accounts = (await ethereum.request({ method: "eth_accounts", params: [] })) as string[];
 		await ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x89" }] });
 		const result = await ethereum.request({
@@ -78,12 +78,12 @@ function App() {
 					{ name: "age", type: "uint256" },
 				],
 			},
-			domain: { name: "Webmax Dapp Example", version: "1" },
+			domain: { name: "sdk Dapp Example", version: "1" },
 			primaryType: "Person",
 			message: { name: "Bob", age: 25 },
 		};
 
-		const ethereum = await webmax.provider("eip155");
+		const ethereum = await sdk.provider("eip155");
 		const _accounts = (await ethereum.request({ method: "eth_accounts", params: [] })) as string[];
 		const result = await ethereum.request({
 			method: "eth_signTypedData_v4",
@@ -97,8 +97,8 @@ function App() {
 		<>
 			<div className="w-full max-w-screen-sm mx-auto px-4 py-12 space-y-8">
 				<div>
-					<div className="text-2xl font-semibold">Webmax Dapp Example</div>
-					<div className="text-muted-foreground">This is a simple example of how to use the webmax dapp client.</div>
+					<div className="text-2xl font-semibold">sdk Dapp Example</div>
+					<div className="text-muted-foreground">This is a simple example of how to use the sdk dapp client.</div>
 				</div>
 				<div className="space-y-1">
 					<div className="font-semibold text-lg">Wallet URL</div>
@@ -109,14 +109,14 @@ function App() {
 						</Button>
 					</div>
 					<div className="text-muted-foreground">
-						The webmax protocol allows you to connect to a wallet of any URL by specifying the wallet's URL!
+						The sdk protocol allows you to connect to a wallet of any URL by specifying the wallet's URL!
 					</div>
 				</div>
 				<div className="space-y-1">
 					<div className="font-semibold text-lg">Wallet URL</div>
 
 					<div className="text-muted-foreground">
-						Copy it or whatever, register the bookmarklet above, and WebmaxWallet is available everywhere!
+						Copy it or whatever, register the bookmarklet above, and sdkWallet is available everywhere!
 					</div>
 				</div>
 				<div className="gap-2 grid grid-cols-2">

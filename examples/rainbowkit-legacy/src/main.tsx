@@ -19,41 +19,41 @@ const additionalWallets = [
 	intmaxwalletsdk({
 		chains,
 		wallet: {
-			url: "https://webmax2-wallet.vercel.app",
+			url: "https://intmaxwallet-sdk-wallet.vercel.app/",
 			name: "IntmaxWalletSDK Demo",
-			iconUrl: "https://IntmaxWalletSDK-wallet.vercel.app/vite.svg",
+			iconUrl: "https://intmaxwallet-sdk-wallet.vercel.app/vite.svg",
 		},
 		metadata: {
-			name: "Rainbow-Kit Legacy Demo",
-			description: "Rainbow-Kit Legacy Demo",
-			icons: ["https://IntmaxWalletSDK-wallet.vercel.app/vite.svg"],
+			name: "Rainbow-Kit Demo",
+			description: "Rainbow-Kit Demo",
+			icons: ["https://intmaxwallet-sdk-wallet.vercel.app/vite.svg"],
 		},
 	}),
 	intmaxwalletsdk({
 		chains,
 		mode: "iframe",
 		wallet: {
-			url: "https://webmax2-wallet.vercel.app",
-			name: "IntmaxWalletSDK Demo - IFrame",
-			iconUrl: "https://IntmaxWalletSDK-wallet.vercel.app/vite.svg",
+			url: "https://intmaxwallet-sdk-wallet.vercel.app/",
+			name: "IntmaxWalletSDK Demo",
+			iconUrl: "https://intmaxwallet-sdk-wallet.vercel.app/vite.svg",
 		},
 		metadata: {
-			name: "Rainbow-Kit Legacy Demo",
-			description: "Rainbow-Kit Legacy Demo",
-			icons: ["https://IntmaxWalletSDK-wallet.vercel.app/vite.svg"],
+			name: "Rainbow-Kit Demo",
+			description: "Rainbow-Kit Demo",
+			icons: ["https://intmaxwallet-sdk-wallet.vercel.app/vite.svg"],
 		},
 	}),
 	intmaxwalletsdk({
 		chains,
 		wallet: {
-			url: "https://wallet.intmax.io",
-			name: "INTMAX Wallet",
-			iconUrl: "https://wallet.intmax.io/favicon.ico",
+			url: "https://intmaxwallet-sdk-wallet.vercel.app/",
+			name: "IntmaxWalletSDK Demo",
+			iconUrl: "https://intmaxwallet-sdk-wallet.vercel.app/vite.svg",
 		},
 		metadata: {
-			name: "Rainbow-Kit Legacy Demo",
-			description: "Rainbow-Kit Legacy Demo",
-			icons: ["https://IntmaxWalletSDK-wallet.vercel.app/vite.svg"],
+			name: "Rainbow-Kit Demo",
+			description: "Rainbow-Kit Demo",
+			icons: ["https://intmaxwallet-sdk-wallet.vercel.app/vite.svg"],
 		},
 	}),
 ];

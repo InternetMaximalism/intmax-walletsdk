@@ -3,18 +3,6 @@ import { Network, WebmaxWallet } from "./core/types";
 export const DEFAULT_WALLETS = [
 	{
 		type: "webmax",
-		name: "Local Wallet",
-		logoUrl: "http://localhost:5173/vite.svg",
-		url: "http://localhost:5173",
-	},
-	{
-		type: "webmax",
-		name: "Demo Wallet",
-		logoUrl: "https://walletnext-wallet.vercel.app/vite.svg",
-		url: "https://walletnext-wallet.vercel.app",
-	},
-	{
-		type: "webmax",
 		name: "INTMAX",
 		logoUrl: "https://wallet.intmax.io/icons/icon-512x512.png",
 		url: "https://wallet.intmax.io",

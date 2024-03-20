@@ -64,7 +64,7 @@ const OnboardingDrawer: FC<DrawerProps<"onboarding">> = ({ setLock }) => {
 			<DrawerHeader className="text-left">
 				<DrawerTitle>Welcome to Demo Wallet</DrawerTitle>
 				<DrawerDescription>
-					This is a demo wallet for Webmax.js.{" "}
+					This is a demo wallet for INTMAX WalletSDK{" "}
 					<span className="text-destructive font-semibold">Never put assets in it. </span>
 					There's also a DemoDapp that you can use.
 				</DrawerDescription>
