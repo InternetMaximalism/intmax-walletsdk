@@ -1,5 +1,5 @@
-import { AbstractResponse } from "walletnext";
-import { RpcProviderError } from "walletnext/dapp";
+import { AbstractResponse } from "intmax-walletsdk";
+import { RpcProviderError } from "intmax-walletsdk/dapp";
 
 export const throwOrResult = (response: AbstractResponse) => {
 	if ("error" in response) {

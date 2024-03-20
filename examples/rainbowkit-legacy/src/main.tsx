@@ -1,7 +1,7 @@
 import "@rainbow-me/rainbowkit/styles.css";
+import { intmaxwalletsdk } from "intmax-walletsdk/rainbowkit-legacy";
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { walletnext } from "walletnext/rainbowkit-legacy";
 import App from "./App";
 import "./global.css";
 
@@ -16,34 +16,34 @@ const { chains, publicClient } = configureChains(
 );
 
 const additionalWallets = [
-	walletnext({
+	intmaxwalletsdk({
 		chains,
 		wallet: {
 			url: "https://webmax2-wallet.vercel.app",
-			name: "WalletNext Demo",
-			iconUrl: "https://walletnext-wallet.vercel.app/vite.svg",
+			name: "IntmaxWalletSDK Demo",
+			iconUrl: "https://IntmaxWalletSDK-wallet.vercel.app/vite.svg",
 		},
 		metadata: {
 			name: "Rainbow-Kit Legacy Demo",
 			description: "Rainbow-Kit Legacy Demo",
-			icons: ["https://walletnext-wallet.vercel.app/vite.svg"],
+			icons: ["https://IntmaxWalletSDK-wallet.vercel.app/vite.svg"],
 		},
 	}),
-	walletnext({
+	intmaxwalletsdk({
 		chains,
 		mode: "iframe",
 		wallet: {
 			url: "https://webmax2-wallet.vercel.app",
-			name: "WalletNext Demo - IFrame",
-			iconUrl: "https://walletnext-wallet.vercel.app/vite.svg",
+			name: "IntmaxWalletSDK Demo - IFrame",
+			iconUrl: "https://IntmaxWalletSDK-wallet.vercel.app/vite.svg",
 		},
 		metadata: {
 			name: "Rainbow-Kit Legacy Demo",
 			description: "Rainbow-Kit Legacy Demo",
-			icons: ["https://walletnext-wallet.vercel.app/vite.svg"],
+			icons: ["https://IntmaxWalletSDK-wallet.vercel.app/vite.svg"],
 		},
 	}),
-	walletnext({
+	intmaxwalletsdk({
 		chains,
 		wallet: {
 			url: "https://wallet.intmax.io",
@@ -53,14 +53,14 @@ const additionalWallets = [
 		metadata: {
 			name: "Rainbow-Kit Legacy Demo",
 			description: "Rainbow-Kit Legacy Demo",
-			icons: ["https://walletnext-wallet.vercel.app/vite.svg"],
+			icons: ["https://IntmaxWalletSDK-wallet.vercel.app/vite.svg"],
 		},
 	}),
 ];
 
 const connectors = connectorsForWallets([
 	{
-		groupName: "WalletNext",
+		groupName: "IntmaxWalletSDK",
 		wallets: additionalWallets,
 	},
 ]);

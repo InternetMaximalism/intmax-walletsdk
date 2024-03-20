@@ -1,10 +1,10 @@
+import { WalletHost as Host, parseWalletHost } from "intmax-walletsdk";
 import { FC } from "react";
-import { WebmaxHost as Host, parseWebmaxHost } from "walletnext";
 
 export const WebmaxHost: FC<{
 	host: Host;
 }> = ({ host }) => {
-	const { origin, url } = parseWebmaxHost(host);
+	const { origin, url } = parseWalletHost(host);
 	const dappUrl = url ? url : origin;
 
 	return (

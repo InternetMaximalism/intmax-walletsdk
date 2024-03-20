@@ -1,7 +1,7 @@
 import { ENSAccount } from "@/lib/blockchain/ens";
 import { InternalTxRequest, Token } from "@/types";
+import { DappMetadata, WalletHost } from "intmax-walletsdk";
 import { Account, Hash, Hex } from "viem";
-import { DappMetadata, WebmaxHost } from "walletnext";
 import { create } from "zustand";
 
 export type DrawerPropsPattern =
@@ -54,7 +54,7 @@ export type DrawerPropsPattern =
 	  }
 	| {
 			id: "webmax-connect";
-			host: WebmaxHost;
+			host: WalletHost;
 			dappMetadata: DappMetadata;
 			onConnect: () => void;
 			onCancel: () => void;
