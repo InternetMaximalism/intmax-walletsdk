@@ -35,13 +35,11 @@ const main = async () => {
 	// @ts-ignore
 	window.ethereum.request = (params) => {
 		const result = provider.request(params);
-		console.info("Request", params, result);
 		return result;
 	};
 
 	// @ts-ignore
 	window.ethereum.on = (event, cb) => {
-		console.info("On", event);
 		return provider.on(event, cb);
 	};
 };

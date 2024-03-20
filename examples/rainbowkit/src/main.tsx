@@ -14,27 +14,27 @@ import { walletnext } from "walletnext/rainbowkit";
 const additionalWallets = [
 	walletnext({
 		wallet: {
-			url: "https://walletnext-wallet.vercel.app",
+			url: "https://webmax2-wallet.vercel.app",
 			name: "WalletNext Demo",
-			iconUrl: "https://walletnext-wallet.vercel.app/vite.svg",
+			iconUrl: "https://webmax2-wallet.vercel.app/vite.svg",
 		},
 		metadata: {
 			name: "Rainbow-Kit Demo",
 			description: "Rainbow-Kit Demo",
-			icons: ["https://walletnext-wallet.vercel.app/vite.svg"],
+			icons: ["https://webmax2-wallet.vercel.app/vite.svg"],
 		},
 	}),
 	walletnext({
 		mode: "iframe",
 		wallet: {
-			url: "https://walletnext-wallet.vercel.app",
+			url: "https://webmax2-wallet.vercel.app",
 			name: "WalletNext Demo - IFrame",
-			iconUrl: "https://walletnext-wallet.vercel.app/vite.svg",
+			iconUrl: "https://webmax2-wallet.vercel.app/vite.svg",
 		},
 		metadata: {
 			name: "Rainbow-Kit Demo",
 			description: "Rainbow-Kit Demo",
-			icons: ["https://walletnext-wallet.vercel.app/vite.svg"],
+			icons: ["https://webmax2-wallet.vercel.app/vite.svg"],
 		},
 	}),
 	walletnext({
@@ -46,7 +46,7 @@ const additionalWallets = [
 		metadata: {
 			name: "Rainbow-Kit Demo",
 			description: "Rainbow-Kit Demo",
-			icons: ["https://walletnext-wallet.vercel.app/vite.svg"],
+			icons: ["https://webmax2-wallet.vercel.app/vite.svg"],
 		},
 	}),
 ];

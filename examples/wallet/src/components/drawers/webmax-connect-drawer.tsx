@@ -3,9 +3,10 @@ import { FC } from "react";
 import { Button } from "../ui/button";
 import { DrawerClose, DrawerFooter, DrawerHeader, DrawerTitle } from "../ui/drawer";
 import { WebmaxDappInfo } from "../webmax-dappinfo";
+import { WebmaxHost } from "../webmax-host";
 
 const WebmaxConnectDrawer: FC<DrawerProps<"webmax-connect">> = ({
-	origin,
+	host,
 	dappMetadata,
 	onCancel,
 	onConnect,
@@ -23,17 +24,7 @@ const WebmaxConnectDrawer: FC<DrawerProps<"webmax-connect">> = ({
 			</DrawerHeader>
 			<div className="px-4 space-y-2">
 				<WebmaxDappInfo dappMetadata={dappMetadata} />
-				<div className="grid grid-cols-2 px-2 py-4 border rounded-md">
-					<div className="font-semibold">URL</div>
-					<a
-						href={origin}
-						target="_blank"
-						rel="noreferrer noopener"
-						className="text-right text-muted-foreground hover:underline underline-offset-2"
-					>
-						{origin}
-					</a>
-				</div>
+				<WebmaxHost host={host} />
 			</div>
 			<DrawerFooter className="grid grid-cols-2">
 				<DrawerClose asChild>

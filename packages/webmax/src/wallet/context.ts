@@ -1,5 +1,5 @@
 import { AbstractErrorResponse, AbstractRequest, AbstractSuccessResponse, WindowHandling } from "../types/messaging";
-import { AbstractMessageSchema, DappMetadata } from "../types/protocol";
+import { AbstractMessageSchema, DappMetadata, WebmaxHost } from "../types/protocol";
 import { parseChainedNamespace } from "../utils/parseChainedNamespace";
 
 export type WebmaxWalletContext<MethodSchema extends AbstractMessageSchema[number] = AbstractMessageSchema[number]> = {
@@ -9,7 +9,7 @@ export type WebmaxWalletContext<MethodSchema extends AbstractMessageSchema[numbe
 		chainId?: string;
 		params: MethodSchema["params"];
 		metadata?: DappMetadata;
-		origin: string | "internal";
+		host: WebmaxHost; // This is unique id for the dapp
 		raw: AbstractRequest;
 	};
 	window: (handling: WindowHandling) => void;
@@ -19,7 +19,7 @@ export type WebmaxWalletContext<MethodSchema extends AbstractMessageSchema[numbe
 
 export const createWebmaxWalletContext = <MethodSchema extends AbstractMessageSchema[number]>(
 	request: AbstractRequest,
-	origin: string,
+	host: WebmaxHost,
 ) => {
 	type Context = WebmaxWalletContext<MethodSchema>;
 	let windowHandling: WindowHandling = "close";
@@ -31,7 +31,7 @@ export const createWebmaxWalletContext = <MethodSchema extends AbstractMessageSc
 		method: request.method as Context["method"],
 		req: {
 			chainId,
-			origin,
+			host,
 			metadata: request.metadata as Context["req"]["metadata"],
 			params: request.params as Context["req"]["params"],
 			raw: request,

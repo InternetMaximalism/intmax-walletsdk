@@ -14,6 +14,7 @@ const WINDOW_WATCH_INTERVAL = 100;
 // biome-ignore lint/suspicious/noExplicitAny:
 const openWindow = (opt: WebmaxDappClientOptions<any, any>) => {
 	const { url, name, window: windowOpt } = opt.wallet;
+	invariant(!windowOpt?.mode || windowOpt?.mode !== "custom");
 	const height = windowOpt?.height || DEFAULT_WALLET_WINDOW_HEIGHT;
 	const width = windowOpt?.width || DEFAULT_WALLET_WINDOW_WIDTH;
 	const [top, left] = [window.screenY, window.screenX + window.innerWidth - width];
@@ -68,11 +69,6 @@ const _callRequest = (ref: WalletClientRef, opt: WebmaxDappClientOptions<any, an
 	}));
 
 	return Promise.race([promise, windowClosed]);
-};
-
-export const incrementId = (ref: WalletClientRef) => {
-	ref.id = ref.id ? ref.id + 1 : 1;
-	return ref.id;
 };
 
 export const callRequest = async (
