@@ -51,16 +51,6 @@ export type IntmaxMessageSchema = [
 		params?: undefined;
 		result: IntmaxConnectResult;
 	},
-	/**
-	 * @description Notice to dapp to close the window.
-	 */
-	{
-		type: "notice";
-		namespace: Namespaces["INTMAX"];
-		method: "webmax_closeWindow";
-		params?: undefined;
-		result: null;
-	},
 ];
 
 export type EthApprovalMessageSchema = [

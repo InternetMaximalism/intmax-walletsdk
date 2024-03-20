@@ -50,7 +50,7 @@ const _callRequest = (ref: WalletClientRef, opt: DappClientOptions<any, any>, me
 	ref.handshake && sendMessageOnce();
 	const listener = (event: MessageEvent) => {
 		if (event.source !== ref.window) return;
-		if (event.data.method === "webmax_ready") {
+		if (event.data.method === "intmax_ready") {
 			ref.handshake = event.data.result;
 			sendMessageOnce();
 		}

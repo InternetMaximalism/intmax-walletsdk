@@ -1,5 +1,5 @@
 export const WALLET_ACTION_METHODS = [
-	"webmax/webmax_connect",
+	"intmax/intmax_connect",
 	"eip155/eth_requestAccounts",
 	"eip155/eth_sign",
 	"eip155/eth_sendTransaction",

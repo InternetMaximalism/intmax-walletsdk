@@ -9,7 +9,7 @@ interface RainbowKitChain {
 	iconBackground?: string;
 }
 
-export type WalletNextOptions = {
+export type IntmaxWalletSDKOptions = {
 	chains?: (Chain & RainbowKitChain)[];
 	metadata?: DappMetadata;
 	wallet: { name?: string; url: string; iconUrl?: string };
@@ -17,7 +17,7 @@ export type WalletNextOptions = {
 	defaultChainId?: number;
 };
 
-export const intmaxwalletsdk = (options: WalletNextOptions) => ({
+export const intmaxwalletsdk = (options: IntmaxWalletSDKOptions) => ({
 	id: `intmax:${options.wallet.url}:${options.mode}`,
 	name: options.wallet.name || "INTMAX Wallet",
 	iconUrl: options.wallet.iconUrl ?? "",

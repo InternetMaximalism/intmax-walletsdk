@@ -26,14 +26,14 @@ const initialState: IntmaxDappState = {
 //TODO: Redesign
 export const createIntmaxDappStore = (storage: BaseStorage): IntmaxStateStore => {
 	const getState = async () => {
-		const state = await storage.get<IntmaxDappState>("webmax");
+		const state = await storage.get<IntmaxDappState>("intmax");
 		return state ?? initialState;
 	};
 
 	const setState = async (state: IntmaxDappState | ((state: IntmaxDappState) => IntmaxDappState)) => {
 		const currentState = await getState();
 		const newState = typeof state === "function" ? state(currentState) : state;
-		await storage.set("webmax", newState);
+		await storage.set("intmax", newState);
 	};
 
 	return {
