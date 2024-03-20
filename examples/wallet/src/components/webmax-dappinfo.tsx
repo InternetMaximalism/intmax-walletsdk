@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { DappMetadata } from "intmax-walletsdk";
 import { FC } from "react";
-import { DappMetadata } from "walletnext";
 
 export const WebmaxDappInfo: FC<{ dappMetadata: DappMetadata; size?: "sm" | "default" }> = ({
 	dappMetadata,

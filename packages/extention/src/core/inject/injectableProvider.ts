@@ -1,5 +1,5 @@
 import EventEmitter from "eventemitter3";
-import { EIP1193LikeProvider, RpcProviderError } from "walletnext/dapp";
+import { EIP1193LikeProvider, RpcProviderError } from "intmax-walletsdk/dapp";
 import { getSiteMetadata } from "../lib/getSiteMetadata";
 import { inpageMessaging } from "../messagings/inpage";
 

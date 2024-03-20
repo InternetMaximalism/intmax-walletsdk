@@ -35,7 +35,7 @@
 		"tailwind-merge": "^2.2.1",
 		"tailwindcss-animate": "^1.0.7",
 		"uuidv7": "^0.6.3",
-		"walletnext": "workspace:^",
+		"intmax-walletsdk": "workspace:^",
 		"zustand": "^4.5.0"
 	},
 	"devDependencies": {

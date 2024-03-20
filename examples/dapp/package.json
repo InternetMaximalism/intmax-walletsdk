@@ -17,7 +17,7 @@
 		"react-dom": "^18.2.0",
 		"tailwind-merge": "^2.2.1",
 		"tailwindcss-animate": "^1.0.7",
-		"walletnext": "workspace:^"
+		"intmax-walletsdk": "workspace:^"
 	},
 	"devDependencies": {
 		"@types/node": "^20.11.16",

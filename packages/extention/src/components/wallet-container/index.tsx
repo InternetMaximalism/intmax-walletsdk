@@ -2,8 +2,8 @@ import { popupMessaging } from "@/core/messagings/popup";
 import { WebmaxWallet } from "@/core/types";
 import { waitIframeWindowReady } from "@/lib/utils";
 import { useRequestStore } from "@/popup/stores/request";
+import { ethereumProvider, intmaxDappClient } from "intmax-walletsdk/dapp";
 import { FC, useEffect, useRef } from "react";
-import { ethereumProvider, webmaxDappClient } from "walletnext/dapp";
 import { useConnectExtension } from "./useConnectExtension";
 
 export const WalletContainer: FC<{
@@ -35,7 +35,7 @@ export const WalletContainer: FC<{
 
 			console.info("WalletContainer3", request);
 
-			const client = webmaxDappClient({
+			const client = intmaxDappClient({
 				wallet: {
 					name: wallet.name,
 					url: wallet.url,

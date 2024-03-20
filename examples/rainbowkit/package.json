@@ -15,7 +15,7 @@
 		"react-dom": "^18.2.0",
 		"viem": "~2.7.15",
 		"wagmi": "~2.5.7",
-		"walletnext": "workspace:^"
+		"intmax-walletsdk": "workspace:^"
 	},
 	"devDependencies": {
 		"@types/react": "^18.2.43",

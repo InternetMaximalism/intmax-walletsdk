@@ -9,13 +9,13 @@ import { http, WagmiProvider, createConfig } from "wagmi";
 import { arbitrum, mainnet, optimism, polygon } from "wagmi/chains";
 import App from "./App";
 
-import { walletnext } from "walletnext/rainbowkit";
+import { intmaxwalletsdk } from "intmax-walletsdk/rainbowkit";
 
 const additionalWallets = [
-	walletnext({
+	intmaxwalletsdk({
 		wallet: {
 			url: "https://webmax2-wallet.vercel.app",
-			name: "WalletNext Demo",
+			name: "IntmaxWalletSDK Demo",
 			iconUrl: "https://webmax2-wallet.vercel.app/vite.svg",
 		},
 		metadata: {
@@ -24,11 +24,11 @@ const additionalWallets = [
 			icons: ["https://webmax2-wallet.vercel.app/vite.svg"],
 		},
 	}),
-	walletnext({
+	intmaxwalletsdk({
 		mode: "iframe",
 		wallet: {
 			url: "https://webmax2-wallet.vercel.app",
-			name: "WalletNext Demo - IFrame",
+			name: "IntmaxWalletSDK Demo - IFrame",
 			iconUrl: "https://webmax2-wallet.vercel.app/vite.svg",
 		},
 		metadata: {
@@ -37,7 +37,7 @@ const additionalWallets = [
 			icons: ["https://webmax2-wallet.vercel.app/vite.svg"],
 		},
 	}),
-	walletnext({
+	intmaxwalletsdk({
 		wallet: {
 			url: "https://wallet.intmax.io",
 			name: "INTMAX Wallet",
@@ -62,7 +62,7 @@ const config = createConfig({
 	connectors: connectorsForWallets(
 		[
 			{
-				groupName: "WalletNext",
+				groupName: "IntmaxWalletSDK",
 				wallets: additionalWallets,
 			},
 		],

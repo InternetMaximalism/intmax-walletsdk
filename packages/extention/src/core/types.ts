@@ -1,4 +1,4 @@
-import { Namespace, WebmaxReadyResult } from "walletnext";
+import { IntmaxReadyResult, Namespace } from "intmax-walletsdk";
 
 export type SiteMetadata = { host: string; name: string; description: string; icons: string[] };
 
@@ -17,7 +17,7 @@ export type InjectedWallet = {
 
 export type WalletMetadata = {
 	url: string;
-} & WebmaxReadyResult;
+} & IntmaxReadyResult;
 
 export type Session = {
 	wallet: WebmaxWallet;

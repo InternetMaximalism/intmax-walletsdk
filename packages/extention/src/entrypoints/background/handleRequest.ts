@@ -14,8 +14,8 @@ import {
 	sessionsStorage,
 	walletMetadataStorage,
 } from "@/storage";
+import { RpcProviderError, WALLET_APPROVAL_METHODS } from "intmax-walletsdk/dapp";
 import { uuidv7 } from "uuidv7";
-import { RpcProviderError, WALLET_APPROVAL_METHODS } from "walletnext/dapp";
 import { browser } from "wxt/browser";
 
 const openPopupWindow = async () => {

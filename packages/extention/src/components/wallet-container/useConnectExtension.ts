@@ -2,8 +2,8 @@ import { EXTENSION_URL } from "@/constants";
 import { WebmaxWallet } from "@/core/types";
 import { waitIframeWindowReady } from "@/lib/utils";
 import { useWalletMetadataStore } from "@/popup/stores/wallet";
+import { intmaxDappClient } from "intmax-walletsdk/dapp";
 import { RefObject, useCallback } from "react";
-import { webmaxDappClient } from "walletnext/dapp";
 
 export const useConnectExtension = (wallet: WebmaxWallet, ref: RefObject<HTMLIFrameElement>) => {
 	const setMetadata = useWalletMetadataStore((state) => state.setMetadata);
@@ -16,7 +16,7 @@ export const useConnectExtension = (wallet: WebmaxWallet, ref: RefObject<HTMLIFr
 
 		console.info("WalletContainer connect2", wallet);
 
-		const client = webmaxDappClient({
+		const client = intmaxDappClient({
 			wallet: {
 				name: wallet.name,
 				url: wallet.url,

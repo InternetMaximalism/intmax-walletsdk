@@ -3,10 +3,10 @@ import { isConnected } from "@/lib/webmax";
 import { withResolvers } from "@/lib/withResolvers";
 import { useNetworksStore } from "@/stores/network";
 import { useWebmaxConnectionStore } from "@/stores/webmax";
+import { DappMetadata } from "intmax-walletsdk";
+import { intmaxWalletClient } from "intmax-walletsdk/wallet";
 import { useEffect } from "react";
 import { Address, Hash, Hex, LocalAccount, isAddressEqual } from "viem";
-import { DappMetadata } from "walletnext";
-import { webmaxWalletClient } from "walletnext/wallet";
 import { useAccounts } from "./account";
 import { useDrawer } from "./drawer";
 
@@ -27,22 +27,22 @@ export const useWebmax = () => {
 		if (!(localAccounts.length && supportedChains.length)) return;
 		if (props?.id === "onboarding") return;
 
-		const webmax = webmaxWalletClient();
+		const webmax = intmaxWalletClient();
 
-		webmax.on("webmax/webmax_ready", (c) => {
+		webmax.on("intmax/intmax_ready", (c) => {
 			return c.success({
-				supportedNamespaces: ["eip155", "webmax"],
+				supportedNamespaces: ["eip155", "intmax"],
 				supportedChains: supportedChains,
 			});
 		});
 
-		webmax.on("webmax/webmax_connect", async (c) => {
+		webmax.on("intmax/intmax_connect", async (c) => {
 			const [host, dappMetadata] = [c.req.host, c.req.metadata];
 			if (!dappMetadata) return c.failure("Invalid metadata", { code: 4001 });
 
 			if (isConnected(c, connections)) {
 				return c.success({
-					supportedNamespaces: ["eip155", "webmax"],
+					supportedNamespaces: ["eip155", "intmax"],
 					supportedChains: supportedChains,
 					accounts: { eip155: ethereumAccounts },
 				});
@@ -54,10 +54,10 @@ export const useWebmax = () => {
 
 			try {
 				await promise;
-				setConnections((connections) => [...connections, { host, namespaces: ["eip155", "webmax"] }]);
+				setConnections((connections) => [...connections, { host, namespaces: ["eip155", "intmax"] }]);
 
 				return c.success({
-					supportedNamespaces: ["eip155", "webmax"],
+					supportedNamespaces: ["eip155", "intmax"],
 					supportedChains: supportedChains,
 					accounts: { eip155: ethereumAccounts },
 				});
