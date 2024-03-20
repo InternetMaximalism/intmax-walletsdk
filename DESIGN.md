@@ -1,4 +1,4 @@
-# INTMAX Wallet SDK Protocol Proposal
+# INTMAX WalletSDK Protocol Proposal
 
 Wallet Connect with Web Wallets and more
 
@@ -201,7 +201,7 @@ The naming "readonly" may change in the future.
 
 ## Note: EIP1193 Event Handling
 
-Due to its specificity, the INTMAXWallet SDK protocol finds it difficult to transmit events. Therefore, it is assumed that EIP1193 events will be resolved by the SDK on the dapp side.
+Due to its specificity, the INTMAX WalletSDK protocol finds it difficult to transmit events. Therefore, it is assumed that EIP1193 events will be resolved by the SDK on the dapp side.
 
 ## Use Cases
 
