@@ -4,7 +4,7 @@ import { createInjectableProvider } from "./injectableProvider";
 
 declare global {
 	interface Window {
-		ethereum: EIP1193Provider;
+		ethereum: EIP1193Provider & { providers: EIP1193Provider[] };
 		webmax_ext: EIP1193Provider;
 	}
 }
@@ -18,8 +18,11 @@ export const initWebmaxProvider = async () => {
 	if (!shouldInject()) return;
 
 	const provider = createInjectableProvider();
+	const providers = window.ethereum?.providers ? [...window.ethereum.providers, provider] : [provider];
 
-	//console.log("before", window.ethereum, window.ethereum?.providers);
+	Object.defineProperties(provider, {
+		providers: { value: providers, configurable: true },
+	});
 
 	Object.defineProperties(window, {
 		ethereum: { value: provider, configurable: false },
