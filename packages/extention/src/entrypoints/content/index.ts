@@ -10,6 +10,8 @@ export default defineContentScript({
 		inpageMessaging.onMessage("request", ({ data }) => contentMessaging.sendMessage("request", data));
 		contentMessaging.onEvent("onEvent", ({ data }) => inpageMessaging.sendEvent("onEvent", data));
 
+		inpageMessaging.sendEvent("onReady", true);
+
 		if (navigator.userAgent.toLowerCase().includes("firefox")) {
 			const container = document.head || document.documentElement;
 			const script = document.createElement("script");
