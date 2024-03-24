@@ -11,10 +11,7 @@ export const useConnectExtension = (wallet: WebmaxWallet, ref: RefObject<HTMLIFr
 	const connect = useCallback(async () => {
 		if (!ref.current?.contentWindow) return;
 
-		console.info("WalletContainer connect", wallet);
 		await waitIframeWindowReady(ref.current);
-
-		console.info("WalletContainer connect2", wallet);
 
 		const client = intmaxDappClient({
 			wallet: {
@@ -27,7 +24,6 @@ export const useConnectExtension = (wallet: WebmaxWallet, ref: RefObject<HTMLIFr
 
 		const result = await client.connect();
 
-		console.info("WalletContainer connect3", result);
 		const metadata = { ...result, url: wallet.url };
 		setMetadata(wallet, metadata);
 	}, [wallet, setMetadata, ref]);
