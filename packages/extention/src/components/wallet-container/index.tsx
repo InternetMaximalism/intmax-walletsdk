@@ -1,3 +1,4 @@
+import { handleAdditionalStorageRequest } from "@/core/additional-storage";
 import { popupMessaging } from "@/core/messagings/popup";
 import { WebmaxWallet } from "@/core/types";
 import { waitIframeWindowReady } from "@/lib/utils";
@@ -17,7 +18,16 @@ export const WalletContainer: FC<{
 
 	const request = requests?.[wallet.url];
 
-	console.info("WalletContainer", request);
+	// For Beta feature (Used by Intmax Wallet)
+	useEffect(() => {
+		const listener = async (event: MessageEvent) => {
+			if (event.source !== ref.current?.contentWindow) return;
+			const result = await handleAdditionalStorageRequest(event);
+			if (result) ref.current?.contentWindow?.postMessage(result, event.origin);
+		};
+		window.addEventListener("message", listener);
+		return () => window.removeEventListener("message", listener);
+	}, []);
 
 	useEffect(() => {
 		if (!(ref.current?.contentWindow && request)) return;
@@ -27,13 +37,8 @@ export const WalletContainer: FC<{
 		approvingRequestsRef.current.add(request.id);
 
 		(async () => {
-			console.info("WalletContainer1", request);
 			await connect().then(() => new Promise((resolve) => setTimeout(resolve, 500)));
-			console.info("WalletContainer2", request);
-
 			await waitIframeWindowReady(iframe);
-
-			console.info("WalletContainer3", request);
 
 			const client = intmaxDappClient({
 				wallet: {
@@ -48,11 +53,7 @@ export const WalletContainer: FC<{
 			const provider = await client.provider("eip155");
 			await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: request.chainId }] });
 
-			console.info("WalletContainer4", request);
 			const result = await provider.request({ method: request.method, params: request.params });
-
-			console.info("WalletContainer5", result);
-
 			await popupMessaging.sendMessage("onResult", { id: request.id, result });
 		})().catch((error) => {
 			console.error("WalletContainer error", error);
