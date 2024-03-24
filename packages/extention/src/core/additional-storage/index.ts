@@ -33,15 +33,15 @@ export const handleAdditionalStorageRequest = async (event: MessageEvent) => {
 	try {
 		if (!(request?.type && request?.data)) return;
 		if (request.type === "additional-storage-get") {
-			const value = await storage.getItem(`local:${event.origin}:${request.data.key}`);
+			const value = await storage.getItem(`local:/${event.origin}/${request.data.key}/`);
 			return { id: request.id, type: request.type, data: { success: true, value } };
 		}
 		if (request.type === "additional-storage-set") {
-			await storage.setItem(`local:${event.origin}:${request.data.key}`, request.data.value);
+			await storage.setItem(`local:/${event.origin}/${request.data.key}/`, request.data.value);
 			return { id: request.id, type: request.type, data: { success: true } };
 		}
 		if (request.type === "additional-storage-remove") {
-			await storage.removeItem(`local:${event.origin}:${request.data.key}`);
+			await storage.removeItem(`local:/${event.origin}/${request.data.key}/`);
 			return { id: request.id, type: request.type, data: { success: true } };
 		}
 	} catch (e) {
