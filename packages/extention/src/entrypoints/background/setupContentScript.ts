@@ -5,7 +5,7 @@ export const setupContentScript = async () => {
 	const inpageRegisteredContentScript = registeredContentScripts.find((cs) => cs.id === "inpage");
 	try {
 		if (!(inpageRegisteredContentScript || navigator.userAgent.toLowerCase().includes("firefox"))) {
-			chrome.scripting.registerContentScripts([
+			await chrome.scripting.registerContentScripts([
 				{
 					id: "inpage",
 					matches: ["file://*/*", "http://*/*", "https://*/*"],
