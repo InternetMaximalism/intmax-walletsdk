@@ -14,6 +14,7 @@ export default defineConfig({
 				matches: ["<all_urls>"],
 			},
 		],
+		host_permissions: ["<all_urls>"],
 		// content_security_policy: {
 		// 	extension_pages: "frame-ancestors 'none'; script-src 'self'; object-src 'self'; connect-src 'self'",
 		// },
