@@ -10,7 +10,7 @@ import { NetworkDialog } from "./network-dialog";
 function NetworkSettingsPage() {
 	const networks = useNetworksStore((state) => state.networks);
 	const setNetworks = useNetworksStore((state) => state.setNetworks);
-	const settings = useSettingsStore((state) => state.settings);
+	const isTestMode = useSettingsStore((state) => state.isTestMode);
 
 	const handleNetworkChange = (network: Network | null) => {
 		if (network) {
@@ -27,7 +27,7 @@ function NetworkSettingsPage() {
 			<SettingsHeader backTo="/" title="Manage Networks" />
 			<div className="grid p-2 gap-2">
 				{networks
-					?.filter((network) => settings?.isTestMode || !network.isTestMode)
+					?.filter((network) => isTestMode || !network.isTestMode)
 					.map((network) => (
 						<div key={network.namespace + network.chainId} className="flex items-center gap-2 p-2 overflow-x-hidden">
 							<div>

@@ -10,7 +10,7 @@ import { WalletDialog } from "./wallet-dialog";
 function WalletSettingsPage() {
 	const wallets = useWalletStore((state) => state.wallets);
 	const setWallets = useWalletStore((state) => state.setWallets);
-	const settings = useSettingsStore((state) => state.settings);
+	const isTestMode = useSettingsStore((state) => state.isTestMode);
 
 	const handleWalletChange = (before: WebmaxWallet | null, wallet: WebmaxWallet | null) => {
 		if (!wallet) return;
@@ -29,7 +29,7 @@ function WalletSettingsPage() {
 			<div className="grid p-2 gap-2">
 				<h3 className="text-lg font-semibold">Webmax Wallets</h3>
 				{wallets
-					?.filter((wallet) => settings?.isTestMode || !wallet.isTestMode)
+					?.filter((wallet) => isTestMode || !wallet.isTestMode)
 					.map((wallet) => (
 						<div key={wallet.url} className="flex items-center gap-2 p-2 overflow-x-hidden">
 							<div>

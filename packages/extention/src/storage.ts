@@ -31,7 +31,3 @@ export const openingPopupWindowStorage = storage.defineItem<{
 } | null>("session:openingPopupWindow", {
 	defaultValue: null,
 });
-
-export const popupSettingsStorage = storage.defineItem<PopupSettings>("local:popupSettings", {
-	defaultValue: { isTestMode: false },
-});
