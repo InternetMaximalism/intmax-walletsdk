@@ -32,6 +32,9 @@ export const HomeHeader = () => {
 						<DropdownMenuItem asChild>
 							<Link to="/settings/networks">Networks</Link>
 						</DropdownMenuItem>
+						<DropdownMenuItem asChild>
+							<Link to="/settings/other">Settings</Link>
+						</DropdownMenuItem>
 					</DropdownMenuGroup>
 				</DropdownMenuContent>
 			</DropdownMenu>

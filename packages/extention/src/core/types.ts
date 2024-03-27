@@ -7,6 +7,7 @@ export type WebmaxWallet = {
 	name: string;
 	logoUrl: string | null;
 	url: string;
+	isTestMode?: boolean;
 };
 
 export type InjectedWallet = {
@@ -34,6 +35,7 @@ export type Network = {
 	chainId: number;
 	name?: string;
 	logoUrl?: string;
+	isTestMode?: boolean;
 	httpRpcUrl: string;
 };
 
@@ -58,4 +60,8 @@ export type RequestResult<T = unknown> = {
 	id: string;
 	result?: T;
 	error?: { message: string; code: number };
+};
+
+export type PopupSettings = {
+	isTestMode: boolean;
 };

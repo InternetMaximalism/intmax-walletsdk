@@ -7,6 +7,20 @@ export const DEFAULT_WALLETS = [
 		logoUrl: "https://wallet.intmax.io/icons/icon-512x512.png",
 		url: "https://wallet.intmax.io",
 	},
+	{
+		type: "webmax",
+		name: "DEMO Wallet",
+		logoUrl: "https://intmaxwallet-sdk-wallet.vercel.app/vite.svg",
+		url: "https://intmaxwallet-sdk-wallet.vercel.app/",
+		isTestMode: true,
+	},
+	{
+		type: "webmax",
+		name: "localhost:5173",
+		logoUrl: null,
+		url: "http://localhost:5173",
+		isTestMode: true,
+	},
 ] satisfies WebmaxWallet[];
 
 export const DEFAULT_NETWORKS = [
@@ -30,6 +44,37 @@ export const DEFAULT_NETWORKS = [
 		name: "Arbitrum",
 		logoUrl: "https://ankrscan.io/assets/blockchains/arbitrum.svg",
 		httpRpcUrl: "https://rpc.ankr.com/arbitrum",
+	},
+	{
+		namespace: "eip155",
+		chainId: 10,
+		name: "Optimism",
+		logoUrl: "https://ankrscan.io/assets/blockchains/optimism.svg",
+		httpRpcUrl: "https://rpc.ankr.com/optimism",
+	},
+	{
+		namespace: "eip155",
+		chainId: 11155111,
+		name: "Sepolia",
+		logoUrl: "https://ankrscan.io/assets/blockchains/eth.svg",
+		httpRpcUrl: "https://rpc.sepolia.org",
+		isTestMode: true,
+	},
+	{
+		namespace: "eip155",
+		chainId: 80001,
+		name: "Matic Mumbai",
+		logoUrl: "https://ankrscan.io/assets/blockchains/polygon.svg",
+		httpRpcUrl: "https://rpc.ankr.com/polygon_mumbai",
+		isTestMode: true,
+	},
+	{
+		namespace: "eip155",
+		chainId: 80001,
+		name: "Arbitrum Sepolia",
+		logoUrl: "https://ankrscan.io/assets/blockchains/arbitrum.svg",
+		httpRpcUrl: "https://sepolia-rollup.arbitrum.io/rpc",
+		isTestMode: true,
 	},
 ] satisfies Network[];
 

@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { useSettingsStore } from "@/popup/stores/settings";
 import { useWalletStore } from "@/popup/stores/wallet";
 import { CheckIcon, ChevronDown, PlusCircleIcon } from "lucide-react";
 import { FC, useState } from "react";
@@ -21,6 +22,7 @@ export const WalletSwitcher: FC = () => {
 	const current = useWalletStore((state) => state.current);
 	const wallets = useWalletStore((state) => state.wallets);
 	const setCurrent = useWalletStore((state) => state.setCurrent);
+	const settings = useSettingsStore((state) => state.settings);
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -40,7 +42,7 @@ export const WalletSwitcher: FC = () => {
 						<CommandInput placeholder="Search team..." />
 						<CommandEmpty>No results found.</CommandEmpty>
 						<CommandGroup heading="Wallets">
-							{(wallets || []).map((wallet) => (
+							{(wallets?.filter((wallet) => settings?.isTestMode || !wallet.isTestMode) || []).map((wallet) => (
 								<CommandItem key={wallet?.url} className="text-sm overflow-hidden" onSelect={() => setCurrent(wallet)}>
 									<Avatar className="mr-2 h-5 w-5">
 										{wallet?.logoUrl && <AvatarImage src={wallet.logoUrl} />}
