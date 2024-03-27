@@ -2,7 +2,7 @@ import { defineBackground } from "wxt/sandbox";
 import { startHandleRequest } from "./handleRequest";
 import { setupContentScript } from "./setupContentScript";
 
-export default defineBackground(async () => {
+export default defineBackground(() => {
 	startHandleRequest();
-	await setupContentScript();
+	setupContentScript();
 });

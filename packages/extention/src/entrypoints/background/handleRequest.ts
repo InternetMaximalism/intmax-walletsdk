@@ -22,7 +22,10 @@ const openPopupWindow = async () => {
 	const openingPopup = await openingPopupWindowStorage.getValue();
 	if (openingPopup) {
 		const existingTab = await browser.windows.get(openingPopup.tabId).catch(() => null);
-		if (existingTab) return await browser.windows.update(openingPopup.tabId, { focused: true });
+		if (existingTab) {
+			await browser.windows.update(openingPopup.tabId, { focused: true });
+			return existingTab;
+		}
 		await openingPopupWindowStorage.setValue(null);
 	}
 
@@ -37,6 +40,7 @@ const openPopupWindow = async () => {
 	});
 	if (!window.id) throw new Error("No window id");
 	await openingPopupWindowStorage.setValue({ tabId: window.id });
+	return window;
 };
 
 const closePopupWindow = async () => {
@@ -64,37 +68,51 @@ const getHttpRpcClient = async (chainId: number) => {
 };
 
 const walletRequest = async <T = unknown>(wallet: WebmaxWallet, data: SiteRequest, chainId?: string) => {
-	await openPopupWindow();
-	await Promise.all(walletRequestQueues.get(wallet.url) ?? []);
-	await openPopupWindow();
-
 	const { promise, resolve } = withResolvers<true>();
-	if (!walletRequestQueues.has(wallet.url)) walletRequestQueues.set(wallet.url, []);
-	walletRequestQueues.get(wallet.url)?.push(promise);
+	const removePromise = () =>
+		walletRequestQueues.set(wallet.url, walletRequestQueues.get(wallet.url)?.filter((p) => p !== promise) ?? []);
 
-	const { namespace, metadata, method, params } = data;
-	const id = uuidv7();
-	const request = { id, namespace, wallet, metadata, method, params, chainId };
+	try {
+		await openPopupWindow();
+		await Promise.all(walletRequestQueues.get(wallet.url) ?? []);
+		const window = await openPopupWindow();
 
-	const existingRequest = await pendingRequestStorage.getValue();
-	await pendingRequestStorage.setValue({ ...existingRequest, [wallet.url]: request });
+		if (!walletRequestQueues.has(wallet.url)) walletRequestQueues.set(wallet.url, []);
+		walletRequestQueues.get(wallet.url)?.push(promise);
 
-	const response = await new Promise<RequestResult<T>>((resolve) => {
-		listeners.set(id, async (result) => resolve(result as RequestResult<T>));
-	});
+		const { namespace, metadata, method, params } = data;
+		const id = uuidv7();
+		const request = { id, namespace, wallet, metadata, method, params, chainId };
 
-	const pendingRequest = await pendingRequestStorage.getValue();
-	const { [wallet.url]: _, ...rest } = pendingRequest;
-	await pendingRequestStorage.setValue(rest);
+		const existingRequest = await pendingRequestStorage.getValue();
+		await pendingRequestStorage.setValue({ ...existingRequest, [wallet.url]: request });
 
-	resolve(true);
-	walletRequestQueues.set(wallet.url, walletRequestQueues.get(wallet.url)?.filter((p) => p !== promise) ?? []);
-	setTimeout(() => {
-		if (walletRequestQueues.get(wallet.url)?.length === 0) closePopupWindow();
-	}, 300);
+		const response = await new Promise<RequestResult<T>>((resolve, reject) => {
+			listeners.set(id, async (result) => resolve(result as RequestResult<T>));
+			browser.windows.onRemoved.addListener((tabId) => {
+				if (tabId !== window.id) return;
+				reject(new RpcProviderError("User closed the window", 4900));
+			});
+		});
 
-	if (response.error) throw new RpcProviderError(response.error.message, response.error.code);
-	return response.result as T;
+		const pendingRequest = await pendingRequestStorage.getValue();
+		const { [wallet.url]: _, ...rest } = pendingRequest;
+		await pendingRequestStorage.setValue(rest);
+
+		resolve(true);
+		removePromise();
+		setTimeout(() => {
+			if (walletRequestQueues.get(wallet.url)?.length === 0) closePopupWindow();
+		}, 300);
+
+		if (response.error) throw new RpcProviderError(response.error.message, response.error.code);
+		return response.result as T;
+	} catch (e) {
+		removePromise();
+		const error = e as RpcProviderError;
+		if ("code" in error && "message" in error) throw error;
+		throw new RpcProviderError(String(e), 500);
+	}
 };
 
 const emitEvent = async (tabId: number, event: string, data: unknown) => {
