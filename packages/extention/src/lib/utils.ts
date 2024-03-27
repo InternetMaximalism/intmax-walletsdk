@@ -16,10 +16,16 @@ export const withResolvers = <T = void, E = unknown>() => {
 };
 
 export const waitIframeWindowReady = async (iframe: HTMLIFrameElement) => {
+	const contentWindow = iframe.contentWindow;
+	if (!contentWindow) throw new Error("Iframe content window is not ready");
+
 	try {
-		iframe?.contentWindow?.origin;
+		contentWindow?.origin;
 		await new Promise((resolve) => iframe?.addEventListener("load", resolve));
-	} catch {}
+		return contentWindow as Window;
+	} catch {
+		return contentWindow as Window;
+	}
 };
 
 export const normalizeChainId = (chainId: string | number) => {
