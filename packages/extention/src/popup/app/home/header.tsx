@@ -27,7 +27,7 @@ export const HomeHeader = () => {
 					<DropdownMenuSeparator />
 					<DropdownMenuGroup>
 						<DropdownMenuItem asChild>
-							<Link to="/settings/wallet">Wallets</Link>
+							<Link to="/settings/wallets">Wallets</Link>
 						</DropdownMenuItem>
 						<DropdownMenuItem asChild>
 							<Link to="/settings/networks">Networks</Link>

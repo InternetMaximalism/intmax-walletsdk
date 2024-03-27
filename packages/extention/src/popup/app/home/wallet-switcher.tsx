@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { useWalletStore } from "@/popup/stores/wallet";
 import { CheckIcon, ChevronDown, PlusCircleIcon } from "lucide-react";
 import { FC, useState } from "react";
+import { Link } from "react-router-dom";
 
 export const WalletSwitcher: FC = () => {
 	const [open, setOpen] = useState(false);
@@ -59,10 +60,12 @@ export const WalletSwitcher: FC = () => {
 					<CommandSeparator />
 					<CommandList>
 						<CommandGroup>
-							<CommandItem>
-								<PlusCircleIcon className="mr-2 h-5 w-5" />
-								Create new
-							</CommandItem>
+							<Link to="/settings/wallets">
+								<CommandItem>
+									<PlusCircleIcon className="mr-2 h-5 w-5" />
+									Create new
+								</CommandItem>{" "}
+							</Link>
 						</CommandGroup>
 					</CommandList>
 				</Command>
