@@ -7,6 +7,8 @@ export default defineConfig({
 	vite: () => ({ plugins: [react()] }),
 	imports: false,
 	manifest: {
+		name: "INTMAX Wallet",
+		version: "1.0.0",
 		permissions: ["activeTab", "scripting", "storage", "tabs", "unlimitedStorage"],
 		web_accessible_resources: [
 			{
@@ -15,8 +17,5 @@ export default defineConfig({
 			},
 		],
 		host_permissions: ["<all_urls>"],
-		// content_security_policy: {
-		// 	extension_pages: "frame-ancestors 'none'; script-src 'self'; object-src 'self'; connect-src 'self'",
-		// },
 	},
 });
