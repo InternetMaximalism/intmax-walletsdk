@@ -3,15 +3,7 @@ import { Switch } from "@/components/ui/switch";
 import { useSettingsStore } from "@/popup/stores/settings";
 import { SettingsHeader } from "../settings-header";
 
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectLabel,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 function OtherSettingsPage() {
 	const { isTestMode, setTestMode, theme, setTheme } = useSettingsStore();
