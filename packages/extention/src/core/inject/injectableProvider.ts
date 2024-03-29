@@ -15,7 +15,9 @@ export const createInjectableProvider = (): EIP1193LikeProvider => {
 		await waitForReady;
 		const { method, params } = args;
 		const metadata = await getSiteMetadata();
+		method !== "eth_call" && console.log("args", args.method, args.params);
 		const response = await inpageMessaging.sendMessage("request", { metadata, namespace: "eip155", method, params });
+		method !== "eth_call" && console.log("response", args.method, response);
 		if (response.error) throw new RpcProviderError(response.error.message, response.error.code);
 		return response.result;
 	};
