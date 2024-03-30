@@ -29,14 +29,6 @@
 			"types": "./dist/types/dapp/index.d.ts",
 			"import": "./dist/esm/dapp/index.js"
 		},
-		"./wagmi-legacy": {
-			"types": "./dist/types/plugins/wagmi-v1/index.d.ts",
-			"import": "./dist/esm/plugins/wagmi-v1/index.js"
-		},
-		"./rainbowkit-legacy": {
-			"types": "./dist/types/plugins/rainbowkit-v1/index.d.ts",
-			"import": "./dist/esm/plugins/rainbowkit-v1/index.js"
-		},
 		"./wagmi": {
 			"types": "./dist/types/plugins/wagmi-v2/index.d.ts",
 			"import": "./dist/esm/plugins/wagmi-v2/index.js"
@@ -51,25 +43,19 @@
 			"types": ["./dist/types/index.d.ts"],
 			"wallet": ["./dist/types/wallet/index.d.ts"],
 			"dapp": ["./dist/types/dapp/index.d.ts"],
-			"wagmi-legacy": ["./dist/types/plugins/wagmi-v1/index.d.ts"],
-			"rainbowkit-legacy": ["./dist/types/plugins/rainbowkit-v1/index.d.ts"],
 			"wagmi": ["./dist/types/plugins/wagmi-v2/index.d.ts"],
 			"rainbowkit": ["./dist/types/plugins/rainbowkit-v2/index.d.ts"]
 		}
 	},
 	"peerDependencies": {
-		"rainbowkit-v2": "npm:@rainbow-me/rainbowkit@2.x",
-		"wagmi-v1": "npm:wagmi@1.x",
-		"wagmi-v2": "npm:wagmi@2.x"
+		"rainbowkit": "^2.0.0",
+		"wagmi": "^2.0.0"
 	},
 	"peerDependenciesMeta": {
-		"wagmi-v1": {
+		"wagmi": {
 			"optional": true
 		},
-		"wagmi-v2": {
-			"optional": true
-		},
-		"rainbowkit-v2": {
+		"rainbowkit": {
 			"optional": true
 		}
 	},
@@ -80,16 +66,14 @@
 		"esbuild": "^0.20.0",
 		"esbuild-svelte": "^0.8.0",
 		"glob": "^10.3.10",
-		"rainbowkit-v2": "npm:@rainbow-me/rainbowkit@^2.0.1",
 		"svelte-check": "^3.6.4",
 		"svelte-preprocess": "^5.1.3",
 		"tslib": "^2.6.2",
 		"tsx": "^4.7.1",
-		"viem": "^2.7.15",
-		"wagmi-v1": "npm:wagmi@^1.4.13",
-		"wagmi-v2": "npm:wagmi@^2.5.7"
+		"viem": "^2.7.15"
 	},
 	"dependencies": {
+		"@rainbow-me/rainbowkit": "^2.0.4",
 		"eventemitter3": "^5.0.1",
 		"svelte": "^4.2.11"
 	}
