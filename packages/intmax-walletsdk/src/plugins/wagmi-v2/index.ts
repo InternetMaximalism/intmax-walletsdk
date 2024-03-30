@@ -8,8 +8,7 @@ import {
 	getAddress,
 	numberToHex,
 } from "viem";
-import { ChainNotConfiguredError } from "wagmi-v1";
-import { createConnector, normalizeChainId } from "wagmi-v2";
+import { ChainNotConfiguredError, createConnector } from "wagmi";
 import { ethereumProvider, intmaxDappClient } from "../../dapp";
 import { DappMetadata } from "../../types/protocol";
 
@@ -103,7 +102,7 @@ export function intmaxwalletsdk(parameters: IntmaxWalletSDKParameters) {
 				const provider = await this.getProvider();
 
 				const chain = config.chains.find((x) => x.id === chainId);
-				if (!chain) throw new SwitchChainError(new ChainNotConfiguredError({ chainId }));
+				if (!chain) throw new SwitchChainError(new ChainNotConfiguredError());
 
 				try {
 					await Promise.all([
@@ -131,7 +130,7 @@ export function intmaxwalletsdk(parameters: IntmaxWalletSDKParameters) {
 			async getChainId() {
 				const provider = await this.getProvider();
 				const chainId = await provider.request({ method: "eth_chainId" });
-				return normalizeChainId(chainId);
+				return Number(chainId);
 			},
 			async getProvider() {
 				return provider;
@@ -148,14 +147,14 @@ export function intmaxwalletsdk(parameters: IntmaxWalletSDKParameters) {
 				await config.storage?.removeItem(`${this.id}.disconnected`);
 			},
 			async onChainChanged(chain) {
-				const chainId = normalizeChainId(chain);
+				const chainId = Number(chain);
 				config.emitter.emit("change", { chainId });
 			},
 			async onConnect(connectInfo) {
 				const accounts = await this.getAccounts();
 				if (accounts.length === 0) return;
 
-				const chainId = normalizeChainId(connectInfo.chainId);
+				const chainId = Number(connectInfo.chainId);
 				config.emitter.emit("connect", { accounts, chainId });
 
 				const provider = await this.getProvider();

@@ -10,10 +10,7 @@ function App() {
 	const handleSignMessage = async () => {
 		await signMessage(
 			{ message: "Hello, World!" },
-			{
-				onSuccess: setSignature,
-				onError: (error) => setError(error.message),
-			},
+			{ onSuccess: setSignature, onError: (error) => setError(error.message) },
 		);
 	};
 

@@ -1,6 +1,6 @@
-import { Wallet } from "rainbowkit-v2";
+import { Wallet } from "@rainbow-me/rainbowkit";
 import { DappMetadata } from "src";
-import { createConnector } from "wagmi-v2";
+import { createConnector } from "wagmi";
 import { intmaxwalletsdk as intmaxwalletsdkConnector } from "../wagmi-v2";
 
 export type IntmaxWalletSDKOptions = {
