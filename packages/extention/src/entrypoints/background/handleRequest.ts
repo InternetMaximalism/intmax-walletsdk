@@ -129,6 +129,8 @@ const emitEvent = async (tabId: number, event: string, data: unknown) => {
 	await contentMessaging.sendEvent("onEvent", { event, data }, tabId);
 };
 
+const ethRequestAccountsCache: Map<string, string[]> = new Map();
+
 export const startHandleRequest = () => {
 	currentWebmaxWalletStorage.watch(async (wallet) => {
 		const tabs = await browser.tabs.query({ active: true });
@@ -229,8 +231,12 @@ export const startHandleRequest = () => {
 				return { result: null };
 			}
 			if (method === "eth_requestAccounts") {
+				const cacheKey = `${sender.tab?.id}-${currentWallet.url}`;
+				if (sender.tab?.id && ethRequestAccountsCache.has(cacheKey))
+					return { result: ethRequestAccountsCache.get(cacheKey) };
 				const result = await walletRequest<string[]>(currentWallet, data, normalizeChainId(await _getChainId()));
 				await updateAccounts(result);
+				ethRequestAccountsCache.set(cacheKey, result);
 				return { result };
 			}
 			if (WALLET_APPROVAL_METHODS.includes(method)) {
