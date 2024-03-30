@@ -69,8 +69,10 @@ const getHttpRpcClient = async (chainId: number) => {
 
 const walletRequest = async <T = unknown>(wallet: WebmaxWallet, data: SiteRequest, chainId?: string) => {
 	const { promise, resolve } = withResolvers<true>();
-	const removePromise = () =>
+	const popThis = () => {
+		resolve(true);
 		walletRequestQueues.set(wallet.url, walletRequestQueues.get(wallet.url)?.filter((p) => p !== promise) ?? []);
+	};
 
 	try {
 		await openPopupWindow();
@@ -99,8 +101,7 @@ const walletRequest = async <T = unknown>(wallet: WebmaxWallet, data: SiteReques
 		const { [wallet.url]: _, ...rest } = pendingRequest;
 		await pendingRequestStorage.setValue(rest);
 
-		resolve(true);
-		removePromise();
+		popThis();
 		setTimeout(() => {
 			if (walletRequestQueues.get(wallet.url)?.length === 0) closePopupWindow();
 		}, 300);
@@ -108,7 +109,7 @@ const walletRequest = async <T = unknown>(wallet: WebmaxWallet, data: SiteReques
 		if (response.error) throw new RpcProviderError(response.error.message, response.error.code);
 		return response.result as T;
 	} catch (e) {
-		removePromise();
+		popThis();
 		const error = e as RpcProviderError;
 		if ("code" in error && "message" in error) throw error;
 		throw new RpcProviderError(String(e), 500);
@@ -187,10 +188,8 @@ export const startHandleRequest = () => {
 			};
 
 			const _getChainId = async () => {
-				const [session, walletMetadata] = [await getSession(), await getWalletMetadata()];
+				const session = await getSession();
 				if (session?.chainIds[namespace]) return session?.chainIds[namespace];
-				const supportedEthChains = walletMetadata?.supportedChains.filter((c) => c.startsWith("eip155"));
-				if (supportedEthChains) return Number(supportedEthChains[0].split(":")[1]);
 				return 1;
 			};
 

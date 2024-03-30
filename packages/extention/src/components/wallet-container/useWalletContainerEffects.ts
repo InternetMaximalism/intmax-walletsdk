@@ -4,7 +4,6 @@ import { WebmaxWallet } from "@/core/types";
 import { useRequestStore } from "@/popup/stores/request";
 import { useWalletMetadataStore } from "@/popup/stores/wallet";
 import { useEffect, useRef } from "react";
-import { connectWallet } from "./walletConnection";
 import { handleWalletRequest } from "./walletRequestHandler";
 
 export function useWalletContainerEffects(wallet: WebmaxWallet, iframeRef: React.RefObject<HTMLIFrameElement>) {
@@ -31,15 +30,9 @@ export function useWalletContainerEffects(wallet: WebmaxWallet, iframeRef: React
 		if (approvingRequestsRef.current.has(request.id)) return;
 		approvingRequestsRef.current.add(request.id);
 
-		const connect = async () => {
-			if (!iframeRef.current) return;
-			const result = await connectWallet(wallet, iframeRef.current);
-			setMetadata(wallet, { ...result, url: wallet.url });
-		};
-
-		handleWalletRequest(wallet, request, connect, iframeRef.current).catch((error) => {
+		handleWalletRequest(wallet, request, iframeRef.current).catch((error) => {
 			console.error("WalletContainer error", error);
 			popupMessaging.sendMessage("onResult", { id: request.id, error });
 		});
-	}, [wallet, request, iframeRef, setMetadata]);
+	}, [wallet, request, iframeRef]);
 }
