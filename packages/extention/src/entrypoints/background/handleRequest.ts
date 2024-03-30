@@ -48,6 +48,7 @@ const closePopupWindow = async () => {
 	if (!openingPopup) return;
 	await browser.windows.remove(openingPopup.tabId);
 	await openingPopupWindowStorage.setValue(null);
+	await popupMessaging.sendEvent("reloadPopup", true);
 };
 
 const clients = new Map<number, HttpJsonRpcClient>();
@@ -69,18 +70,28 @@ const getHttpRpcClient = async (chainId: number) => {
 
 const walletRequest = async <T = unknown>(wallet: WebmaxWallet, data: SiteRequest, chainId?: string) => {
 	const { promise, resolve } = withResolvers<true>();
-	const popThis = () => {
+
+	const next = async () => {
+		const existing = walletRequestQueues.get(wallet.url);
+		walletRequestQueues.set(wallet.url, existing?.filter((p) => p !== promise) ?? []);
+
+		const pendingRequest = await pendingRequestStorage.getValue();
+		const { [wallet.url]: _, ...rest } = pendingRequest;
+		await pendingRequestStorage.setValue(rest);
 		resolve(true);
-		walletRequestQueues.set(wallet.url, walletRequestQueues.get(wallet.url)?.filter((p) => p !== promise) ?? []);
+
+		setTimeout(() => {
+			if (walletRequestQueues.get(wallet.url)?.length === 0) closePopupWindow();
+		}, 300);
 	};
 
 	try {
-		await openPopupWindow();
-		await Promise.all(walletRequestQueues.get(wallet.url) ?? []);
-		const window = await openPopupWindow();
-
+		const wating = Promise.all(walletRequestQueues.get(wallet.url) ?? []);
 		if (!walletRequestQueues.has(wallet.url)) walletRequestQueues.set(wallet.url, []);
 		walletRequestQueues.get(wallet.url)?.push(promise);
+		await wating;
+
+		const window = await openPopupWindow();
 
 		const { namespace, metadata, method, params } = data;
 		const id = uuidv7();
@@ -101,15 +112,12 @@ const walletRequest = async <T = unknown>(wallet: WebmaxWallet, data: SiteReques
 		const { [wallet.url]: _, ...rest } = pendingRequest;
 		await pendingRequestStorage.setValue(rest);
 
-		popThis();
-		setTimeout(() => {
-			if (walletRequestQueues.get(wallet.url)?.length === 0) closePopupWindow();
-		}, 300);
+		await next();
 
 		if (response.error) throw new RpcProviderError(response.error.message, response.error.code);
 		return response.result as T;
 	} catch (e) {
-		popThis();
+		await next();
 		const error = e as RpcProviderError;
 		if ("code" in error && "message" in error) throw error;
 		throw new RpcProviderError(String(e), 500);
@@ -159,11 +167,6 @@ export const startHandleRequest = () => {
 
 			const currentWallet = await currentWebmaxWalletStorage.getValue();
 			if (!currentWallet) throw new Error("No wallet found");
-
-			const getWalletMetadata = async () => {
-				const walletMetadata = await walletMetadataStorage.getValue();
-				return walletMetadata?.find((w) => w.url === currentWallet.url);
-			};
 
 			const getSession = async () => {
 				const sessions = await sessionsStorage.getValue();
