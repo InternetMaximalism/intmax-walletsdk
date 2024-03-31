@@ -1,15 +1,14 @@
 import { handleAdditionalStorageRequest } from "@/core/additional-storage";
 import { popupMessaging } from "@/core/messagings/popup";
-import { PendingRequest, WebmaxWallet } from "@/core/types";
+import { WebmaxWallet } from "@/core/types";
 import { useRequestStore } from "@/popup/stores/request";
 import { useWalletMetadataStore } from "@/popup/stores/wallet";
 import { useEffect, useRef } from "react";
-import { connectWallet } from "./walletConnection";
 import { handleWalletRequest } from "./walletRequestHandler";
 
 export function useWalletContainerEffects(wallet: WebmaxWallet, iframeRef: React.RefObject<HTMLIFrameElement>) {
 	const requests = useRequestStore((state) => state.pendingRequest);
-	const approvingRequestsRef = useRef<null | PendingRequest>(null);
+	const approvingRequestsRef = useRef<Set<string>>(new Set());
 	const setMetadata = useWalletMetadataStore((state) => state.setMetadata);
 
 	const request = requests?.[wallet.url];
@@ -28,19 +27,12 @@ export function useWalletContainerEffects(wallet: WebmaxWallet, iframeRef: React
 	useEffect(() => {
 		if (!(iframeRef.current?.contentWindow && request)) return;
 
-		if (approvingRequestsRef.current) return;
-		approvingRequestsRef.current = request;
+		if (approvingRequestsRef.current.has(request.id)) return;
+		approvingRequestsRef.current.add(request.id);
 
-		const connect = async () => {
-			if (!iframeRef.current) return;
-			const result = await connectWallet(wallet, iframeRef.current);
-			setMetadata(wallet, { ...result, url: wallet.url });
-		};
-
-		handleWalletRequest(wallet, request, connect, iframeRef.current).catch((error) => {
+		handleWalletRequest(wallet, request, iframeRef.current).catch((error) => {
 			console.error("WalletContainer error", error);
-			approvingRequestsRef.current = null;
 			popupMessaging.sendMessage("onResult", { id: request.id, error });
 		});
-	}, [wallet, request, iframeRef, setMetadata]);
+	}, [wallet, request, iframeRef]);
 }

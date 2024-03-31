@@ -16,6 +16,7 @@ export const createInjectableProvider = (): EIP1193LikeProvider => {
 		const { method, params } = args;
 		const metadata = await getSiteMetadata();
 		const response = await inpageMessaging.sendMessage("request", { metadata, namespace: "eip155", method, params });
+
 		if (response.error) throw new RpcProviderError(response.error.message, response.error.code);
 		return response.result;
 	};
