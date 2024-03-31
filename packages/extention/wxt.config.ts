@@ -8,7 +8,7 @@ export default defineConfig({
 	imports: false,
 	manifest: {
 		name: "INTMAX Wallet",
-		version: "1.0.0",
+		version: "1.0.2",
 		permissions: ["activeTab", "scripting", "storage", "tabs", "unlimitedStorage"],
 		web_accessible_resources: [
 			{
