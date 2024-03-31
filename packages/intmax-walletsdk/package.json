@@ -48,7 +48,7 @@
 		}
 	},
 	"peerDependencies": {
-		"rainbowkit": "^2.0.0",
+		"@rainbow-me/rainbowkit": "^2.0.0",
 		"wagmi": "^2.0.0"
 	},
 	"peerDependenciesMeta": {
