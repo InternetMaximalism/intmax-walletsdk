@@ -21,9 +21,30 @@ export const createInjectableProvider = (): EIP1193LikeProvider => {
 		return response.result;
 	};
 
+	const enable = () => request({ method: "eth_requestAccounts" });
+	const send = (methodOrPayload: unknown, paramsOrCb: unknown) => {
+		if (typeof methodOrPayload === "string") return request({ method: methodOrPayload, params: paramsOrCb });
+		return request(methodOrPayload as { method: string; params: unknown }).then(
+			paramsOrCb as (result: unknown) => void,
+		);
+	};
+	const sendAsync = async (payload: unknown, cb: (error: unknown, result: unknown) => void) => {
+		const { method, params, ...rest } = payload as { method: string; params: unknown };
+		try {
+			const result = await request({ method, params });
+			cb(null, { ...rest, method, result });
+		} catch (e) {
+			const error = e as Error;
+			cb(error, { ...rest, method, error });
+		}
+	};
+
 	return {
 		isMetaMask: true,
 		request,
+		enable,
+		send,
+		sendAsync,
 		on: (event, cb) => emitter.on(event, cb),
 		removeListener: (event, cb) => emitter.removeListener(event, cb),
 		providers: undefined,
