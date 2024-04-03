@@ -30,17 +30,19 @@ const openPopupWindow = async () => {
 	}
 
 	const currentWindow = await browser.windows.getCurrent();
-	const window = await browser.windows.create({
+	const popup = await browser.windows.create({
 		url: browser.runtime.getURL("/popup.html?create=true"),
 		type: "panel",
 		height: POPUP_SIZE.height + 28,
 		width: POPUP_SIZE.width,
-		left: (currentWindow.left ?? 0) + (currentWindow.width ? currentWindow.width - currentWindow.width : 0),
-		top: currentWindow.top ?? 0,
+		left:
+			(currentWindow.width ? (currentWindow.left ?? 0) + currentWindow.width : window.screen.availWidth) -
+			POPUP_SIZE.width,
+		top: (currentWindow.top ?? 0) + 100,
 	});
-	if (!window.id) throw new Error("No window id");
-	await openingPopupWindowStorage.setValue({ tabId: window.id });
-	return window;
+	if (!popup.id) throw new Error("No window id");
+	await openingPopupWindowStorage.setValue({ tabId: popup.id });
+	return popup;
 };
 
 const closePopupWindow = async () => {
