@@ -1,4 +1,4 @@
-import { Network, PendingRequest, Session, WalletMetadata, WebmaxWallet } from "@/core/types";
+import { Network, PendingRequest, PopupSettings, Session, WalletMetadata, WebmaxWallet } from "@/core/types";
 import { storage } from "wxt/storage";
 import { DEFAULT_NETWORKS, DEFAULT_WALLETS } from "./constants";
 

@@ -19,17 +19,9 @@ export const initWebmaxProvider = async () => {
 
 	const provider = createInjectableProvider();
 	const providers = window.ethereum?.providers ? [...window.ethereum.providers, provider] : [provider];
-
 	Object.defineProperties(provider, {
 		providers: { value: providers, configurable: true },
 	});
-
-	Object.defineProperties(window, {
-		ethereum: { value: provider, configurable: false },
-		intmax: { value: provider, configurable: false },
-	});
-
-	//console.log("after", window.ethereum, window.ethereum?.providers);
 
 	announceProvider({
 		info: {
@@ -40,6 +32,19 @@ export const initWebmaxProvider = async () => {
 		},
 		provider,
 	});
+
+	try {
+		Object.defineProperties(window, {
+			ethereum: { value: provider, configurable: false },
+			intmax: { value: provider, configurable: false },
+		});
+	} catch (e) {
+		// @ts-ignore - this is a hack to avoid the error
+		window.ethereum = provider;
+	}
+
+	// @ts-ignore
+	window.web3 = { currentProvider: provider };
 
 	window.dispatchEvent(new Event("ethereum#initialized"));
 };

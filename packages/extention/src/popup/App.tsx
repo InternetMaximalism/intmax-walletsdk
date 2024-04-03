@@ -5,6 +5,7 @@ import GlobalLayout from "./app/layout";
 const HomePage = lazy(() => import("./app/home"));
 const WalletSettingsPage = lazy(() => import("./app/settings/wallets"));
 const NetworksSettingsPage = lazy(() => import("./app/settings/networks"));
+const OtherSettingsPage = lazy(() => import("./app/settings/other"));
 
 const router = createHashRouter([
 	{
@@ -12,8 +13,9 @@ const router = createHashRouter([
 		element: <GlobalLayout />,
 		children: [
 			{ path: "/", element: <HomePage /> },
-			{ path: "/settings/wallet", element: <WalletSettingsPage /> },
+			{ path: "/settings/wallets", element: <WalletSettingsPage /> },
 			{ path: "/settings/networks", element: <NetworksSettingsPage /> },
+			{ path: "/settings/other", element: <OtherSettingsPage /> },
 		],
 	},
 ]);

@@ -22,7 +22,10 @@ const openPopupWindow = async () => {
 	const openingPopup = await openingPopupWindowStorage.getValue();
 	if (openingPopup) {
 		const existingTab = await browser.windows.get(openingPopup.tabId).catch(() => null);
-		if (existingTab) return await browser.windows.update(openingPopup.tabId, { focused: true });
+		if (existingTab) {
+			await browser.windows.update(openingPopup.tabId, { focused: true });
+			return existingTab;
+		}
 		await openingPopupWindowStorage.setValue(null);
 	}
 
@@ -37,6 +40,7 @@ const openPopupWindow = async () => {
 	});
 	if (!window.id) throw new Error("No window id");
 	await openingPopupWindowStorage.setValue({ tabId: window.id });
+	return window;
 };
 
 const closePopupWindow = async () => {
@@ -44,6 +48,7 @@ const closePopupWindow = async () => {
 	if (!openingPopup) return;
 	await browser.windows.remove(openingPopup.tabId);
 	await openingPopupWindowStorage.setValue(null);
+	await popupMessaging.sendEvent("reloadPopup", true);
 };
 
 const clients = new Map<number, HttpJsonRpcClient>();
@@ -64,43 +69,67 @@ const getHttpRpcClient = async (chainId: number) => {
 };
 
 const walletRequest = async <T = unknown>(wallet: WebmaxWallet, data: SiteRequest, chainId?: string) => {
-	await openPopupWindow();
-	await Promise.all(walletRequestQueues.get(wallet.url) ?? []);
-	await openPopupWindow();
-
 	const { promise, resolve } = withResolvers<true>();
-	if (!walletRequestQueues.has(wallet.url)) walletRequestQueues.set(wallet.url, []);
-	walletRequestQueues.get(wallet.url)?.push(promise);
 
-	const { namespace, metadata, method, params } = data;
-	const id = uuidv7();
-	const request = { id, namespace, wallet, metadata, method, params, chainId };
+	const next = async () => {
+		const existing = walletRequestQueues.get(wallet.url);
+		walletRequestQueues.set(wallet.url, existing?.filter((p) => p !== promise) ?? []);
 
-	const existingRequest = await pendingRequestStorage.getValue();
-	await pendingRequestStorage.setValue({ ...existingRequest, [wallet.url]: request });
+		const pendingRequest = await pendingRequestStorage.getValue();
+		const { [wallet.url]: _, ...rest } = pendingRequest;
+		await pendingRequestStorage.setValue(rest);
+		resolve(true);
 
-	const response = await new Promise<RequestResult<T>>((resolve) => {
-		listeners.set(id, async (result) => resolve(result as RequestResult<T>));
-	});
+		setTimeout(() => {
+			if (walletRequestQueues.get(wallet.url)?.length === 0) closePopupWindow();
+		}, 300);
+	};
 
-	const pendingRequest = await pendingRequestStorage.getValue();
-	const { [wallet.url]: _, ...rest } = pendingRequest;
-	await pendingRequestStorage.setValue(rest);
+	try {
+		const wating = Promise.all(walletRequestQueues.get(wallet.url) ?? []);
+		if (!walletRequestQueues.has(wallet.url)) walletRequestQueues.set(wallet.url, []);
+		walletRequestQueues.get(wallet.url)?.push(promise);
+		await wating;
 
-	resolve(true);
-	walletRequestQueues.set(wallet.url, walletRequestQueues.get(wallet.url)?.filter((p) => p !== promise) ?? []);
-	setTimeout(() => {
-		if (walletRequestQueues.get(wallet.url)?.length === 0) closePopupWindow();
-	}, 300);
+		const window = await openPopupWindow();
 
-	if (response.error) throw new RpcProviderError(response.error.message, response.error.code);
-	return response.result as T;
+		const { namespace, metadata, method, params } = data;
+		const id = uuidv7();
+		const request = { id, namespace, wallet, metadata, method, params, chainId };
+
+		const existingRequest = await pendingRequestStorage.getValue();
+		await pendingRequestStorage.setValue({ ...existingRequest, [wallet.url]: request });
+
+		const response = await new Promise<RequestResult<T>>((resolve, reject) => {
+			listeners.set(id, async (result) => resolve(result as RequestResult<T>));
+			browser.windows.onRemoved.addListener((tabId) => {
+				if (tabId !== window.id) return;
+				reject(new RpcProviderError("User closed the window", 4900));
+			});
+		});
+
+		const pendingRequest = await pendingRequestStorage.getValue();
+		const { [wallet.url]: _, ...rest } = pendingRequest;
+		await pendingRequestStorage.setValue(rest);
+
+		await next();
+
+		if (response.error) throw new RpcProviderError(response.error.message, response.error.code);
+		return response.result as T;
+	} catch (e) {
+		await next();
+		const error = e as RpcProviderError;
+		if ("code" in error && "message" in error) throw error;
+		throw new RpcProviderError(String(e), 500);
+	}
 };
 
 const emitEvent = async (tabId: number, event: string, data: unknown) => {
 	console.info("Emitting event", event, data, tabId);
 	await contentMessaging.sendEvent("onEvent", { event, data }, tabId);
 };
+
+const ethRequestAccountsCache: Map<string, string[]> = new Map();
 
 export const startHandleRequest = () => {
 	currentWebmaxWalletStorage.watch(async (wallet) => {
@@ -141,11 +170,6 @@ export const startHandleRequest = () => {
 			const currentWallet = await currentWebmaxWalletStorage.getValue();
 			if (!currentWallet) throw new Error("No wallet found");
 
-			const getWalletMetadata = async () => {
-				const walletMetadata = await walletMetadataStorage.getValue();
-				return walletMetadata?.find((w) => w.url === currentWallet.url);
-			};
-
 			const getSession = async () => {
 				const sessions = await sessionsStorage.getValue();
 				let session = sessions?.find((s) => s.wallet.url === currentWallet.url && s.host === metadata.host);
@@ -169,10 +193,8 @@ export const startHandleRequest = () => {
 			};
 
 			const _getChainId = async () => {
-				const [session, walletMetadata] = [await getSession(), await getWalletMetadata()];
+				const session = await getSession();
 				if (session?.chainIds[namespace]) return session?.chainIds[namespace];
-				const supportedEthChains = walletMetadata?.supportedChains.filter((c) => c.startsWith("eip155"));
-				if (supportedEthChains) return Number(supportedEthChains[0].split(":")[1]);
 				return 1;
 			};
 
@@ -209,8 +231,12 @@ export const startHandleRequest = () => {
 				return { result: null };
 			}
 			if (method === "eth_requestAccounts") {
+				const cacheKey = `${sender.tab?.id}-${currentWallet.url}`;
+				if (sender.tab?.id && ethRequestAccountsCache.has(cacheKey))
+					return { result: ethRequestAccountsCache.get(cacheKey) };
 				const result = await walletRequest<string[]>(currentWallet, data, normalizeChainId(await _getChainId()));
 				await updateAccounts(result);
+				ethRequestAccountsCache.set(cacheKey, result);
 				return { result };
 			}
 			if (WALLET_APPROVAL_METHODS.includes(method)) {
