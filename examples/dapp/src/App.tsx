@@ -13,7 +13,7 @@ const DAPP_METADATA = {
 
 const createsdk = (walletUrl: string) => {
 	return intmaxDappClient({
-		wallet: { url: walletUrl, name: "DEMO Wallet", window: { mode: "iframe" } },
+		wallet: { url: walletUrl, name: "DEMO Wallet", window: { mode: "popup" } },
 		metadata: DAPP_METADATA,
 		providers: { eip155: ethereumProvider() },
 	});
