@@ -88,7 +88,7 @@ const buildContext = await context({
 	platform: "node",
 	bundle: true,
 	outbase: "./src",
-	outdir: "./dist",
+	outdir: "./dist/esm",
 	format: "esm",
 	plugins: [addExtension(".js"), sveltePlugin],
 });
