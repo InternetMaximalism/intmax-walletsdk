@@ -1,7 +1,7 @@
 {
 	"name": "intmax-walletsdk",
 	"description": "intmax-walletsdk is a implementation of the INTMAX Wallet SDK protocol for Dapp and Wallet",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"keywords": ["wallet", "dapp", "web3", "web-wallet", "ethereum", "intmax"],
 	"author": "Aoi Kimura <aoi.kimura@intmax.io>",
 	"license": "MIT",
