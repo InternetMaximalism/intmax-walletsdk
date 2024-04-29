@@ -56,14 +56,41 @@ const sveltePlugin: Plugin = {
 		});
 	},
 };
+const addExtension = (extension = ".js", fileExtension = ".ts"): Plugin => ({
+	name: "add-extension",
+	setup(build: PluginBuild) {
+		build.onResolve({ filter: /.*/ }, (args) => {
+			if (args.importer) {
+				const p = path.join(args.resolveDir, args.path);
+				let tsPath = `${p}${fileExtension}`;
+
+				let importPath = "";
+				if (path.basename(args.importer).split(".")[0] === args.path) {
+					importPath = args.path;
+				} else if (fs.existsSync(tsPath)) {
+					importPath = args.path + extension;
+				} else {
+					tsPath = path.join(args.resolveDir, args.path, `index${fileExtension}`);
+					if (fs.existsSync(tsPath)) {
+						importPath = `${args.path}/index${extension}`;
+					}
+				}
+
+				return { path: importPath, external: true };
+			}
+		});
+	},
+});
 
 const buildContext = await context({
 	entryPoints,
+	logLevel: "info",
+	platform: "node",
+	bundle: true,
 	outbase: "./src",
 	outdir: "./dist/esm",
 	format: "esm",
-	logLevel: "info",
-	plugins: [sveltePlugin],
+	plugins: [addExtension(".js"), sveltePlugin],
 });
 
 if (isWatch) {
