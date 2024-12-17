@@ -7,6 +7,11 @@ INTMAX WalletSDK is a protocol and SDK for connecting Web Wallets with Dapps.
 This SDK is for dapp and wallet to interact with each other using the INTMAX WalletSDK.
 For more information on the protocol, See [DESIGN.md](./DESIGN.md).
 
+## Documentation Links
+
+- [SDK API Reference](https://intmax-wallet.gitbook.io/intmax-walletsdk)
+- [INTMAX Wallet Chrome Extension](https://chromewebstore.google.com/detail/intmax-wallet/dhbodocklcdelmbmpaicgedbpncpacnk)
+
 ## Demo URL
 
 - [Dapp Example](https://intmaxwallet-sdk-dapp.vercel.app/)
